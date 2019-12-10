@@ -1,0 +1,16 @@
+<style>
+
+</style>
+
+<template>
+    <text>收藏</text>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class Home extends wepy.page {
+        config = {
+            navigationBarTitleText: '收藏'
+        };
+    }
+</script>

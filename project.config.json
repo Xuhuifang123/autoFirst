@@ -1,0 +1,16 @@
+{
+	"description": "汽势小程序测试页面",
+	"setting": {
+		"urlCheck": true, //不检查安全域名
+		"es6": false,     //关闭ES6转ES5
+		"postcss": false, //关闭上传代码时样式自动补全
+		"minified": false //关闭代码压缩上传
+	},
+	"compileType": "miniprogram",
+	"appid": "wx7c269387e7968d97",
+	"projectname": "autofirst",
+	"miniprogramRoot": "dist/",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {}
+}

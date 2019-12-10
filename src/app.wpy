@@ -1,0 +1,102 @@
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/home/index',
+      "pages/home/home",
+      "pages/home/my",
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      color: "#666666",
+      selectedColor: "#2674FF",
+      backgroundColor: "#ffffff",
+      borderStyle: "black",
+      list: [
+        {
+          pagePath: "pages/home/index",
+          text: "首页",
+          iconPath: "../src/images/home_my1.png",
+          selectedIconPath: "../src/images/home_my2.png"
+        },
+        {
+          pagePath: "pages/home/home",
+          text: "收藏",
+          iconPath: "../src/images/home_my1.png",
+          selectedIconPath: "../src/images/home_my2.png"
+        },
+        {
+          pagePath: "pages/home/my",
+          text: "我的",
+          iconPath: "../src/images/home_news1.png",
+          selectedIconPath: "../src/images/home_news2.png"
+        }
+      ]
+    },
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  constructor () {
+    super()
+    // this.use('requestfix')
+    this.use('promisify')
+  }
+
+  onLaunch() {
+    this.testAsync()
+  }
+
+  sleep (s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  async testAsync () {
+    const data = await this.sleep(3)
+    console.log(data)
+  }
+
+  getUserInfo(cb) {
+    const that = this
+    if (this.globalData.userInfo) {
+      return this.globalData.userInfo
+    }
+    wepy.getUserInfo({
+      success (res) {
+        that.globalData.userInfo = res.userInfo
+        cb && cb(res.userInfo)
+      }
+    })
+  }
+}
+</script>
+<style lang="less">
+  .container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+</style>

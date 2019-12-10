@@ -1,0 +1,97 @@
+<template>
+    <view class="wrap">
+        <scroll-view
+            @scroll="handleScroll"
+            @scrolltoupper="upper"
+            @scrolltolower="loadMore"
+            scroll-top="{{scrollTop}}"
+            scroll-y
+            scroll-with-animation="{{true}}"
+            class='wrapSroll'>
+            <Menu @tabClick.user="tabChange"></Menu>
+            <view class="content">
+            <Column 
+                :colType="columnType" 
+                :colType.sync="columnType"
+                :colPage="columnPage"
+                :colPage.sync="columnPage"></Column>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import Menu from '../../components/menu';
+    import Column from '../../components/column';
+    export default class Index extends wepy.page {
+        customData = {}  // 自定义数据
+        customFunction ()　{}  //自定义方法
+
+        onLoad () {}  // 在Page和Component共用的生命周期函数
+
+        onShow () {}  // 只在Page中存在的页面生命周期函数
+        // 只在Page实例中存在的配置数据，对应于原生的page.json文件
+        config = {
+            navigationBarTitleText: '汽势'
+        };
+
+        data = {
+            columnType:'tuijian',
+            columnPage:1
+        };  // 页面所需数据均需在这里声明，可用于模板数据绑定
+        
+        //声明页面中所引用的组件，或声明组件中所引用的子组件
+        components = {
+            Menu:Menu,
+            Column:Column
+        };  
+
+        mixins = [];  // 声明页面所引用的Mixin实例
+
+        computed = {};  // 声明计算属性（详见后文介绍）
+
+        watch = {};  // 声明数据watcher（详见后文介绍）
+
+        // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
+        methods = {
+            // 接收子组件的值
+            tabChange( item ){
+                this.columnType = item.type;
+                this.columnPage = 1;
+                //使用$broadcast事件广播，父组件向各个子组件发送广播事件
+                this.$broadcast('requestType',this.columnType,this.columnPage);
+                // console.log( item );
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                this.columnPage = this.columnPage*1 + 1;
+                this.$broadcast('requestType',this.columnType,this.columnPage);
+            }
+        };  
+
+        events = {};  // 声明组件之间的事件处理函数
+    }
+</script>
+<style lang="less">
+    page{
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    .wrapSroll{
+        height: 100vh;
+        width: 100vw;
+    }
+</style>
+

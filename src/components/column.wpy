@@ -1,0 +1,117 @@
+<template lang="wxml">
+    <view>
+        <block
+            wx:for="{{newsList}}"
+            wx:key="{{index}}">
+            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr'>
+                <view class='news_con' @tap="storyDetail({{item.id}})">
+                    <view class='news_title'>{{item.title}}</view>
+                    <view class='news_info'>
+                        <text class='news_type'>{{item.author}}</text>
+                        <text class='news_author'>{{item.author}}</text>
+                        <text class='news_view'>{{item.user_id}}</text>
+                    </view>
+                </view>
+                <image src="{{item.img}}" />
+            </view>
+            <view class="news_nr" wx:else>
+                <view class='news_con' @tap="storyDetail({{item.id}})">
+                    <view class='news_title'>{{item.title}}</view>
+                    <view class='news_info'>
+                        <text class='news_type'>{{item.author}}</text>
+                        <text class='news_author'>{{item.author}}</text>
+                        <text class='news_view'>{{item.user_id}}</text>
+                    </view>
+                </view>
+                <image src="{{item.img}}" />
+            </view>
+        </block>
+        
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '../../src/api/api';
+    export default class Column extends wepy.component {
+        props = {
+            colType:{
+                type: String,
+                default: 'tuijian'
+            },
+            colPage:{
+                type: Number,
+                default: 1
+            },
+        };
+        onLoad(){
+            console.log( this.colType,this.colPage );
+            this.getNewsList( this.colType,this.colPage );
+        };
+        data = {
+            newsList:[]
+        };
+        methods = {
+            
+        };
+        events = {
+            requestType( val,page ){
+                if( val != this.colType ){
+                    this.newsList = [];
+                    // 模板数据变更后更新
+                    this.$apply();
+                }
+                this.getNewsList( val,page );
+            }
+        };
+        
+        async getNewsList( type,curPage ){
+            let that = this;
+            let params = {
+                query:{
+                    page: curPage,
+                    columnid:2524
+                }
+            }
+            const res = await api.GETTUIJIAN(params);
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.newsList.push( res.data.data[i] );
+                    // that.setData({ newsList : that.newsList });
+                }
+            }
+            this.$apply();
+            console.log( that.newsList )
+        };
+    }
+</script>
+
+<style lang="less">
+    .news_nr{
+        display: flex;
+        background: #fff;
+        padding: 20rpx;
+        border-bottom: 1px solid #dbdbdb;
+        image{
+            width: 240rpx;
+            height: 160rpx;
+            border-radius: 10rpx;
+        }
+        .news_con{
+            flex: 1;
+            padding-right: 20rpx;
+            position: relative;
+            .news_title{
+                font-size: 32rpx;
+                color: #333;
+                line-height: 48rpx;
+                max-height: 96rpx;
+                overflow: hidden;
+            }
+            .news_info{
+                position: absolute;
+                bottom: 0;
+            }
+        }
+    }
+</style>

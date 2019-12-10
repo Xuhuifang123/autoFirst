@@ -1,0 +1,66 @@
+<template lang="wxml">
+    <view class='menu'>
+        <repeat for="{{navList}}" key="index" index="index" item="item">
+            <view 
+                class="{{current == item.name ? 'ina_cur' : ''}}" 
+                @tap="goNext({{item}})"> {{item.name}} </view>
+        </repeat>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    export default class Menu extends wepy.component {
+        data = {
+            current: '推荐',
+            navList:[
+                {
+                    type:'tuijian',
+                    name:'推荐'
+                },
+                {
+                    type:'zhibo',
+                    name:'直播'
+                },
+                {
+                    type:'shipin',
+                    name:'视频'
+                },
+                {
+                    type:'zhuanti',
+                    name:'专题'
+                }
+            ]
+        };
+        methods = {
+            goNext ( item ){
+                if( this.current == item.name ){
+                    return false;
+                }else{
+                    this.current = item.name;
+                    // 传值给父页面
+                    this.$emit('tabClick',item);
+                }
+            }
+        }
+    }
+
+</script>
+
+<style lang="less">
+    .menu{
+        display: flex;
+        width: 100%;
+        height: 60rpx;
+        line-height: 60rpx;
+        background: #fff;
+        view{
+            margin: 0 20rpx;
+            font-size: 24rpx;
+            &.ina_cur{
+                font-weight: bold;
+                font-size: 28rpx;
+            }
+        }
+    }
+</style>
