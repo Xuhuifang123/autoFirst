@@ -3,30 +3,33 @@
         <block
             wx:for="{{newsList}}"
             wx:key="{{index}}">
-            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr'>
+            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
                 <view class='news_con' @tap="storyDetail({{item.id}})">
                     <view class='news_title'>{{item.title}}</view>
-                    <view class='news_info'>
-                        <text class='news_type'>{{item.author}}</text>
-                        <text class='news_author'>{{item.author}}</text>
-                        <text class='news_view'>{{item.user_id}}</text>
-                    </view>
                 </view>
-                <image src="{{item.img}}" />
+                <view class='img_con' @tap="storyDetail({{item.id}})">
+                    <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                </view>
+                <view class='news_info'>
+                    <text class='news_type'>{{item.author}}</text>
+                    <text class='news_author'>{{item.author}}</text>
+                    <text class='news_view'>{{item.user_id}}</text>
+                </view>
             </view>
             <view class="news_nr" wx:else>
-                <view class='news_con' @tap="storyDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
+                <view class='news_con'>
+                    <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
                     <view class='news_info'>
                         <text class='news_type'>{{item.author}}</text>
                         <text class='news_author'>{{item.author}}</text>
                         <text class='news_view'>{{item.user_id}}</text>
                     </view>
                 </view>
-                <image src="{{item.img}}" />
+                <view class='img_con' @tap="storyDetail({{item.id}})">
+                    <image src="{{item.img}}" />
+                </view>
             </view>
         </block>
-        
     </view>
 </template>
 
@@ -52,7 +55,12 @@
             newsList:[]
         };
         methods = {
-            
+            storyDetail:function(id){
+                console.log( id );
+                wepy.navigateTo({
+                    url: '../../pages/detail/story?id='+id
+                })
+            }
         };
         events = {
             requestType( val,page ){
@@ -114,4 +122,18 @@
             }
         }
     }
+    .news_nr.news_imgs_nr{
+        flex-direction: column;
+        .news_title{
+            max-height: 48rpx;
+        }
+        .img_con{
+            display: flex;
+            justify-content: space-between;
+            image{
+                width: 230rpx;
+            }
+        }
+    }
+
 </style>

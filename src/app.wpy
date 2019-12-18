@@ -14,6 +14,7 @@ export default class extends wepy.app {
       'pages/home/index',
       "pages/home/home",
       "pages/home/my",
+      "pages/detail/story"
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -30,20 +31,20 @@ export default class extends wepy.app {
         {
           pagePath: "pages/home/index",
           text: "首页",
-          iconPath: "../src/images/home_my1.png",
-          selectedIconPath: "../src/images/home_my2.png"
+          iconPath: "./images/home1.png",
+          selectedIconPath: "./images/home2.png"
         },
         {
           pagePath: "pages/home/home",
           text: "收藏",
-          iconPath: "../src/images/home_my1.png",
-          selectedIconPath: "../src/images/home_my2.png"
+          iconPath: "./images/collection1.png",
+          selectedIconPath: "./images/collection2.png"
         },
         {
           pagePath: "pages/home/my",
           text: "我的",
-          iconPath: "../src/images/home_news1.png",
-          selectedIconPath: "../src/images/home_news2.png"
+          iconPath: "./images/news1.png",
+          selectedIconPath: "./images/news2.png"
         }
       ]
     },

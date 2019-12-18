@@ -10,11 +10,11 @@
             class='wrapSroll'>
             <Menu @tabClick.user="tabChange"></Menu>
             <view class="content">
-            <Column 
-                :colType="columnType" 
-                :colType.sync="columnType"
-                :colPage="columnPage"
-                :colPage.sync="columnPage"></Column>
+                <Column 
+                    :colType="columnType" 
+                    :colType.sync="columnType"
+                    :colPage="columnPage"
+                    :colPage.sync="columnPage"></Column>
             </view>
         </scroll-view>
     </view>
@@ -93,5 +93,6 @@
         height: 100vh;
         width: 100vw;
     }
+
 </style>
 

@@ -1,0 +1,188 @@
+<template>
+    <view class="wrap">
+        <view class="artice_con">
+            <view class="author flex verCenter">
+                <view class='flex fullFlex'>
+                    <image src='https://img.auto-first.cn/upload/author/201810/img_1540987185775681893.png' class='authorPhoto'/>
+                    <view class='fullFlex authorInfo'>
+                        <view class='authorInfo_bt'>汽势Auto-First</view>
+                        <view class='authorInfo_time'><text>2018年05月18日</text></view>
+                    </view>
+                </view>
+                <!--<a href="javascript:;" class="attention " data-id="35">关注</a>-->
+                <!-- <view class='special_label'>行业专题</view> -->
+                <view class="attention" data-id="35"><text></text>关注</view>
+            </view>
+            <view class="artice_nr">
+                <view class="artice_bt">红旗首款电动SUV年内上市</view>
+                <view class="artice_main">
+                    <view><image src='https://qs.auto-first.cn/attachment/images/2/2018/05/uBxS2Woa2n2nBAnLaLS25lNkLNlbBa.jpg' alt="汽势传媒" title="汽势传媒" /></view>
+                    <view>汽势传媒日前了解到，上月在北京车展亮相的红旗品牌首款电动SUV——红旗E-HS3，将于年内正式上市。红旗E-HS3将作为红旗品牌直接切入新能源的先锋，按照新红旗的产品规划，到2020年将推出续航里程达600km的FME平台系列电动车，到2025年将推出15款电动车型。</view>
+                </view>
+                <view class="artice_views"><text></text>1.2万次</view>
+            </view>
+
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../../src/api/api';
+    export default class Story extends wepy.page{
+        config = {
+            navigationBarTitleText: '文章详情'
+        };
+        onLoad(options){
+            console.log(options);
+            this.getStoryCon( options.id );
+        };
+        async getStoryCon( storyId ){
+            console.log( storyId );
+            let that = this;
+            let params = {
+                query:{
+                    story_id:storyId
+                }
+            }
+            const res = await api.GETSTORY(params);
+            if( res.data.code == 200 ){
+                console.log( res.data )
+            }
+        };
+    }
+
+</script>
+
+<style lang="less">
+    @import "../../plug-in/wxParse/wxParse.wxss";
+    
+    .flex{
+        display: flex;
+    }
+    .fullFlex{
+        flex: 1;
+    }
+    .verCenter{
+        align-items: center;
+    }
+    .artice_con{
+        background: #fff; 
+        // 作者相关信息
+        .author{
+            padding: 34rpx 24rpx 20rpx 24rpx; 
+            overflow: hidden;
+            .authorPhoto{
+                width: 64rpx; 
+                height: 64rpx; 
+                border-radius: 50%; 
+                overflow: hidden; 
+                margin-right: 20rpx;
+            }
+            .authorInfo{
+                overflow: hidden; 
+                width: 0; 
+                padding-right: 10rpx;
+                .authorInfo_bt{
+                    font-weight: normal; 
+                    font-size: 30rpx; 
+                    color: #52A3FF; 
+                    line-height: 40rpx; 
+                    white-space: nowrap; 
+                    text-overflow: ellipsis; 
+                    overflow: hidden;
+                }
+                .authorInfo_time{
+                    font-size: 24rpx; 
+                    line-height: 24rpx; 
+                    color: #818181;
+                }
+            }
+            .special_label{ 
+                height: 36rpx; 
+                background: rgba(230,0,18,0.1);
+                border-radius: 18rpx;
+                color: rgba(255,38,0,1);
+                font-size: 24rpx;
+                padding: 0 20rpx;
+                line-height: 36rpx;
+                margin-right: 30rpx;
+            }
+            .attention{
+                width: 120rpx; 
+                height: 48rpx; 
+                border-radius: 3px; 
+                border:1px solid rgba(201,44,29,1); 
+                line-height: 48rpx; 
+                text-align: center; 
+                font-size: 24rpx; 
+                color:rgba(201,44,29,1);
+                text{
+                    display: inline-block; 
+                    width: 28rpx; 
+                    height: 28rpx; 
+                    vertical-align: top; 
+                    margin: 10rpx 2px 0 0; 
+                    background-image: url(//img.auto-first.cn/system/images/icon_attention.png);
+                    background-size: 28rpx; 
+                    background-position: center; 
+                    background-repeat: no-repeat;
+                }
+                &.cur{
+                    background:rgba(184,184,184,1);
+                    border: 1px solid rgba(0, 0, 0, 0);
+                }
+            }
+        }
+        .artice_nr{
+            padding: 0 30rpx 30rpx 30rpx;
+            background: #fff;
+            margin-bottom: 20rpx;
+            .artice_bt{
+                color: #333333;
+                font-size: 36rpx;
+                line-height: 40rpx;
+                font-weight: bold;
+                margin-bottom: 30rpx;
+            }
+            view{
+                text-indent: 72rpx !important;
+                color: #333333;
+                font-size: 34rpx;
+                line-height: 58rpx;
+                margin-bottom: 30rpx;
+                text-align: justify;
+                image{
+                    max-width: 100%;
+                    display: block;
+                    &.emotion{
+                        display: inline;
+                    }
+                }
+            }
+        }
+        .preview .artice_nr{
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    }
+
+
+.artice_nr .artice_main h1{ font-weight: bold; color: #333; margin-bottom: 0.15rem; }
+.artice_nr .artice_main h2{ font-weight: bold; color: #333; margin-bottom: 0.15rem; }
+.artice_nr .artice_main h3{ font-weight: bold; font-size: 0.18rem; color: #333; margin-bottom: 0.15rem; }
+.artice_nr .artice_main h4{ font-weight: bold; font-size: 0.16rem; color: #333; margin-bottom: 0.15rem; }
+.artice_nr .artice_main h5{ font-weight: bold; font-size: 0.14rem; color: #333; margin-bottom: 0.14rem; }
+.artice_nr .artice_main h6{ font-weight: bold; font-size: 0.13rem; color: #333; margin-bottom: 0.13rem; }
+.comment .no_comment{ width: 100%; margin: 0.1rem 0; text-align: center; font-size: 0.14rem; color: #333; line-height: 0.2rem; }
+.artice_nr .artice_main table{font-family:arial;font-size:12px;border-left:1px solid #e0e0e0;border-top:1px solid #e0e0e0;text-align:center;width:100%;line-height: 20px;text-indent:0; margin-bottom: 0.15rem;}
+.artice_nr .artice_main table th{padding:5px;border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;color:#666; background:#f2f2f2;text-align:center;}
+.artice_nr .artice_main table th a{font-size:12px;color:#666;}
+.artice_nr .artice_main table td{border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;padding:5px;color:#333;}
+.artice_nr .artice_main table td img{display:inline-block;vertical-align:-5px;margin:0;}
+.artice_nr .artice_main p video{ display: block; width: 100%; }
+.artice_nr .artice_main p iframe{ display: block; width: 100%; height: 2rem; }
+.artice_views{ height: 0.14rem; color: #999999; font-size: 0.12rem; line-height: 0.14rem; }
+.artice_views i{ display: inline-block; width: 0.15rem; height: 0.14rem; background: url(../image/icon_read.png) no-repeat center center; background-size: 100%; margin-right: 0.08rem; vertical-align: top; }
+</style>
