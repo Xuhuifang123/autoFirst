@@ -1,10 +1,8 @@
 <script>
 import wepy from 'wepy'
 import 'wepy-async-function'
-
 import { setStore } from 'wepy-redux'
 import configStore from './store'
-
 const store = configStore()
 setStore(store)
 
@@ -51,7 +49,7 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null
+    userInfo: { }
   }
 
   constructor () {
@@ -61,7 +59,105 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
-    this.testAsync()
+    const that = this;
+    that.testAsync();
+    
+    //查看是否授权
+    wx.getSetting({
+      success: function(res){
+        if (res.authSetting['scope.userInfo']) {
+          wx.getUserInfo({
+            success: function(res) {
+              // console.log(res.userInfo)
+              //用户已经授权过
+              that.globalData.userInfo = res.userInfo;
+            }
+          })
+        }
+      }
+    })
+  }
+
+  onLoad(){
+    
+    
+  }
+
+  sleep (s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  //判断登录状态/是否授权
+  async checkSettingStatus(){
+    try {
+      let auth = await wepy.getSetting();//调用getSetting Api
+      let authSetting = auth.authSetting;//获取authSetting用来判断是否授权
+      console.log('---开始判断---');    
+      if(authSetting['scope.userInfo']){
+          console.log('---已经授权---');
+          //已经授权情况下直接获取userInfor
+          let userInfo= await wepy.getUserInfo();    
+          this.globalData.ret = userInfo;
+          //调用登录
+          this.login();
+      }else{
+        //如果没有授权跳转至授权页进行授权(新版只能通过调用按钮来调出授权框)
+        //授权页面button需要赋予open-type='getUserInfo'属性
+        //bindgetuserinfo='scope' bind方法用来授权/获取userInfor
+        console.log('---用户未授权---');
+        // wepy.navigateTo({ url: './test' });
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+   //登录方法
+  async login(){
+    try {
+      console.log('---调用login方法---')
+      let token = wepy.getStorageSync('token') || '';    
+      let {code:code} = await wepy.login();  //通过调用login获取code 判断是否开始登录
+      if(code){
+        console.log('---获取信息发送网络请求---');
+        let ret = this.globalData.ret
+        wepy.request({
+          url: '', //开发者服务器接口地址",
+          data: {
+            code : code,
+            rawData : ret.rawData,
+            token:token
+          },
+          method:'POST',
+          header:{
+            'Content-Type':'application/x-www-form-urlencoded'
+          }
+        }).then((res)=>{
+            console.log('---网络请求返回成功---')
+            console.log(res)
+            let response = res.data;
+            if(response.code == 1){
+              console.log('---登录正常，返回值1---');
+              console.log(response);
+              this.globalData.userInfo = response.data.userInfo;
+              wepy.setStorageSync('token',response.data.userInfo.token);
+              console.log(this.globalData.userInfo );
+            }else{
+              console.log('---登录异常---');
+              wepy.setStorageSync('token','');
+            }
+        });
+      }else{
+        console.log('---login返回异常---')
+      }
+    } catch (error) {
+      console.log(error) 
+    }
   }
 
   sleep (s) {
@@ -73,21 +169,27 @@ export default class extends wepy.app {
   }
 
   async testAsync () {
-    const data = await this.sleep(3)
+    const data = await this.sleep(3);
     console.log(data)
   }
 
   getUserInfo(cb) {
-    const that = this
-    if (this.globalData.userInfo) {
-      return this.globalData.userInfo
-    }
-    wepy.getUserInfo({
-      success (res) {
-        that.globalData.userInfo = res.userInfo
-        cb && cb(res.userInfo)
-      }
-    })
+    console.log('111');
+    // const that = this
+    // console.log('111');
+    // if (this.globalData.userInfo) {
+    //   return this.globalData.userInfo
+    // }
+    // wepy.getUserInfo({
+    //   success (res) {
+    //     that.globalData.userInfo = res.userInfo
+    //     cb && cb(res.userInfo)
+    //     console.log( that.globalData.userInfo );
+    //   },
+    //   fail (res) {
+    //     console.log( res );
+    //   }
+    // })
   }
 }
 </script>

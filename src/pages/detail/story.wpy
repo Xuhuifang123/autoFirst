@@ -1,12 +1,14 @@
+
 <template>
+    <import src="/wxParse/wxParse.wxml"/>
     <view class="wrap">
         <view class="artice_con">
             <view class="author flex verCenter">
                 <view class='flex fullFlex'>
                     <image src='https://img.auto-first.cn/upload/author/201810/img_1540987185775681893.png' class='authorPhoto'/>
                     <view class='fullFlex authorInfo'>
-                        <view class='authorInfo_bt'>汽势Auto-First</view>
-                        <view class='authorInfo_time'><text>2018年05月18日</text></view>
+                        <view class='authorInfo_bt'>{{storyAuthor}}</view>
+                        <view class='authorInfo_time'><text>{{storyDate}}</text></view>
                     </view>
                 </view>
                 <!--<a href="javascript:;" class="attention " data-id="35">关注</a>-->
@@ -14,14 +16,12 @@
                 <view class="attention" data-id="35"><text></text>关注</view>
             </view>
             <view class="artice_nr">
-                <view class="artice_bt">红旗首款电动SUV年内上市</view>
+                <view class="artice_bt">{{storyBt}}</view>
                 <view class="artice_main">
-                    <view><image src='https://qs.auto-first.cn/attachment/images/2/2018/05/uBxS2Woa2n2nBAnLaLS25lNkLNlbBa.jpg' alt="汽势传媒" title="汽势传媒" /></view>
-                    <view>汽势传媒日前了解到，上月在北京车展亮相的红旗品牌首款电动SUV——红旗E-HS3，将于年内正式上市。红旗E-HS3将作为红旗品牌直接切入新能源的先锋，按照新红旗的产品规划，到2020年将推出续航里程达600km的FME平台系列电动车，到2025年将推出15款电动车型。</view>
+                    <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/>
                 </view>
                 <view class="artice_views"><text></text>1.2万次</view>
             </view>
-
         </view>
     </view>
 </template>
@@ -29,13 +29,24 @@
 <script>
     import wepy from 'wepy'
     import api from '../../../src/api/api';
+    import WxParse from '../../../src/wxParse/wxParse';
+    // import htmlParse from '../../components/htmlParse';
     export default class Story extends wepy.page{
         config = {
             navigationBarTitleText: '文章详情'
         };
+        components = {
+            // WxParse: WxParse
+        };
         onLoad(options){
-            console.log(options);
             this.getStoryCon( options.id );
+        };
+        data = {
+            storyBt:'',
+            storyAuthor:'',
+            storyDate: '',
+            parserName:'storyCon',
+            parserContent: ''
         };
         async getStoryCon( storyId ){
             console.log( storyId );
@@ -47,7 +58,14 @@
             }
             const res = await api.GETSTORY(params);
             if( res.data.code == 200 ){
-                console.log( res.data )
+                that.storyBt = res.data.data.title;
+                that.storyAuthor = res.data.data.author;
+                that.storyDate = res.data.data.story_date;
+                // that.parserContent = res.data.data.content;
+                that.parserContent = WxParse.wxParse('parserContent', 'html', res.data.data.content, that, 0);
+                that.$apply();
+                // that.$invoke('组件名', '组件里对应事件');
+                // that.$invoke('htmlParse', 'htmlParseNotice');                
             }
         };
     }
@@ -55,8 +73,7 @@
 </script>
 
 <style lang="less">
-    @import "../../plug-in/wxParse/wxParse.wxss";
-    
+    @import "../../../src/wxParse/wxParse.wxss";
     .flex{
         display: flex;
     }
@@ -145,15 +162,17 @@
                 font-weight: bold;
                 margin-bottom: 30rpx;
             }
-            view{
+            .artice_main view{
                 text-indent: 72rpx !important;
+            }
+            view{
                 color: #333333;
                 font-size: 34rpx;
                 line-height: 58rpx;
                 margin-bottom: 30rpx;
                 text-align: justify;
                 image{
-                    max-width: 100%;
+                    width: 100%;
                     display: block;
                     &.emotion{
                         display: inline;

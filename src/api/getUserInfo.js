@@ -40,7 +40,7 @@ export const author = (context) => {
                                     }
                                 },
                                 fail: function(res){
-                                    resolve({'avatarUrl':'','nickName':'翠花'})
+                                    resolve({'userName':'','userImg':''})
                                     console.log('没有选择授权')
                                 }
                             })               
