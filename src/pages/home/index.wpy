@@ -1,22 +1,22 @@
 <template>
     <view class="wrap">
-        <scroll-view
-            @scroll="handleScroll"
-            @scrolltoupper="upper"
-            @scrolltolower="loadMore"
-            scroll-top="{{scrollTop}}"
-            scroll-y
-            scroll-with-animation="{{true}}"
-            class='wrapSroll'>
-            <Menu @tabClick.user="tabChange"></Menu>
-            <view class="content">
+        <Menu @tabClick.user="tabChange"></Menu>
+        <view class="content">
+            <scroll-view
+                @scroll="handleScroll"
+                @scrolltoupper="upper"
+                @scrolltolower="loadMore"
+                scroll-top="{{scrollTop}}"
+                scroll-y
+                scroll-with-animation="{{true}}"
+                class='wrapSroll'>
                 <Column 
                     :colType="columnType" 
                     :colType.sync="columnType"
                     :colPage="columnPage"
                     :colPage.sync="columnPage"></Column>
-            </view>
-        </scroll-view>
+            </scroll-view>
+        </view>
     </view>
 </template>
 
@@ -92,6 +92,15 @@
     .wrapSroll{
         height: 100vh;
         width: 100vw;
+    }
+    .wrap{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        .content{
+            flex: 1;
+        }
     }
 
 </style>

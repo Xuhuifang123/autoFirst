@@ -1,0 +1,25 @@
+<template>
+    <view class="wrap">
+
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class ArtName extends wepy.page {
+        config = {
+            navigationBarTitleText: '汽势号'
+        };
+        onLoad(options){
+            
+        };
+        data = {
+            
+        };
+
+    }
+</script>
+
+<style lang="less">
+
+</style>

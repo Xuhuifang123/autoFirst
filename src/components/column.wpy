@@ -35,7 +35,7 @@
 
 <script>
     import wepy from 'wepy';
-    import api from '../../src/api/api';
+    import api from '../../src/api/ApiConstants';
     export default class Column extends wepy.component {
         props = {
             colType:{

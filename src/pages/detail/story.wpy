@@ -1,26 +1,45 @@
-
 <template>
     <import src="/wxParse/wxParse.wxml"/>
     <view class="wrap">
         <view class="artice_con">
             <view class="author flex verCenter">
                 <view class='flex fullFlex'>
-                    <image src='https://img.auto-first.cn/upload/author/201810/img_1540987185775681893.png' class='authorPhoto'/>
+                    <image src='{{userInfo.photo}}' class='authorPhoto'/>
                     <view class='fullFlex authorInfo'>
-                        <view class='authorInfo_bt'>{{storyAuthor}}</view>
-                        <view class='authorInfo_time'><text>{{storyDate}}</text></view>
+                        <view class='authorInfo_bt'>{{userInfo.name}}</view>
+                        <view class='authorInfo_time'><text>{{storyInfo.story_date}}</text></view>
                     </view>
                 </view>
                 <!--<a href="javascript:;" class="attention " data-id="35">关注</a>-->
                 <!-- <view class='special_label'>行业专题</view> -->
-                <view class="attention" data-id="35"><text></text>关注</view>
+                <view class="attention" data-id="{{storyInfo.u_authorid}}"><text></text>关注</view>
             </view>
             <view class="artice_nr">
-                <view class="artice_bt">{{storyBt}}</view>
+                <view class="artice_bt">{{storyInfo.title}}</view>
                 <view class="artice_main">
                     <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/>
                 </view>
-                <view class="artice_views"><text></text>1.2万次</view>
+                <!-- <view class="artice_views"><i></i>1.2万次</view> -->
+                <view class='wxParse-p' wx:if="{{storyInfo.contentInfo}}">{{storyInfo.contentInfo}}</view>
+            </view>
+            <view class="artice_share flex" wx:if='{{storyInfo}}'>
+                <button class='shareMessage' open-type="share">分享至好友</button>
+                <view class='shareTimeline'>分享至朋友圈</view>
+            </view>
+            <!-- 相关推荐 -->
+            <view class='stroy_list'>
+                <view class='stroy_list_dl flex' 
+                    wx:for='{{storyList}}' 
+                    wx:key='{{index}}'>
+                    <view class='stroy_list_dd flex'>
+                        <view class='stroy_list_bt' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                        <view class='stroy_list_info'>
+                            <text>{{item.author}}</text>
+                            <text>{{item.pub}}</text>
+                        </view>
+                    </view>
+                    <image class='stroy_list_img' src='{{item.title_pic1}}' @tap="storyDetail({{item.id}})"></image>
+                </view>
             </view>
         </view>
     </view>
@@ -28,7 +47,7 @@
 
 <script>
     import wepy from 'wepy'
-    import api from '../../../src/api/api';
+    import api from '../../../src/api/ApiConstants';
     import WxParse from '../../../src/wxParse/wxParse';
     // import htmlParse from '../../components/htmlParse';
     export default class Story extends wepy.page{
@@ -42,27 +61,36 @@
             this.getStoryCon( options.id );
         };
         data = {
-            storyBt:'',
-            storyAuthor:'',
-            storyDate: '',
+            userInfo:{},
+            storyInfo:{},
             parserName:'storyCon',
-            parserContent: ''
+            parserContent: '',
+            storyList:{}
+        };
+        methods = {
+            storyDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/story?id='+id
+                })
+            }
         };
         async getStoryCon( storyId ){
-            console.log( storyId );
             let that = this;
             let params = {
                 query:{
-                    story_id:storyId
+                    id:storyId
                 }
             }
+            api.loading();
             const res = await api.GETSTORY(params);
+            console.log( res );
             if( res.data.code == 200 ){
-                that.storyBt = res.data.data.title;
-                that.storyAuthor = res.data.data.author;
-                that.storyDate = res.data.data.story_date;
-                // that.parserContent = res.data.data.content;
-                that.parserContent = WxParse.wxParse('parserContent', 'html', res.data.data.content, that, 0);
+                api.finishLoading();
+                const storyDetail = res.data.data;
+                that.userInfo = storyDetail.userInfo;
+                that.storyInfo = storyDetail.storyInfo;
+                that.storyList = storyDetail.storyList;
+                that.parserContent = WxParse.wxParse('parserContent', 'html', that.storyInfo.content, that, 0);
                 that.$apply();
                 // that.$invoke('组件名', '组件里对应事件');
                 // that.$invoke('htmlParse', 'htmlParseNotice');                
@@ -162,10 +190,8 @@
                 font-weight: bold;
                 margin-bottom: 30rpx;
             }
-            .artice_main view{
+            .wxParse-p{
                 text-indent: 72rpx !important;
-            }
-            view{
                 color: #333333;
                 font-size: 34rpx;
                 line-height: 58rpx;
@@ -178,30 +204,72 @@
                         display: inline;
                     }
                 }
+                video{ 
+                    display: block; 
+                    width: 100%; 
+                }
+                iframe{
+                    display: block;
+                    width: 100%;
+                    height: 400rpx;
+                }
+            }
+            .artice_views{
+                height: 28rpx; 
+                color: #999999; 
+                font-size: 24rpx; 
+                line-height: 28rpx;
+                i{
+                    display: inline-block;
+                    width: 30rpx;
+                    height: 28rpx;
+                    background: url(//img.auto-first.cn/system/image/icon_read.png) no-repeat center center;
+                    background-size: 100%; 
+                    margin-right: 18rpx; 
+                    vertical-align: top;
+                }
             }
         }
         .preview .artice_nr{
             margin-bottom: 0;
             padding-bottom: 0;
         }
-
     }
-
-
-.artice_nr .artice_main h1{ font-weight: bold; color: #333; margin-bottom: 0.15rem; }
-.artice_nr .artice_main h2{ font-weight: bold; color: #333; margin-bottom: 0.15rem; }
-.artice_nr .artice_main h3{ font-weight: bold; font-size: 0.18rem; color: #333; margin-bottom: 0.15rem; }
-.artice_nr .artice_main h4{ font-weight: bold; font-size: 0.16rem; color: #333; margin-bottom: 0.15rem; }
-.artice_nr .artice_main h5{ font-weight: bold; font-size: 0.14rem; color: #333; margin-bottom: 0.14rem; }
-.artice_nr .artice_main h6{ font-weight: bold; font-size: 0.13rem; color: #333; margin-bottom: 0.13rem; }
-.comment .no_comment{ width: 100%; margin: 0.1rem 0; text-align: center; font-size: 0.14rem; color: #333; line-height: 0.2rem; }
-.artice_nr .artice_main table{font-family:arial;font-size:12px;border-left:1px solid #e0e0e0;border-top:1px solid #e0e0e0;text-align:center;width:100%;line-height: 20px;text-indent:0; margin-bottom: 0.15rem;}
-.artice_nr .artice_main table th{padding:5px;border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;color:#666; background:#f2f2f2;text-align:center;}
-.artice_nr .artice_main table th a{font-size:12px;color:#666;}
-.artice_nr .artice_main table td{border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;padding:5px;color:#333;}
-.artice_nr .artice_main table td img{display:inline-block;vertical-align:-5px;margin:0;}
-.artice_nr .artice_main p video{ display: block; width: 100%; }
-.artice_nr .artice_main p iframe{ display: block; width: 100%; height: 2rem; }
-.artice_views{ height: 0.14rem; color: #999999; font-size: 0.12rem; line-height: 0.14rem; }
-.artice_views i{ display: inline-block; width: 0.15rem; height: 0.14rem; background: url(../image/icon_read.png) no-repeat center center; background-size: 100%; margin-right: 0.08rem; vertical-align: top; }
+    .artice_nr .artice_main h1{ color: #333; margin-bottom: 30rpx; }
+    .artice_nr .artice_main h2{ color: #333; margin-bottom: 30rpx; }
+    .artice_nr .artice_main h3{ font-size: 36rpx; color: #333; margin-bottom: 30rpx; }
+    .artice_nr .artice_main h4{ font-size: 32rpx; color: #333; margin-bottom: 30rpx; }
+    .artice_nr .artice_main h5{ font-size: 28rpx; color: #333; margin-bottom: 28rpx; }
+    .artice_nr .artice_main h6{ font-size: 26rpx; color: #333; margin-bottom: 26rpx; }
+    .comment .no_comment{ width: 100%; margin: 20rpx 0; text-align: center; font-size: 28rpx; color: #333; line-height: 40rpx; }
+    .artice_nr .artice_main table{ font-family:arial; font-size:24rpx; border-left:1px solid #e0e0e0;border-top:1px solid #e0e0e0; text-align:center; width:100%; line-height: 40rpx; text-indent:0; margin-bottom: 30rpx;}
+    .artice_nr .artice_main table th{ padding: 10rpx; border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;color:#666; background:#f2f2f2;text-align:center;}
+    .artice_nr .artice_main table th a{font-size:24rpx;color:#666;}
+    .artice_nr .artice_main table td{border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;padding:10rpx;color:#333;}
+    .artice_nr .artice_main table td img{display:inline-block;vertical-align:-5px;margin:0;}
+    .stroy_list{
+        padding: 0 30rpx;
+    }
+    .stroy_list_dl{
+        padding: 20rpx 0;
+        border-bottom: 1px solid #dbdbdb;
+        &:last-child{
+            border-bottom: none;
+        }
+        .stroy_list_img{
+            width: 300rpx;
+            height: 200rpx;
+        }
+        .stroy_list_dd{
+            flex: 1;
+            flex-direction: column;
+            position: relative;
+            .stroy_list_info{
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+            }
+        }
+    }
 </style>

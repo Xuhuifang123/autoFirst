@@ -10,7 +10,9 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/home/index',
-      "pages/home/home",
+      "pages/home/live",
+      "pages/home/video",
+      "pages/home/artName",
       "pages/home/my",
       "pages/detail/story"
     ],
@@ -21,28 +23,40 @@ export default class extends wepy.app {
       navigationBarTextStyle: 'black'
     },
     tabBar: {
-      color: "#666666",
-      selectedColor: "#2674FF",
+      color: "#6D7278",
+      selectedColor: "#000000",
       backgroundColor: "#ffffff",
       borderStyle: "black",
       list: [
         {
           pagePath: "pages/home/index",
           text: "首页",
-          iconPath: "./images/home1.png",
-          selectedIconPath: "./images/home2.png"
+          iconPath: "./images/home.png",
+          selectedIconPath: "./images/homeSel.png"
         },
         {
-          pagePath: "pages/home/home",
-          text: "收藏",
-          iconPath: "./images/collection1.png",
-          selectedIconPath: "./images/collection2.png"
+          pagePath: "pages/home/live",
+          text: "直播",
+          iconPath: "./images/broadcast.png",
+          selectedIconPath: "./images/broadcastSel.png"
+        },
+        {
+          pagePath: "pages/home/video",
+          text: "视频",
+          iconPath: "./images/video.png",
+          selectedIconPath: "./images/videoSel.png"
+        },
+        {
+          pagePath: "pages/home/artName",
+          text: "汽势号",
+          iconPath: "./images/tab_write.png",
+          selectedIconPath: "./images/tab_write_sel.png"
         },
         {
           pagePath: "pages/home/my",
           text: "我的",
-          iconPath: "./images/news1.png",
-          selectedIconPath: "./images/news2.png"
+          iconPath: "./images/my.png",
+          selectedIconPath: "./images/mySel.png"
         }
       ]
     },

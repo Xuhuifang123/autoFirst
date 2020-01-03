@@ -33,6 +33,7 @@ const wxRequest = async (params = {}, url, noLoadingStatus, navigateBackStatus) 
         return err
     }
 }
+
 module.exports = {
     wxRequest
 }

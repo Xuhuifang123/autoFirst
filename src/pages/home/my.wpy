@@ -38,66 +38,51 @@
             let that = this;
             let userInfo = e.detail.userInfo || null;
             if (userInfo != null) {
-            // httpUtil.loading();
-            wx.login({
-                success: function (res) {
-                    let code = res.code;
-                    if (code) {
-                        console.log(code);
-                        //发起网络请求
-                        that.loginFromServer(code, userInfo);
-                    } else {
-                        console.log(456);
-                        // httpUtil.finishLoading();
-                        // httpUtil.toast("登录失败~" + res.errMsg);
+                // httpUtil.loading();
+                wx.login({
+                    success: function (res) {
+                        let code = res.code;
+                        if (code) {
+                            //发起网络请求
+                            that.loginFromServer(code, userInfo);
+                        } else {
+                            console.log(456);
+                            // httpUtil.finishLoading();
+                            // httpUtil.toast("登录失败~" + res.errMsg);
+                        }
                     }
-                }
-            })
+                })
             }
         };
 
-        async getNewsList( type,curPage ){
-            const res = await api.GETTUIJIAN(params);
-            if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
-                }
-            }
-            this.$apply();
-            console.log( that.newsList )
-        };
-
-        loginFromServer(code, user) {
+        async loginFromServer(code, user) {
             let that = this;
             let params = {
                 code: code
             };
+            console.log( params );
             const res = await api.LOGINURL(params);
-
-            httpUtil.executePost(api.URL_LOGIN, params, {
-                onSuccess(data) {
-                    httpUtil.finishLoading();
-                    if (data) {
-                        if (data.is_bind == 'yes') {
-                            app.setUserInfo(data.user_info);
-                            that.updateUserInfo();
-                            that.loadUserCenter();
-                        } else {
-                            app.setSessionId(data.user_info.session_id);
-                            wx.navigateTo({
-                                url: '/pages/home/login/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + data.bind_id
-                            })
-                        }
-                    } else {
-                        httpUtil.toast("登录失败~" + res.errMsg);
-                    }
-                },
-                onFailed(error) {c
-                    httpUtil.finishLoading();
-                    httpUtil.toast("登录失败~" + res.errMsg);
-                }
-            });
+            console.log( res );
+            if( res.data.code == 200 ){
+                // httpUtil.finishLoading();
+                // if (data) {
+                //     if (data.is_bind == 'yes') {
+                //         app.setUserInfo(data.user_info);
+                //         that.updateUserInfo();
+                //         that.loadUserCenter();
+                //     } else {
+                //         app.setSessionId(data.user_info.session_id);
+                //         wx.navigateTo({
+                //             url: '/pages/home/login/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + data.bind_id
+                //         })
+                //     }
+                // } else {
+                //     httpUtil.toast("登录失败~" + res.errMsg);
+                // }
+            }else{
+                // httpUtil.finishLoading();
+                // httpUtil.toast("登录失败~" + res.errMsg);
+            }
         };
         
     }

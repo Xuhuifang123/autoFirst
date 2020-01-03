@@ -1,11 +1,16 @@
 <template lang="wxml">
-    <view class='menu'>
-        <repeat for="{{navList}}" key="index" index="index" item="item">
-            <view 
-                class="{{current == item.name ? 'ina_cur' : ''}}" 
-                @tap="goNext({{item}})"> {{item.name}} </view>
-        </repeat>
-    </view>
+    <scroll-view
+        scroll-left="{{scrollLeft}}"
+        scroll-x
+        scroll-with-animation="{{true}}"
+        class='menuSroll'>
+            <repeat for="{{navList}}" key="index" index="index" item="item">
+                <view 
+                    class="{{current == item.name ? 'ina_cur' : ''}}" 
+                    id='{{item.type}}'
+                    @tap="goNext({{item}})"> {{item.name}} </view>
+            </repeat>
+    </scroll-view>
 </template>
 
 <script>
@@ -13,6 +18,8 @@
     export default class Menu extends wepy.component {
         data = {
             current: '推荐',
+            scrollLeft: 0,
+            winWidth: 375,
             navList:[
                 {
                     type:'tuijian',
@@ -29,17 +36,55 @@
                 {
                     type:'zhuanti',
                     name:'专题'
+                },
+                {
+                    type:'pingce',
+                    name:'评测'
+                },
+                {
+                    type:'daogou',
+                    name:'导购'
+                },
+                {
+                    type:'kuaibao',
+                    name:'快报'
+                },
+                {
+                    type:'jingxuan',
+                    name:'精选'
+                },
+                {
+                    type:'xinche',
+                    name:'新车'
+                },
+                {
+                    type:'hangye',
+                    name:'行业'
                 }
             ]
         };
+        onLoad(){
+            const that = this;
+            that.winWidth = wx.getSystemInfoSync().windowWidth || 375;
+        };
         methods = {
-            goNext ( item ){
-                if( this.current == item.name ){
+            goNext ( item,e ){
+                const that = this;
+                if( that.current == item.name ){
                     return false;
                 }else{
-                    this.current = item.name;
+                    that.current = item.name;
+                    let itemId = e.target.id,
+                        itemLeft = e.target.offsetLeft;
+
+                    var query = wx.createSelectorQuery();
+                    query.select('#'+itemId).boundingClientRect(function (rect) {
+                        var setLeft = itemLeft - that.winWidth/2 + rect.width/2;
+                        that.scrollLeft = setLeft;
+                    }).exec();
+
                     // 传值给父页面
-                    this.$emit('tabClick',item);
+                    that.$emit('tabClick',item);
                 }
             }
         }
@@ -54,13 +99,36 @@
         height: 60rpx;
         line-height: 60rpx;
         background: #fff;
+        overflow-x: auto;
+        overflow-y: hidden;
         view{
             margin: 0 20rpx;
             font-size: 24rpx;
+            white-space: nowrap;
             &.ina_cur{
                 font-weight: bold;
                 font-size: 28rpx;
             }
         }
     }
+
+    .menuSroll{
+        height: 60rpx;
+        line-height: 60rpx;
+        background: #fff;
+        // overflow-x: auto;
+        // overflow-y: hidden;
+        width: 100vw;
+        white-space: nowrap;
+        view{
+            margin: 0 20rpx;
+            font-size: 24rpx;
+            display: inline-block;
+            &.ina_cur{
+                font-weight: bold;
+                font-size: 28rpx;
+            }
+        }
+    }
+
 </style>
