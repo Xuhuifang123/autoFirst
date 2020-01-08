@@ -14,7 +14,9 @@ export default class extends wepy.app {
       "pages/home/video",
       "pages/home/artName",
       "pages/home/my",
-      "pages/detail/story"
+      "pages/detail/story",
+      "pages/list/specialList",
+      "pages/list/photoList"
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -31,32 +33,32 @@ export default class extends wepy.app {
         {
           pagePath: "pages/home/index",
           text: "首页",
-          iconPath: "./images/home.png",
-          selectedIconPath: "./images/homeSel.png"
+          iconPath: "./res/images/home.png",
+          selectedIconPath: "./res/images/homeSel.png"
         },
         {
           pagePath: "pages/home/live",
           text: "直播",
-          iconPath: "./images/broadcast.png",
-          selectedIconPath: "./images/broadcastSel.png"
+          iconPath: "./res/images/broadcast.png",
+          selectedIconPath: "./res/images/broadcastSel.png"
         },
         {
           pagePath: "pages/home/video",
           text: "视频",
-          iconPath: "./images/video.png",
-          selectedIconPath: "./images/videoSel.png"
+          iconPath: "./res/images/video.png",
+          selectedIconPath: "./res/images/videoSel.png"
         },
         {
           pagePath: "pages/home/artName",
           text: "汽势号",
-          iconPath: "./images/tab_write.png",
-          selectedIconPath: "./images/tab_write_sel.png"
+          iconPath: "./res/images/tab_write.png",
+          selectedIconPath: "./res/images/tab_write_sel.png"
         },
         {
           pagePath: "pages/home/my",
           text: "我的",
-          iconPath: "./images/my.png",
-          selectedIconPath: "./images/mySel.png"
+          iconPath: "./res/images/my.png",
+          selectedIconPath: "./res/images/mySel.png"
         }
       ]
     },

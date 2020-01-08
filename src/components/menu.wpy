@@ -38,8 +38,8 @@
                     name:'专题'
                 },
                 {
-                    type:'pingce',
-                    name:'评测'
+                    type:'tupian',
+                    name:'图片',
                 },
                 {
                     type:'daogou',

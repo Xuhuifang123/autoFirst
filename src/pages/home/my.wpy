@@ -14,7 +14,7 @@
 
 <script>
     import wepy from 'wepy';
-    import api from '../../../src/api/api';
+    import api from '../../api/ApiConstants';
     export default class My extends wepy.page {
         config = {
             navigationBarTitleText: '我的'
