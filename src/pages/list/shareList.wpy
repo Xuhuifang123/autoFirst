@@ -1,0 +1,246 @@
+<template lang="wxml">
+    <scroll-view
+        @scroll="handleScroll"
+        @scrolltoupper="upper"
+        @scrolltolower="loadMore"
+        scroll-y
+        scroll-with-animation="{{true}}"
+        class='wrapSroll'>
+        <view class='share_list'>
+            <block
+                wx:for="{{shareList}}"
+                wx:key="{{index}}">
+                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                    <view class='news_info'>
+                        <image class='news_photo' src="{{item.photo}}" />
+                        <text class='news_author'>{{item.author}}</text>
+                    </view>
+                    <view class='news_con' @tap="storyDetail({{item.id}})">
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                    </view>
+                    <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                </view>
+                <view class="news_nr" wx:else>
+                    <view class='news_info'>
+                        <image class='news_photo' src="{{item.photo}}" />
+                        <text class='news_author'>{{item.author}}</text>                      
+                    </view>
+                    <view class='news_con'>
+                        <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                        <image src="{{item.img}}" class='storyImg'/>
+                        <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                    </view>                    
+                </view>
+            </block>
+        </view>
+        <view class="moreLoading" wx:if='{{loading}}'>
+            <image src="../../res/images/homeLoading.png" />数据加载 更多精彩
+        </view>
+    </scroll-view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '../../../src/api/ApiConstants';
+    export default class shareList extends wepy.page {
+        config = {
+            navigationBarTitleText: '我的分享'
+        };
+        components = {
+            
+        };
+        props = {
+            
+        }; 
+        onLoad(options){
+            // this.getNewsList( val,page );
+            console.log( this.data.shareList );
+        };
+        data = {
+            shareList:[
+                {
+                    author: "梁子辰",
+                    id: 139416,
+                    img: "http://img4.news18a.com/site/other/202001/ina_1578984082418625961.jpg",
+                    imgs: [],
+                    photo: "http://img.news18a.com/image/admin/touxiang.jpg",
+                    time: "1天前",
+                    title: "提供不同功率电动机 东风富康e爱丽舍申报图曝光",
+                    url: "http://m.news18a.com/ina_app/storys_139416.html",
+                    user_id: 426200 
+                },
+                {
+                    author: "奚筱林",
+                    id: 139394,
+                    img: "http://img1.news18a.com/site/other/202001/ina_1578974240685788502.jpg",
+                    imgs: [
+                        "http://img4.news18a.com/site/other/202001/ina_1578974247158687805.jpg",
+                        "http://img4.news18a.com/site/other/202001/ina_15789742511135244242.jpg",
+                        "http://img1.news18a.com/site/other/202001/ina_1578974240685788502.jpg"
+                    ],
+                    photo: "http://img.news18a.com/userPhoto/user_14562697981057.jpg",
+                    time: "1天前",
+                    title: "外观灵动/配置高 别克全新纯电动车命名VELITE 7",
+                    url: "http://m.news18a.com/ina_app/storys_139394.html",
+                    user_id: 28199
+                },
+                {
+                    author: "梁子辰",
+                    id: 139416,
+                    img: "http://img4.news18a.com/site/other/202001/ina_1578984082418625961.jpg",
+                    imgs: [],
+                    photo: "http://img.news18a.com/image/admin/touxiang.jpg",
+                    time: "1天前",
+                    title: "提供不同功率电动机 东风富康e爱丽舍申报图曝光",
+                    url: "http://m.news18a.com/ina_app/storys_139416.html",
+                    user_id: 426200 
+                },
+            ],
+            loading:true
+        };
+        methods = {
+            storyDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/story?id='+id
+                })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                // this.columnPage = this.columnPage*1 + 1;
+                // this.$broadcast('requestType',this.columnType,this.columnPage);
+            }
+        };
+        events = {
+
+        };
+        
+        async getNewsList( type,curPage ){
+            let that = this;
+            let params = {
+                query:{
+                    page: curPage,
+                    columnid:2524
+                }
+            }
+            const res = await api.GETTUIJIAN(params);
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.newsList.push( res.data.data[i] );
+                    // that.setData({ newsList : that.newsList });
+                }
+            }
+            this.$apply();
+            console.log( that.newsList )
+        };
+    }
+</script>
+
+<style lang="less">
+    .wrapSroll{
+        height: 100vh;
+        width: 100vw;
+    }
+    .share_list{
+        padding: 24rpx 24rpx 0 24rpx;
+    }
+    .news_nr{
+        background: #fff;
+        padding: 20rpx 0;
+        border-bottom: 1px solid #EEEEEE;
+        .news_con{
+            display: flex;
+            position: relative;
+            .storyImg{
+                width: 276rpx;
+                height: 184rpx;
+                border-radius: 10rpx;
+                display: block;
+                margin-left: 20rpx;
+            }
+            .news_title{
+                flex: 1;
+                font-size: 30rpx;
+                color: #000000;
+                line-height: 40rpx;
+                max-height: 80rpx;
+                overflow: hidden;
+                font-weight: bold;
+            }
+        }
+        .news_info{
+            display: flex;
+            margin-bottom: 20rpx;
+            .news_photo{
+                width: 64rpx;
+                height: 64rpx;
+                border-radius: 50%;
+                margin-right: 16rpx;
+            }
+            .news_author{
+                flex: 1;
+                font-size: 30rpx;
+                color: #52A3FF;
+                line-height: 64rpx;
+            }
+        }
+        .news_view{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            color: #ADADAD;
+            font-size: 20rpx;
+            image{
+                width: 28rpx;
+                height: 18rpx;
+                display: inline-block;
+                margin-right: 4rpx;
+            }
+        }
+    }
+    .news_nr.news_imgs_nr{
+        flex-direction: column;
+        .news_title{
+            max-height: 40rpx;
+            margin-bottom: 20rpx;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .img_con{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20rpx;
+            image{
+                width: 228rpx;
+                height: 152rpx;
+            }
+        }
+        .news_view{
+            position: static;
+        }
+    }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
+        }
+    }
+</style>

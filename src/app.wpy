@@ -14,15 +14,21 @@ export default class extends wepy.app {
       "pages/home/video",
       "pages/home/artName",
       "pages/home/my",
-      "pages/detail/story",
+      "pages/aboutMy/aboutUs",
+      "pages/aboutMy/feedback",
+      "pages/aboutMy/aboutApp",
       "pages/list/specialList",
-      "pages/list/photoList"
+      "pages/list/photoList",
+      "pages/list/shareList",
+      "pages/detail/photoDetail",
+      "pages/detail/story",
+      "pages/detail/liveDetail",
     ],
     window: {
       backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
+      navigationBarBackgroundColor: '#C92C1D',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'white'
     },
     tabBar: {
       color: "#6D7278",

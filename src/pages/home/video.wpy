@@ -1,7 +1,27 @@
 <template>
-    <view class="wrap">
+    <scroll-view
+        @scroll="handleScroll"
+        @scrolltoupper="upper"
+        @scrolltolower="loadMore"
+        scroll-y
+        scroll-with-animation="{{true}}"
+        class='wrapSroll'>
+        <view class='videoCon'>
+            <block wx:for='{{videoData}}' wx:key='{{index}}'>
+                <view class='video_nr'>
+                    <view class='video_bt' @tap='liveDetail()'>{{item.videoTitle}}</view>
+                    <view class="video_player">
+                        <video src="{{item.videoUrl}}" controls='true'></video>
+                    </view>
+                    <view class="video_info">
+                        <view class="video_author"><image src='{{item.authorPhoto}}'/>{{item.authorName}}</view>
+                        <view class="video_view"><image src='../../res/images/iconlook.png'/>35689</view>
+                    </view>
+                </view>
+            </block>
+        </view>
 
-    </view>
+    </scroll-view>
 </template>
 
 <script>
@@ -11,15 +31,104 @@
             navigationBarTitleText: '视频'
         };
         onLoad(options){
-
+            
         };
         data = {
-            
+            videoData:[
+                {
+                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
+                    'authorName':'孙琦',
+                    'videoTitle':'电动车续航里程为什么会有不同标准？',
+                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/1.mp4'
+                },
+                {
+                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
+                    'authorName':'孙琦',
+                    'videoTitle':'电动车续航里程为什么会有不同标准？',
+                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/2.mp4'
+                },
+                {
+                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
+                    'authorName':'孙琦',
+                    'videoTitle':'电动车续航里程为什么会有不同标准？',
+                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/3.mp4'
+                },
+            ]
+        };
+        methods = {
+            liveDetail(){
+                wepy.navigateTo({
+                    url: '../../pages/detail/liveDetail'
+                })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                // this.columnPage = this.columnPage*1 + 1;
+                // this.$broadcast('requestType',this.columnType,this.columnPage);
+            }
         };
 
     }
 </script>
 
 <style lang="less">
-
+    .videoCon{
+        padding: 24rpx 24rpx 0 24rpx;
+        .video_nr{
+            margin-bottom: 20rpx;
+            .video_bt{
+                font-size: 30rpx;
+                color:#000000;
+                line-height: 34rpx;
+                font-weight: bold;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+            .video_player{
+                width: 100%;
+                height: 394rpx;
+                border-radius: 10rpx;
+                overflow: hidden;
+                margin: 16rpx 0 20rpx 0;
+                video{
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+            .video_info{
+                display: flex;
+                justify-content: space-between;
+                height: 64rpx;
+                line-height: 64rpx;
+                .video_author{
+                    font-size: 30rpx;
+                    color: #000000;
+                    image{
+                        width: 64rpx;
+                        height: 64rpx;
+                        vertical-align: top;
+                        margin-right: 12rpx;
+                        border-radius: 50%;
+                    }
+                }
+                .video_view{
+                    font-size: 20rpx;
+                    color: #9D9D9D;
+                    image{
+                        width: 32rpx;
+                        height: 20rpx;
+                        margin-right: 6rpx;
+                    }
+                }
+            }
+        }
+    }
 </style>

@@ -1,0 +1,96 @@
+<template>
+    <view class="liveWrap">
+        <view class="player">
+            <!-- <view class="player_video">
+                <video src="http://img.auto-first.cn/upload/special/static/video/1.mp4" id='video1' controls="true" autoplay='true'></video>
+            </view> -->
+            <view class="player_video player_advance">
+                <view class="player_tip">距开播还剩 00：18：18 
+                    <!-- <view class='player_tip_btn'><image src='../../res/images/liveNotify.png'/>提醒</view> -->
+                    <view class='player_tip_btn reminded'>已提醒</view>
+                </view>
+            </view>
+            <view class="player_bt">开不坏的丰田，越野男人的放飞自我！</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class Livedetail extends wepy.page {
+        config = {
+            navigationBarTitleText: '详情'
+        };
+        onLoad(options){
+            
+        };
+        data = {
+            
+        };
+        methods = {
+            
+        };
+
+    }
+</script>
+
+<style lang="less">
+    .player{
+        .player_video{
+            width: 100%;
+            height: 420rpx;
+            video{
+                width: 100%;
+                height: 100%;
+            } 
+        }
+        .player_bt{
+            margin: 0 24rpx;
+            height: 80rpx;
+            line-height: 80rpx;
+            font-size: 15px;
+            color: #000000;
+            font-weight: bold;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            border-bottom: 1px solid #EEEEEE;
+        }
+        .player_advance{
+            background: #3A3A3A;
+            position: relative;
+            .player_tip{
+                position: absolute;
+                top: 132rpx;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                color: #FFFFFF;
+                font-size: 30rpx;
+                line-height: 42rpx;
+                .player_tip_btn{
+                    width: 120rpx;
+                    height: 42rpx;
+                    background:rgba(201,44,29,1);
+                    border-radius: 22rpx;
+                    font-size: 24rpx;
+                    color: #fff;
+                    margin-left: 24rpx;
+                    display: inline-block;
+                    vertical-align: top;
+                    image{
+                        width: 24rpx;
+                        height: 28rpx;
+                        vertical-align: top;
+                        margin-top: 7rpx;
+                        margin-right: 4rpx;
+                    }
+                }
+                .player_tip_btn.reminded{
+                   background: #6D7278; 
+                }
+            }
+        }
+    }
+    
+</style>

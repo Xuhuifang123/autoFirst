@@ -1,0 +1,73 @@
+<template>
+    <view class="wrap">
+        <view class='feedback_nr'>
+            <form bindsubmit="bindFormSubmit">
+                <textarea 
+                placeholder="请写下您的意见或建议"
+                placeholder-class='feedbackHolder'
+                cursor-spacing='5'
+                hold-keyboard='true'
+                disable-default-padding='true'
+                name='feedback'></textarea>
+                <button form-type="submit" class='submit_feedback'><image src='../../res/images/login_btn.png' /></button>
+            </form>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class Feedback extends wepy.page {
+        config = {
+            navigationBarTitleText: '意见反馈'
+        };
+        onLoad(options){
+            
+        };
+        data = {
+            
+        };
+        methods = {
+            bindFormSubmit:function(e){
+                console.log( e.detail.value.feedback );
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    .feedbackHolder{
+        font-size: 30rpx;
+        color: #AEAEAE;
+    }
+    .feedback_nr{
+        padding: 24rpx 24rpx 0 24rpx;
+        textarea{
+            width: 100%;
+            height: 328rpx;
+            background:#fff;
+            border-radius: 8rpx;
+            border:1px solid #DEDEDE;
+            box-sizing: border-box;
+            padding: 20rpx;
+            line-height: 42rpx;
+            color: #333;
+            font-size: 30rpx;
+            margin-bottom: 60rpx;
+        }
+        .submit_feedback{
+            padding: 0;
+            background: rgba(0, 0, 0, 0);
+            margin: 0 auto;
+            image{
+                width: 590rpx;
+                height: 92rpx;
+                vertical-align: top;
+            }
+        }
+        .submit_feedback::after{
+            display: none;
+        }
+    }
+
+</style>

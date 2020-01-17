@@ -1,7 +1,44 @@
 <template lang="wxml">
     <!-- 图片 -->
-    <view wx:if="{{colType==('tupian')}}">
-        1111
+    <view class='photo_list' wx:if="{{colType==('tupian')}}">
+        <view class='photo_con'>
+            <view class='photo_nr'>
+                <view class='photo_bt' @tap="photoList()">一汽奔腾-T99</view>
+                <view class='photo_img' @tap="photoList()">
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                </view>
+                <view class='photo_info'>
+                    <view class='photo_author'>汽车商业评论</view>
+                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
+                </view>
+            </view>
+            <view class='photo_nr'>
+                <view class='photo_bt'>一汽奔腾-T99</view>
+                <view class='photo_img'>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                </view>
+                <view class='photo_info'>
+                    <view class='photo_author'>汽车商业评论</view>
+                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
+                </view>
+            </view>
+            <view class='photo_nr'>
+                <view class='photo_bt'>一汽奔腾-T99</view>
+                <view class='photo_img'>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+                </view>
+                <view class='photo_info'>
+                    <view class='photo_author'>汽车商业评论</view>
+                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
+                </view>
+            </view>
+        </view>
     </view>
     
     <!-- 专题 -->
@@ -30,6 +67,25 @@
         </view>
     </view>
 
+    <!-- 播报 -->
+    <view class='report_list' wx:elif="{{colType==('bobao')}}">
+        <block wx:for='{{bobaoData}}' wx:key="{{index}}" wx:for-item='item' wx:for-index='parentIndex'>
+            <view class='report_con'>
+                <view class='report_date'><view><image src="../res/images/icon_time.png" />{{item[0].day}}</view></view>
+                <view class='report_nr' wx:for='{{item}}' wx:key="{{index}}" wx:for-item='report' wx:for-index='childInx'>
+                    <view class='report_time'>{{report.time}}</view>
+                    <view class="report_info">
+                        <view class="report_bt">{{report.title}}</view>
+                        <view class="report_detail {{report.falg ? 'report_detail_all' : ''}}">{{report.content}}</view>
+                        <view class='report_btn' wx:if='{{report.falg}}'><view class='toggle_btn' @tap="toggleDetail('hide')" data-parent='{{parentIndex}}' data-child='{{childInx}}'>收起<image src="../res/images/hide.png" /></view></view>
+                        <view class='report_btn' wx:else><view class='toggle_btn' @tap="toggleDetail('show')" data-parent='{{parentIndex}}' data-child='{{childInx}}'>展开<image src="../res/images/show.png" /></view></view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+
+    <!-- 文章信息流 -->
     <view class='news_list' wx:else>
         <swiper class='swiper'
             indicator-dots='true'
@@ -39,7 +95,7 @@
             circular='true'
             indicator-color='#fff'
             indicator-active-color='#000' >
-            <block wx:for="{{imgUrls}}">
+            <block wx:for="{{imgUrls}}" wx:key='{{index}}'>
                 <swiper-item>
                     <image src="{{item}}" class="slide-image"/>
                 </swiper-item>
@@ -91,6 +147,10 @@
                 </view>
             </view>
         </block>
+
+        <view class="moreLoading" wx:if='{{loading}}'>
+            <image src="../res/images/homeLoading.png" />数据加载 更多精彩
+        </view>
     </view>
 
 </template>
@@ -113,8 +173,11 @@
             
         };
         onLoad(){
-            console.log( this.colType,this.colPage );
+            console.log( this.colType ,this.colPage );
             this.getNewsList( this.colType,this.colPage );
+            if( this.colType == 'bobao' ){
+                this.disposeReport();
+            }
         };
         data = {
             imgUrls:[
@@ -124,11 +187,74 @@
                 'http://img4.news18a.com/site/other/202001/ina_1577931813985703965.jpg',
                 'http://img3.news18a.com/site/other/202001/ina_15779476811409811595.jpg'
             ],
-            newsList:[]
+            newsList:[],
+            loading:false,
+            bobaoData:[
+                {
+                    "cloum": "汽势播报",
+                    "content": "英国时间1月8日，阿斯顿·马丁官方确认将限量生产V12 SPEEDSTER车型，数量88辆，计划2021年第一季度交付客户。阿斯顿·马丁V12 SPEEDSTER是庆祝阿斯顿·马丁悠久的赛车传统和现代化设计相结合的车型，同时其开放式的驾驶舱也在向阿斯顿·马丁1959年获得勒芒赛事大奖的DBR1和CC100 Speedster百年概念车致敬。",
+                    "day": "2020.01.08",
+                    "id": "915",
+                    "img": [],
+                    "time": "16:32",
+                    "title": "限量88辆！阿斯顿·马丁V12 SPEEDSTER确认生产",
+                    "type": "seat",
+                },
+                {
+                    "cloum": "汽势播报",
+                    "content": "据最新消息，威马汽车将于2020年底发布一款全新SUV，该车的整体设计获奖依旧使用威马家族设计，并将使用5G技术，最快或于2020年底正式上市。新车整体设计将依旧采用威马家族式设计，整体车身尺寸也与威马EX5大体相似，只不过新车车尾使用了与刚刚上市威马EX6 Plus更为相似。据悉，该车将是全球首台搭载5G技术的智能新能源车，该车最快或将于2020年底上市。",
+                    "day": "2020.01.08",
+                    "id": "914",
+                    "img": [],
+                    "time": "16:31",
+                    "title": "威马将推出全新SUV车型 搭载5G技术/最快或于2020年底上市",
+                    "type": "seat",
+                },
+                {
+                    "cloum": "汽势播报",
+                    "content": "1月8日，东风风神召开发布会，公布了公司全新的战略规划，包括2020年度“312”新产品规划。同时东风风神宣布，其还将在2020年4月发布全新品牌形象。2019年，东风风神全年销量达到了75025台，同比2018年增长了8.5%。借着销量增长，东风风神乘胜追击，于今日发布了2020年度“312”新产品计划，即3款全新车型+1款中期改款车型+2款年度改款车型。",
+                    "day": "2020.01.08",
+                    "id": "913",
+                    "img": [],
+                    "time": "16:30",
+                    "title": "6款新车 东风风神2020年新产品规划公布",
+                    "type": "seat",
+                },
+                {
+                    "cloum": "汽势播报",
+                    "content": "据外媒报道，大众汽车1月7日宣布，Luca de Meo已经辞去西班牙汽车品牌西雅特CEO一职。与此同时，其竞争对手雷诺正在加紧寻找新任CEO。大众在1月7日发表的一份声明中称：“西雅特首席执行官Luca de Meo自己提出不再担任西雅特CEO一职，双方已经达成一致。“一位知情人士对外媒透露，De Meo是雷诺CEO的竞争者之一，然而他与大众签署的竞业禁止条款比较严格，有可能成为他加盟雷诺的最大障碍。另一位消息人士表示：“目前双方还没有就潜在的‘冷却期’达成一致。“这名消息人士表示，如果真的加盟雷诺，De Meo将不得不推迟自己在雷诺上任的时间，毕竟他对大众集团的战略了如指掌。因此，当前还尚不明确De Meo是否会完全离开大众，大众集团旗下拥有包括兰博基尼、布加迪、宾利、斯柯达、大众、奥迪、保时捷和杜卡迪等多个品牌。第三名消息人士表示：“Luca de Meo将离开西雅特，但是仍将留在大众集团。",
+                    "day": "2020.01.08",
+                    "id": "912",
+                    "img": [],
+                    "time": "16:29",
+                    "title": "大众西雅特CEO辞职 或将竞聘雷诺CEO",
+                    "type": "seat",
+                },
+                {
+                    "cloum": "汽势播报",
+                    "content": "一汽集团最新发布的数据显示，2019年集团营业收入首次突破6000亿大关达6200亿元，同比增长4.4%；实现利润440.5亿元，同比增长2.2%。营收利润双增长的背景下，2019年集团销量也逆势增长。数据显示，2019年一汽集团共实现整车销售346.4万辆，同比增长1.3%。",
+                    "day": "2020.01.07",
+                    "id": "911",
+                    "img": [],
+                    "time": "18:13",
+                    "title": "同比增长4.4% 一汽集团2019年营收超6000亿",
+                    "type": "seat",
+                },
+                {
+                    "cloum": "汽势播报",
+                    "content": "1月7日，特斯拉上海超级工厂，国产Model 3交付仪式正式开启。这是国产Model 3的首次面向社会车主的交付，因此特斯拉公司上下异常重视，就连马斯克也从美国跑了过来，为上海工厂站台！在活动现场，马斯克宣布特斯拉新车Model Y项目正式启动。在介绍Model Y项目时马斯克表示：“Model Y是致力于打造一辆大家都能负担得起的SUV，就像Model 3是一辆大家都负担得起的轿车一样。这两个市场部分对特斯拉都是非常重要的车型，Model Y将会用更先进的生产技术，未来会逐渐给大家揭晓，我个人对其采用的生产技术非常欣喜。”",
+                    "data_id": "",
+                    "day": "2020.01.07",
+                    "id": "910",
+                    "img": [],
+                    "time": "18:11",
+                    "title": "国产特斯拉今日交付，马斯克宣布Model Y项目正式启动",
+                    "type": "seat",
+                }
+            ]
         };
         methods = {
             storyDetail:function(id){
-                console.log( id );
                 wepy.navigateTo({
                     url: '../../pages/detail/story?id='+id
                 })
@@ -137,21 +263,63 @@
                 wepy.navigateTo({
                     url: '../../pages/list/specialList?type='+type
                 })
+            },
+            photoList:function(){
+                wepy.navigateTo({
+                    url: '../../pages/list/photoList'
+                })
+            },
+            toggleDetail:function(type,e){
+                const that = this,
+                    parentIndex = e.currentTarget.dataset.parent,
+                    childInx = e.currentTarget.dataset.child;
+                console.log( type,parentIndex,childInx );
+                if( type == 'show' ){
+                    that.bobaoData[parentIndex][childInx].falg = true;
+                }else{
+                    that.bobaoData[parentIndex][childInx].falg = false;
+                }
             }
+            
+        };
+        disposeReport(){
+            const that = this;
+            let curDate = that.bobaoData[0].day;
+            let newReport = [];
+            let inx = 0;
+            newReport[inx] = [];
+            that.bobaoData.forEach(item => {
+                item.falg = false;
+                if( item.day == curDate ){
+                    newReport[inx].push( item );
+                }else{
+                    curDate = item.day;
+                    inx++;
+                    newReport[inx] = [];
+                    newReport[inx].push( item );
+                }
+            });
+            console.log( newReport );
+            that.bobaoData = newReport;
         };
         events = {
             requestType( val,page ){
-                if( val != this.colType ){
-                    this.newsList = [];
+                const that = this;
+                if( val == "bobao" ){
+                    that.disposeReport();
+                }else{
+                    that.newsList = [];
                     // 模板数据变更后更新
-                    this.$apply();
+                    that.$apply();
+                    that.getNewsList( val,page );
                 }
-                this.getNewsList( val,page );
+                
             }
         };
         
         async getNewsList( type,curPage ){
             let that = this;
+            // that.loading = true;
             let params = {
                 query:{
                     page: curPage,
@@ -166,6 +334,7 @@
                 }
             }
             this.$apply();
+            // that.loading = false;
             console.log( that.newsList )
         };
     }
@@ -195,7 +364,7 @@
         }
     }
     .news_list{
-        padding: 0 24rpx;
+        padding: 20rpx 24rpx 0 24rpx;
     }
     .news_nr{
         display: flex;
@@ -236,6 +405,7 @@
                 color:  #FF2600;
                 float: left;
                 margin-right: 10rpx;
+                font-size: 20rpx;
             }
             .news_author{
                 float: left;
@@ -257,14 +427,14 @@
         flex-direction: column;
         .news_title{
             max-height: 40rpx;
-            margin-bottom: 8rpx;
+            margin-bottom: 16rpx;
             white-space: nowrap;
             text-overflow: ellipsis;
         }
         .img_con{
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8rpx;
+            margin-bottom: 16rpx;
             image{
                 width: 228rpx;
                 height: 152rpx;
@@ -301,9 +471,24 @@
         }
 
     }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
+        }
+    }
     // 专题
     .special_con{
-        padding: 0 24rpx;
+        padding: 20rpx 24rpx;
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
@@ -343,6 +528,144 @@
             }
         }
     }
-
+    // 图片
+    .photo_con{
+        padding: 0 24rpx;
+        .photo_nr{
+            padding: 20rpx 0 18rpx 0;
+            border-bottom: 1px solid #EEEEEE;
+            .photo_bt{
+                font-size: 30rpx;
+                color: #000000;
+                line-height: 42rpx;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-bottom: 12rpx;
+                font-weight: bold;
+            }
+            .photo_img{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 16rpx;
+                image{
+                    width: 228rpx;
+                    height: 152rpx;
+                    border-radius: 10rpx;
+                }
+            }
+            .photo_info{
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                height: 34rpx;
+                font-size: 24rpx;
+                line-height: 34rpx;
+                .photo_author{
+                    color: #52A3FF;
+                }
+                .photo_view{
+                    color: #ADADAD;
+                    image{
+                        width: 28rpx;
+                        height: 18rpx;
+                        margin-right: 8rpx;
+                    }
+                }
+            }
+        }
+    }
+    // 播报
+    .report_con{
+        overflow: hidden;
+        padding-top: 40rpx;
+        .report_date{
+            margin: 0 auto 0 auto;
+            text-align: center;
+            view{
+                padding: 0 40rpx 0 60rpx;
+                background: #FBE5EA;
+                border-radius: 32rpx;
+                height: 64rpx;
+                line-height: 64rpx;
+                font-size: 36rpx;
+                color: #C92C1D;
+                display: inline-block;
+                vertical-align: top;
+                image{
+                    width: 36rpx;
+                    height: 36rpx;
+                    vertical-align: top;
+                    margin-top: 14rpx;
+                    margin-right: 16rpx;
+                }
+            }
+        }
+        .report_nr{
+            display: flex;
+            border-bottom: 20rpx solid #F5F5F5;
+            padding-top: 40rpx;
+            .report_time{
+                width: 140rpx;
+                padding-left: 32rpx;
+                position: relative;
+                font-size: 30rpx;
+                line-height: 42rpx;
+                color: #6D7278;
+                &::before{
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 8rpx;
+                    height: 38rpx;
+                    background: #C92C1D;
+                    border-radius: 8rpx;
+                }
+            }
+            .report_info{
+                flex: 1;
+                padding-right: 24rpx;
+                padding-bottom: 40rpx;
+                .report_bt{
+                    font-size: 30rpx;
+                    color:rgba(0,0,0,0.85);
+                    line-height: 42rpx;
+                    font-weight: bold;
+                    margin-bottom: 20rpx;
+                    word-break: break-all;
+                }
+                .report_detail{
+                    font-size: 24rpx;
+                    color:#6D7278;
+                    line-height: 36rpx;
+                    margin-bottom: 20rpx;
+                    max-height: 108rpx;
+                    overflow: hidden;
+                    word-break: break-all;
+                }
+                .report_detail.report_detail_all{
+                    max-height: none;
+                    overflow: visible;
+                }
+                .report_btn{
+                    text-align: right;
+                    height: 34rpx;
+                    .toggle_btn{
+                        display: inline-block;
+                        vertical-align: top;
+                        color: #C92C1D;
+                        font-size: 24rpx;
+                        line-height: 34rpx;
+                        image{
+                            width: 24rpx;
+                            height: 14rpx;
+                            margin-left: 14rpx;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 </style>

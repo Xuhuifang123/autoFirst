@@ -1,0 +1,169 @@
+<template>
+    <view class="wrap">
+        <view class="toAPP">
+            <image src='../../res/images/app_bg.png' class='app_bg'/>
+            <view class="app_ewm">
+                <view class="ewm_bt">长按识别二维码</view>
+                <view class="ewm_nr">
+                    <image src='' class='code_img' />
+                    <image src='../../res/images/android_btn.png' class='app_btn' @tap="jumpBrowser('android')" />
+                </view>
+                <view class="ewm_nr">
+                    <image src='' class='code_img' />
+                    <image src='../../res/images/ios_btn.png' class='app_btn' @tap="jumpBrowser('ios')" />
+                </view>
+            </view>
+            <view class="login_tip">
+                <view class="login_bt">登录APP</view>
+                <view class="login_dec">可参与更多互动和发帖</view>
+            </view>
+        </view>
+    </view>
+
+    <view class="jump_mask" hidden='{{mask}}'>
+        <view class="jump_tip">
+            <view class="jump_bt">确定跳转到 App Store吗？</view>
+            <view class="jumo_choose">
+                <view class="jumo_false" @tap="jumpConfirm('false')">否</view>
+                <view class="jumo_true" @tap="jumpConfirm('true')">是</view>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    export default class AboutApp extends wepy.page {
+        config = {
+            navigationBarTitleText: 'APP'
+        };
+        onLoad(options){
+            
+        };
+        data = {
+            mask:true,
+            dowmType:''
+        };
+        methods = {
+            jumpBrowser:function(type){
+                const that = this;
+                that.dowmType = type;
+                that.mask = false;
+            },
+            jumpConfirm:function(result){
+                const that = this;
+                if(result == 'true'){
+                    //执行跳转
+                }else{
+                    //去掉跳转，弹出框隐藏
+                    console.log( result );
+                    that.mask = true;
+                }
+            }
+        }
+
+    }
+</script>
+
+<style lang="less">
+    .toAPP{
+        position: relative;
+        .app_bg{
+            width: 100%;
+            height: 1000rpx;
+            display: block;
+        }
+        .app_ewm{
+            width: 260rpx;
+            position: absolute;
+            top: 88rpx;
+            left: 245rpx;
+            .ewm_bt{
+                color: #C92C1D;
+                font-size: 30rpx;
+                line-height: 42rpx;
+                text-align: center;
+                margin-bottom: 28rpx;
+                font-weight: bold;
+            }
+            .ewm_nr{
+                image{
+                    width: 220rpx;
+                    display: block;
+                    margin: 0 auto 24rpx auto;
+                }
+                .code_img{
+                    height: 220rpx;
+                    background: #ccc;
+                }
+                .app_btn{
+                    height: 66rpx;
+                }
+            }
+        }
+        .login_tip{
+            margin-top: 40rpx;
+            text-align: center;
+            .login_bt{
+                color: #C92C1D;
+                font-size: 48rpx;
+                line-height: 66rpx;
+                font-weight: bold;
+            }
+            .login_dec{
+                color: #6D7278;
+                font-size: 36rpx;
+                line-height: 50rpx;
+            }
+        }
+    }
+    .jump_mask{
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background:rgba(0,0,0,0.6);
+        transition: display 0.5s linear;
+        .jump_tip{
+            position: absolute;
+            top: 346rpx;
+            left:  94rpx;
+            width: 564rpx;
+            background: #FFFFFF;
+            border-radius: 16rpx;
+            .jump_bt{
+                padding: 70rpx 24rpx;
+                color: #000000;
+                font-size: 36rpx;
+                line-height: 50rpx;
+                text-align: center;
+            }
+            .jumo_choose{
+                height: 98rpx;
+                border-top: 4rpx solid #EEEEEE;
+                line-height: 98rpx;
+                font-size: 36rpx;
+                color: #000000;
+                text-align: center;
+                display: flex;
+                .jumo_false{
+                    flex: 1;
+                    position: relative;
+                    &::after{
+                        position: absolute;
+                        content: '';
+                        width: 4rpx;
+                        height: 100%;
+                        background: #EEEEEE;
+                        right: 0;
+                        top: 0;
+                    }
+                }
+                .jumo_true{
+                    flex: 1;
+                    color: #FF2600;
+                }
+            }
+        }
+    }
+</style>

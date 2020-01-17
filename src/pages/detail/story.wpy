@@ -2,31 +2,28 @@
     <import src="/wxParse/wxParse.wxml"/>
     <view class="wrap">
         <view class="artice_con">
-            <!-- <view class="author flex verCenter">
+            <view class="author flex verCenter">
                 <view class='flex fullFlex'>
                     <image src='{{userInfo.photo}}' class='authorPhoto'/>
                     <view class='fullFlex authorInfo'>
                         <view class='authorInfo_bt'>{{userInfo.name}}</view>
                         <view class='authorInfo_time'><text>{{storyInfo.story_date}}</text></view>
                     </view>
-                </view> -->
-                <!--<a href="javascript:;" class="attention " data-id="35">关注</a>-->
-                <!-- <view class='special_label'>行业专题</view> -->
-                <!-- <view class="attention" data-id="{{storyInfo.u_authorid}}"><text></text>关注</view>
-            </view> -->
+                </view>
+            </view>
             <view class="artice_nr">
                 <view class="artice_bt">{{storyInfo.title}}</view>
-                <view class='authorInfo'>
-                    <view class='authorInfo_bt'>{{userInfo.name}}</view>
-                    <view class='special_label'>{{userInfo.name}}</view>
-                </view>
                 <view class="artice_main">
                     <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/>
                 </view>
             </view>
+            <view class="articleNumber">
+                <view class='articleLook'><image src="../../res/images/iconlook.png" />3569</view>
+                <view class='articleZan'><image src="../../res/images/articeZan.png" />3569</view>
+            </view>
             <view class="artice_share flex" wx:if='{{storyInfo}}'>
-                <button class='shareMessage' open-type="share">分享至好友</button>
-                <view class='shareTimeline'>分享至朋友圈</view>
+                <button class='shareMessage' open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
+                <button class='shareTimeline' open-type="share"><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
             </view>
 
             <view class="recommend">
@@ -196,9 +193,8 @@
                 }
             }
         }
-        
         .artice_nr{
-            padding: 20rpx 24rpx 0 24rpx;
+            padding: 0 24rpx 0 24rpx;
             background: #fff;
             .artice_bt{
                 color:  #000000;
@@ -275,6 +271,67 @@
         .preview .artice_nr{
             margin-bottom: 0;
             padding-bottom: 0;
+        }
+        .articleNumber{
+            height: 32rpx;
+            margin-bottom: 40rpx;
+            display: flex;
+            padding: 0 24rpx;
+            .articleLook,.articleZan{
+                font-size: 20rpx;
+                color: #9D9D9D;
+                line-height: 32rpx;
+                margin-right: 30rpx;
+            }
+            .articleLook image{
+                width: 32rpx;
+                height: 20rpx;
+                vertical-align: top;
+                margin-top: 6rpx;
+                margin-right: 6rpx;
+            }
+            .articleZan image{
+                width: 32rpx;
+                height: 32rpx;
+                vertical-align: top;
+                margin-right: 6rpx;
+            }
+        }
+        .artice_share{
+            padding: 0 76rpx;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40rpx;
+            button{
+                padding: 0;
+                font-size: 30rpx;
+                line-height: 80rpx;
+                border-radius: 40rpx;
+                color: #6D7278;
+                width: 280rpx;
+                margin: 0;
+                overflow: visible;
+                border: 1px solid rgba(102,208,32,1);
+                background-color: #fff;
+                image{
+                    vertical-align: top;
+                    margin-right: 12rpx;
+                }
+            }
+            button::after {
+                display: none;
+            }
+            .shareMessage image{
+                width: 44rpx;
+                height: 38rpx;
+                margin-top: 21rpx;
+            }
+            .shareTimeline image{
+                width: 38rpx;
+                height: 40rpx;
+                margin-top: 20rpx;
+            }
+
         }
     }
     .artice_nr .artice_main h1{ color: #333; margin-bottom: 30rpx; }
@@ -356,7 +413,7 @@
                 }
                 .recommend_list_img {
                     justify-content: space-between;
-                    margin: 16rpx 0;
+                    margin: 0 0 16rpx 0;
                     image{
                         width: 210rpx;
                         height: 140rpx;

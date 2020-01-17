@@ -1,42 +1,20 @@
 <template lang="wxml">
     <view class="photo_bg">
         <view class="photo_top">
+            <view class="photo_model">奔腾T99</view>
             <image class='photo_top_img' src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-            <view class="photo_info">
-                <view class="photo_info_model">车型名称：奔腾T99</view>
-                <view class="photo_info_logo">品牌厂商：一汽奔腾</view>
-                <view class="photo_info_name">沈天香</view>
-            </view>
         </view>
         <view class="photo_wrap">
-            <view class="photo_con">
-                <view class="photo_nr_bt">外观</view>
-                <view class="photo_nr">
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+            <block wx:for="{{photoList}}" wx:key="{{index}}">
+                <view class="photo_con">
+                    <view class="photo_nr_bt">{{item.name}}</view>
+                    <view class="photo_nr">
+                        <block wx:for="{{item.imgList}}" wx:key="{{inx}}">
+                            <image @tap='photoDetail()' src='{{item}}'></image>
+                        </block>
+                    </view>
                 </view>
-            </view>
-            <view class="photo_con">
-                <view class="photo_nr_bt">外观</view>
-                <view class="photo_nr">
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                </view>
-            </view>
+            </block>
         </view>
     </view>
 </template>
@@ -46,64 +24,50 @@
     import api from '../../../src/api/ApiConstants';
     export default class photolList extends wepy.page {
         config = {
-            navigationBarTitleText: '图片详情'
+            navigationBarTitleText: '详情'
         };
         components = {
             
         };
-        props = {
-            colType:{
-                type: String,
-                default: 'tuijian'
-            },
-            colPage:{
-                type: Number,
-                default: 1 
-            },
-        };
+
         onLoad(options){
             
-            // this.getNewsList( this.colType,this.colPage );
         };
         data = {
-            newsList:[]
+            photoList:[
+                {
+                    name:'外观',
+                    imgList:[
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'
+                    ]
+                },
+                {
+                    name:'内饰',
+                    imgList:[
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
+                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'
+                    ]
+                }
+            ]
         };
         methods = {
-            storyDetail:function(id){
+            photoDetail:function(){
                 wepy.navigateTo({
-                    url: '../../pages/detail/story?id='+id
+                    url: '../detail/photoDetail'
                 })
             }
         };
         events = {
-            requestType( val,page ){
-                if( val != this.colType ){
-                    this.newsList = [];
-                    // 模板数据变更后更新
-                    this.$apply();
-                }
-                this.getNewsList( val,page );
-            }
+
         };
         
-        async getNewsList( type,curPage ){
-            let that = this;
-            let params = {
-                query:{
-                    page: curPage,
-                    columnid:2524
-                }
-            }
-            const res = await api.GETTUIJIAN(params);
-            if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
-                }
-            }
-            this.$apply();
-            console.log( that.newsList )
-        };
     }
 </script>
 
@@ -115,38 +79,23 @@
         overflow: hidden;
     }
     .photo_top{
-        background:#fff;
-        border-radius: 16rpx;
-        margin: 24rpx;
+        padding: 40rpx 24rpx;
+        .photo_model{
+            line-height: 34rpx;
+            font-size: 30rpx;
+            color: #000000;
+            font-weight: bold;
+            width: 100%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            margin-bottom: 20rpx;
+        }
         .photo_top_img{
             width: 702rpx;
-            height: 800rpx;
+            height: 702rpx;
             display: block;
-            border-radius: 16rpx 16rpx 0 0;
-        }
-        .photo_info{
-            padding: 40rpx;
-            .photo_info_model,.photo_info_logo{
-                line-height: 34rpx;
-                font-size: 30rpx;
-                color: #000000;
-                font-weight: bold;
-                width: 100%;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-            .photo_info_model{
-                margin-bottom: 10rpx;
-            }
-            .photo_info_logo{
-                margin-bottom: 20rpx;
-            }
-            .photo_info_name{
-                line-height: 34rpx;
-                font-size: 24rpx;
-                color: #52A3FF;
-            }
-        }
+            border-radius: 16rpx;
+        }   
     }
     .photo_con{
         .photo_nr_bt{
