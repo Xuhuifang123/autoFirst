@@ -1,0 +1,320 @@
+<template>
+    <view class="author_detail">
+        <image src='../../res/images/author_bg.png' class="author_bg" />
+        <view class="author_info">
+            <view class="author_count">
+                <image src='http://img.news18a.com/image/admin/touxiang.jpg' class="author_photo" />
+                <view class="count_list">
+                    <view class="count_nr">
+                        <view class="count_bt">5</view>
+                        <view class="count_sign">关注</view>
+                    </view>
+                    <view class="count_nr">
+                        <view class="count_bt">5</view>
+                        <view class="count_sign">已发布</view>
+                    </view>
+                    <view class="count_nr">
+                        <view class="count_bt">5</view>
+                        <view class="count_sign">粉丝</view>
+                    </view>
+                </view>
+            </view>
+            <view class="author_des">
+                <view class="author_bt">汽车预言家</view>
+                <view class="author_sign">我为自己代言 我为自己代言 </view>
+            </view>
+        </view>
+    </view>
+    <view class="news_list">
+        <block
+            wx:for="{{newsList}}"
+            wx:key="{{index}}">
+            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                <view class='news_con' @tap="storyDetail({{item.id}})">
+                    <view class='news_title'>{{item.title}}</view>
+                </view>
+                <view class='img_con' @tap="storyDetail({{item.id}})">
+                    <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                </view>
+                <view class='news_info'>
+                    <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                    <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
+                </view>
+            </view>
+            <view class="news_nr" wx:else>
+                <view class='news_con'>
+                    <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                    <view class='news_info'>
+                        <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                        <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
+                    </view>
+                </view>
+                <view class='img_con' @tap="storyDetail({{item.id}})">
+                    <image src="{{item.img}}" />
+                </view>
+            </view>
+            <!-- 视频 -->
+            <view class='news_imgs_nr news_nr news_video'> 
+                <view class='news_con' @tap="videoDetail({{item.id}})">
+                    <view class='news_title'>{{item.title}}</view>
+                </view>
+                <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
+                    <image class='blockImg' src="http://img.news18a.com/images/video/202001/video_1577950607227.jpeg"/>
+                    <view class='videoMask'><image src="../../res/images/iconplay.png" /></view>
+                </view>
+                <view class='news_info'>
+                    <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                    <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
+                </view>
+            </view>
+        </block>
+    </view>
+
+    <view class="moreLoading" wx:if='{{loading}}'>
+        <image src="../res/images/homeLoading.png" />数据加载 更多精彩
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
+    export default class Authordetail extends wepy.page {
+        config = {
+            navigationBarTitleText: ''
+        };
+        onLoad(options){
+            this.getNewsList( this.colType,this.colPage );
+        };
+        data = {
+            newsList:[],
+        };
+        methods = {
+            
+        };
+        async getNewsList( type,curPage ){
+            let that = this;
+            // that.loading = true;
+            let params = {
+                query:{
+                    page: curPage,
+                    columnid:2524
+                }
+            }
+            const res = await api.GETTUIJIAN(params);
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.newsList.push( res.data.data[i] );
+                    // that.setData({ newsList : that.newsList });
+                }
+            }
+            this.$apply();
+            // that.loading = false;
+            console.log( that.newsList )
+        };
+
+    }
+</script>
+
+<style lang="less">
+    .author_detail{
+        background: #fff;
+        position: relative;
+        .author_bg{
+            width: 750rpx;
+            height: 404rpx;
+            display: block;
+        }
+        .author_info{
+            position: absolute;
+            top: 114rpx;
+            left: 80rpx;
+            right: 80rpx;
+            bottom: 0;
+            .author_count{
+                display: flex;
+                margin-bottom: 20rpx;
+                .author_photo{
+                    width: 180rpx;
+                    height: 180rpx;
+                    border-radius: 50%;
+                    margin-right: 100rpx;
+                }
+                .count_list{
+                    flex: 1;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                .count_nr{
+                    text-align: center;
+                    .count_bt{
+                        font-size: 36rpx;
+                        line-height: 42rpx;
+                        color: rgba(0,0,0,0.85);
+                        margin-bottom: 4rpx;
+                        font-weight: bold;
+                        margin-top: 38rpx;
+                    }
+                    .count_sign{
+                        color: #818181;
+                        font-size: 24rpx;
+                        line-height: 34rpx;
+                    }
+                }
+            }
+            .author_des{
+                .author_bt,.author_sign{
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+                .author_bt{
+                    height: 42rpx;
+                    font-size: 30rpx;
+                    font-weight: bold;
+                    color:rgba(0,0,0,0.85);
+                }
+                .author_sign{
+                    color: #818181;
+                    font-size: 24rpx;
+                    line-height: 34rpx;
+                }
+            }
+        }
+    }
+    .news_list{
+        padding: 20rpx 24rpx 0 24rpx;
+        background: rgba(0,0,0,0.04);
+    }
+    .news_nr{
+        display: flex;
+        background: #fff;
+        padding: 20rpx;
+        margin-bottom: 20rpx;
+        image{
+            width: 276rpx;
+            height: 184rpx;
+            border-radius: 10rpx;
+            display: block;
+        }
+        .news_con{
+            flex: 1;
+            padding-right: 20rpx;
+            position: relative;
+            .news_title{
+                font-size: 30rpx;
+                color: #000000;
+                line-height: 40rpx;
+                max-height: 80rpx;
+                overflow: hidden;
+                font-weight: bold;
+            }
+        }
+        .news_info{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 20rpx;
+            line-height: 34rpx;
+            font-size: 24rpx;
+            .news_view{
+                float: left;
+                color: #9D9D9D;
+                margin-right: 24rpx;
+                image{
+                    width: 28rpx;
+                    height: 18rpx;
+                    display: inline-block;
+                    margin-right: 4rpx;
+                }
+            }
+            .news_zan{
+                float: left;
+                color: #9D9D9D;
+                image{
+                    width: 24rpx;
+                    height: 28rpx;
+                    display: inline-block;
+                    margin-right: 4rpx;
+                    vertical-align: top;
+                    margin-top: 3rpx;
+                }
+            }
+        }
+    }
+    .news_nr.news_imgs_nr{
+        flex-direction: column;
+        .news_title{
+            max-height: 40rpx;
+            margin-bottom: 16rpx;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .img_con{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16rpx;
+            image{
+                width: 210rpx;
+                height: 140rpx;
+            }
+        }
+        .img_con.news_nr_video{
+            display: block;
+            position: relative;
+            .blockImg{
+                width: 100%;
+                height: 394rpx;
+                display: block;
+            }
+            .videoMask{
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 10rpx;
+                background:rgba(0,0,0,0.45);
+                image{
+                    width: 80rpx;
+                    height: 80rpx;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    margin: -40rpx 0 0 -40rpx;
+                }
+            }
+        }
+        .news_info{
+            position: static;
+        }
+
+    }
+    .news_nr.news_imgs_nr.news_video{
+        padding: 20rpx 0;
+        .news_con{
+            padding: 0 20rpx;
+        }
+        .img_con.news_nr_video .blockImg{
+            border-radius: 0;
+        }
+        .news_info{
+            padding: 0 20rpx;
+        }
+    }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
+        }
+    }
+    
+</style>

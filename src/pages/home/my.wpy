@@ -7,7 +7,8 @@
         </view> -->
         <!-- 授权失败 -->
         <!-- <button open-type='getUserInfo' lang="zh_CN" bindgetuserinfo="onGotUserInfo">获取权限</button> -->
-        <view class="loginOut">
+        <!-- 未登录 -->
+        <!-- <view class="loginOut">
             <image src='../../res/images/logoutBg.png' class='loginOut_bg'/>
             <view class="loginOut_nr">
                 <view class="loginOut_left">
@@ -16,7 +17,20 @@
                 </view>
                 <image src='../../res/images/defaultAvatar.png' />
             </view>
+        </view> -->
+
+        <!-- 已登录 -->
+        <view class="loginIn">
+            <image src='../../res/images/photobg.jpg' class='loginIn_bg'/>
+            <view class="loginIn_nr">
+                <view class="avatar_nr">
+                    <image src='../../res/images/defaultAvatar.png' class='avatar'/>
+                </view>
+                <view class="loginIn_bt">昵称：小势八万</view>
+                <view class="loginIn_tip">这个用户还没有设置个性签名呢..</view>
+            </view>
         </view>
+
         <view class="my_list">
             <view class="my_nr">
                 <image src='../../res/images/icon_share.png' class='my_icon'/>
@@ -180,6 +194,46 @@
                     line-height: 40rpx;
                     overflow: hidden;
                 }
+            }
+        }
+    }
+    .loginIn{
+        position: relative;
+        border-bottom: 20rpx solid #F5F5F5;
+        .loginIn_bg{
+            display: block;
+            width: 100%;
+            height: 470rpx;
+        }
+        .loginIn_nr{
+            position: absolute; 
+            width: 100%;
+            top: 148rpx;
+            text-align: center;
+            .avatar_nr{
+                width: 148rpx;
+                height: 148rpx;
+                padding: 2rpx;
+                border-radius: 50%; 
+                margin: 0 auto 18rpx auto;
+                background: #fff;
+                .avatar{
+                    width: 100%;
+                    height: 100%;
+                    display: block;
+                }
+            }
+            .loginIn_bt{
+                color: #FFFFFF;
+                font-size: 30rpx;
+                line-height: 42rpx;
+                margin-bottom: 10rpx;
+                font-weight: bold;
+            }
+            .loginIn_tip{
+                color: #FFFFFF;
+                font-size: 24rpx;
+                line-height: 34rpx;
             }
         }
     }

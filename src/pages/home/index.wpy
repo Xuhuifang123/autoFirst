@@ -1,6 +1,12 @@
 <template>
     <view class="wrap">
+        <!-- 菜单 -->
         <Menu @tabClick.user="tabChange"></Menu>
+        
+        <!-- 编辑频道 -->
+        <EditChannel></EditChannel>
+
+        <!-- 栏目内容 -->
         <view class="content">
             <scroll-view
                 @scroll="handleScroll"
@@ -17,6 +23,7 @@
                     :colPage.sync="columnPage"></Column>
             </scroll-view>
         </view>
+
     </view>
 </template>
 
@@ -24,6 +31,7 @@
     import wepy from 'wepy';
     import Menu from '../../components/menu';
     import Column from '../../components/column';
+    import EditChannel from '../../components/editChannel';
     export default class Index extends wepy.page {
         customData = {}  // 自定义数据
         customFunction ()　{}  //自定义方法
@@ -44,7 +52,8 @@
         //声明页面中所引用的组件，或声明组件中所引用的子组件
         components = {
             Menu:Menu,
-            Column:Column
+            Column:Column,
+            EditChannel:EditChannel
         };  
 
         mixins = [];  // 声明页面所引用的Mixin实例

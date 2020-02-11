@@ -1,0 +1,183 @@
+<template lang="wxml">
+    <!-- @tap="goNext({{item}}) -->
+    <view class='channelWrap'>
+        <view class='channelBack'>
+            <image src='../res/images/home_back.png' class='backBtn' />
+        </view>
+        <view class='channelCon'>
+            <view class='channelBt'>编辑频道</view>
+            <view class='channelTip'>长按可拖动顺序</view>
+            <view class='channelList'>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_focus.png' mode='aspectFit'/>
+                    </view>
+                    <view class='channelName'>焦点</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_special.png' mode='aspectFit' />
+                    </view>
+                    <view class='channelName'>专题</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_report.png' mode='aspectFit' />
+                    </view>
+                    <view class='channelName'>播报</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_recom.png' />
+                    </view>
+                    <view class='channelName'>推荐</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_industry.png' />
+                    </view>
+                    <view class='channelName'>行业</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_face.png' />
+                    </view>
+                    <view class='channelName'>面孔</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_buy.png' />
+                    </view>
+                    <view class='channelName'>买车</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_dazhou.png' />
+                    </view>
+                    <view class='channelName'>大周说车</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_market.png' />
+                    </view>
+                    <view class='channelName'>营销</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_energy.png' />
+                    </view>
+                    <view class='channelName'>新能源</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_video.png' />
+                    </view>
+                    <view class='channelName'>影像</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_evaluate.png' />
+                    </view>
+                    <view class='channelName'>评测</view>
+                </view>
+                <view class='channelNr'>
+                    <view class='channelNr_icon'>
+                        <image src='../res/images/icon_photo.png' />
+                    </view>
+                    <view class='channelName'>图片</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    export default class EditChannel extends wepy.component {
+        data = {
+
+        };
+        onLoad(){
+            const that = this;
+        };
+        methods = {
+            goNext (  ){
+
+                // 传值给父页面
+                // that.$emit('tabClick',item);
+            }
+        }
+    }
+
+</script>
+
+<style lang="less">
+    .channelWrap{
+        height: 100%;
+        width: 540rpx;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 66;
+        background:rgba(247,247,247,1);
+        box-shadow:17rpx 0px 27rpx 59rpx rgba(0,0,0,0.41);
+        .channelBack{
+            width: 44rpx;
+            height: 44rpx;
+            padding: 20rpx 24rpx;
+            .backBtn{
+                display: block;
+                width: 44rpx;
+                height: 44rpx;
+            }
+        }
+        .channelCon{
+            padding: 0 60rpx;
+            .channelBt{
+                font-size: 36rpx;
+                color: #EA0A19;
+                line-height: 50rpx;
+            }
+            .channelTip{
+                color: #818181;
+                font-size: 24rpx;
+                line-height: 34rpx;
+                margin-bottom: 20rpx;
+            }
+            .channelList{
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                .channelNr{
+                    width: 120rpx;
+                    height: 120rpx;
+                    background:#fff;
+                    border-radius: 6rpx;
+                    border:1px solid rgba(214,214,214,1);
+                    margin-bottom: 30rpx;
+                    text-align: center;
+                    .channelNr_icon{
+                        width: 40rpx;
+                        height: 40rpx;
+                        margin: 20rpx auto 0 auto;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                        image{
+                            width: 40rpx;
+                        }
+                    }
+                    
+                    .channelName{
+                        color: #828282;
+                        font-size: 24rpx;
+                        line-height: 34rpx;
+                        // text-align: center;
+                    }
+                }
+            }
+        }
+    }
+
+</style>

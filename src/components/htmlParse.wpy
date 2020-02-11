@@ -4,7 +4,6 @@
 
         <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/>
     </template>
-
 <script>
     import wepy from 'wepy';
     import WxParse from '../wxParse/wxParse.js';
