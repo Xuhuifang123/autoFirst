@@ -7,12 +7,13 @@ const wxRequest = async (params = {}, url, noLoadingStatus, navigateBackStatus) 
         // tip.loading()
     }
     let data = params.query || {}
-    let header = params.header || {'Content-Type': 'application/json'}
+    //let header = params.header || {'Content-Type': 'application/json'}
+    let header = params.header || {'Content-Type': 'application/x-www-form-urlencoded'}
     // header.version = MINI_APPS_VERSION
     try {
         let res = await wepy.request({
             url: url,
-            method: params.method || 'GET',
+            method: params.method || 'POST',
             data: data,
             header: header
         })

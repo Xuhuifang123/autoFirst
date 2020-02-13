@@ -69,10 +69,10 @@
 
     <!-- 播报 -->
     <view class='report_list' wx:elif="{{colType==('bobao')}}">
-        <block wx:for='{{bobaoData}}' wx:key="{{index}}" wx:for-item='item' wx:for-index='parentIndex'>
+        <block wx:for='{{bobaoData}}' wx:key="index" wx:for-item='item' wx:for-index='parentIndex'>
             <view class='report_con'>
                 <view class='report_date'><view><image src="../res/images/icon_time.png" />{{item[0].day}}</view></view>
-                <view class='report_nr' wx:for='{{item}}' wx:key="{{index}}" wx:for-item='report' wx:for-index='childInx'>
+                <view class='report_nr' wx:for='{{item}}' wx:key="index" wx:for-item='report' wx:for-index='childInx'>
                     <view class='report_time'>{{report.time}}</view>
                     <view class="report_info">
                         <view class="report_bt">{{report.title}}</view>
@@ -95,7 +95,7 @@
             circular='true'
             indicator-color='#fff'
             indicator-active-color='#000' >
-            <block wx:for="{{imgUrls}}" wx:key='{{index}}'>
+            <block wx:for="{{imgUrls}}" wx:key='index'>
                 <swiper-item>
                     <image src="{{item}}" class="slide-image"/>
                 </swiper-item>
@@ -104,7 +104,7 @@
 
         <block
             wx:for="{{newsList}}"
-            wx:key="{{index}}">
+            wx:key="index">
             <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
                 <view class='news_con' @tap="storyDetail({{item.id}})">
                     <view class='news_title'>{{item.title}}</view>
@@ -168,13 +168,22 @@
                 type: Number,
                 default: 1 
             },
+            colId:{
+                type:Number,
+                default: 1
+            },
+            colSpell:{
+                type:String,
+                default: 'jiaodian'
+            }
         };
         components = {
             
         };
         onLoad(){
-            console.log( this.colType ,this.colPage );
-            this.getNewsList( this.colType,this.colPage );
+            // console.log( this.colType ,this.colPage,this.colId );
+            this.getNewsList( this.colId,this.colType,this.colPage,this.colSpell );
+            // this.getNewsList( cat_id,menu_id,type,cat_spell,page );
             if( this.colType == 'bobao' ){
                 this.disposeReport();
             }
@@ -279,8 +288,7 @@
                 }else{
                     that.bobaoData[parentIndex][childInx].falg = false;
                 }
-            }
-            
+            }     
         };
         disposeReport(){
             const that = this;
@@ -303,38 +311,73 @@
             that.bobaoData = newReport;
         };
         events = {
-            requestType( val,page ){
+            requestType( cat_id,menu_id,type,cat_spell,page ){
                 const that = this;
-                if( val == "bobao" ){
+                if( cat_spell == "bobao" ){
+                    that.bobaoData = [];
                     that.disposeReport();
                 }else{
                     that.newsList = [];
                     // 模板数据变更后更新
                     that.$apply();
-                    that.getNewsList( val,page );
+                    that.getNewsList( menu_id,type,page,cat_spell,cat_id );
                 }
-                
             }
         };
         
-        async getNewsList( type,curPage ){
+        // this.colId,this.colType,this.colPage,this.colSpell
+        async getNewsList( menu_id,type,page,spell,cat_id ){ // id,type(index),page,spell
             let that = this;
-            // that.loading = true;
-            let params = {
-                query:{
-                    page: curPage,
-                    columnid:2524
+            if( type=='index' ){
+                let params = {
+                    query:{
+                        page: page,
+                        type: 'jiaodian',
+                        id:1,
+                        ua_from:'program'
+                    }
+                };
+                const res = await api.GETTYPEINDEX( params );
+                console.log( res );
+                if( res.data.code == 200 ){
+                    for( let i=0; i<res.data.data.length; i++ ){
+                        that.newsList.push( res.data.data[i] );
+                    }
+                }
+            } else if( type=='hand' ) {
+                let params = {
+                    query:{
+                        page: page,
+                        type: 'jiaodian',
+                        id:1
+                    }
+                };
+                const res = await api.GETTYPEINDEX( params );
+                console.log( res );
+                if( res.data.code == 200 ){
+                    for( let i=0; i<res.data.data.length; i++ ){
+                        that.newsList.push( res.data.data[i] );
+                    }
+                }
+            } else {
+                let params = {
+                    query:{
+                        page: page,
+                        type: spell,
+                        id:menu_id,
+                        column_id:cat_id
+                    }
+                };
+                const res = await api.GETTYPEINDEX( params );
+                console.log( res );
+                if( res.data.code == 200 ){
+                    for( let i=0; i<res.data.data.length; i++ ){
+                        that.newsList.push( res.data.data[i] );
+                    }
                 }
             }
-            const res = await api.GETTUIJIAN(params);
-            if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
-                }
-            }
+            
             this.$apply();
-            // that.loading = false;
             console.log( that.newsList )
         };
     }

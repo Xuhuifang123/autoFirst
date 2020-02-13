@@ -4,7 +4,7 @@
         <Menu @tabClick.user="tabChange"></Menu>
         
         <!-- 编辑频道 -->
-        <EditChannel></EditChannel>
+        <!-- <EditChannel></EditChannel> -->
 
         <!-- 栏目内容 -->
         <view class="content">
@@ -20,7 +20,12 @@
                     :colType="columnType" 
                     :colType.sync="columnType"
                     :colPage="columnPage"
-                    :colPage.sync="columnPage"></Column>
+                    :colPage.sync="columnPage"
+                    :colId="menu_id"
+                    :colId.sync="menu_id"
+                    :colSpell="columnSpellcolSpell"
+                    :colSpell.sync="columnSpell"
+                    ></Column>
             </scroll-view>
         </view>
 
@@ -45,8 +50,11 @@
         };
 
         data = {
-            columnType:'tuijian',
-            columnPage:1
+            columnType:'index',
+            columnSpell:'jiaodian',
+            columnPage:1,
+            column_id:-1,
+            menu_id:1,
         };  // 页面所需数据均需在这里声明，可用于模板数据绑定
         
         //声明页面中所引用的组件，或声明组件中所引用的子组件
@@ -65,12 +73,14 @@
         // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
         methods = {
             // 接收子组件的值
-            tabChange( item ){
-                this.columnType = item.type;
+            tabChange( cat_id,menu_id,type,cat_spell ){
+                this.columnType = type;
+                this.column_id = cat_id;
+                this.menu_id = menu_id;
                 this.columnPage = 1;
+
                 //使用$broadcast事件广播，父组件向各个子组件发送广播事件
-                this.$broadcast('requestType',this.columnType,this.columnPage);
-                // console.log( item );
+                this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
             },
             handleScroll(){
                 // console.log( 222 );
@@ -82,7 +92,7 @@
             /* 上拉加载更多 */
             loadMore(){
                 this.columnPage = this.columnPage*1 + 1;
-                this.$broadcast('requestType',this.columnType,this.columnPage);
+                this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
             }
         };  
 

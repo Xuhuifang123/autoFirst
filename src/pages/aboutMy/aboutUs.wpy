@@ -1,27 +1,40 @@
 <template>
     <view class="wrap">
         <image src='../../res/images/login_logo.png' class='about_logo' />
-        <view class='about_detail'>
-            志在成为汽车传播领域领先者的汽势AUTO-FIRST，是一家新媒体平台。以“在这里读懂中国汽车”为理念，全面解读和前进中的中国汽车行业。汽势涵盖汽势公众号集群、汽势小程序、汽势APP、汽势TV和汽势网页版等全业态、全媒体平台。 
-        </view>
-        <view class='about_detail'>
-            汽势致力于打造原创、严谨、前瞻、专业和深度的汽车传播生态系统。原创、专业、严谨和互联网思维是汽势科技的DNA，用深度解读行业，用视野谋略产业，用态度表明立场。汽势传媒，为塑造汽车传播新格局而来。专业和深度的汽车传播生态系统。原创、专业、严谨和志在成为汽车传播领域领先者的汽势AUTO-FIRST，是一家新媒体平台。以“在这里读懂中国汽车”为理念。 
-        </view>
+        <view class='about_detail'> {{aboutStr}} </view>
         <view class='version'>当前版本：V1.5.6</view>
     </view>
 </template>
 
 <script>
     import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
     export default class AboutUs extends wepy.page {
         config = {
             navigationBarTitleText: '关于我们'
         };
         onLoad(options){
-            
+            this.aboutUs();
         };
         data = {
-            
+            aboutStr:'正在加载...',
+            aboutcode:'11'
+        };
+        async aboutUs(){
+            let that = this;
+            let params = {}
+            api.loading();
+            const res = await api.ABOUTUS(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                api.finishLoading();
+                that.aboutStr = res.data.data;
+                that.aboutcode = res.data.code;
+                console.log( that.aboutStr );   
+            }else{
+                that.aboutStr = '加载失败';
+            }
+            that.$apply();
         };
 
     }
