@@ -7,27 +7,11 @@
         scroll-with-animation="{{true}}"
         class='wrapSroll'>
         <view class="author_con">
-            <view class="author_nr" @tap='authorDetail()'>
-                <image src='http://img.news18a.com/image/admin/touxiang.jpg' class="author_photo" />
+            <view class="author_nr" wx:for="{{authorList}}" wx:key="index" @tap='authorDetail({{item.id}})'>
+                <image src='{{item.photo}}' class="author_photo" />
                 <view class="author_info">
-                    <view class="author_name">汽车商业评论</view>
-                    <view class="author_sign">我为自己代言</view>
-                </view>
-                <image src='../../res/images/my_more.png' class="author_detail" />
-            </view>
-            <view class="author_nr" @tap='authorDetail()'>
-                <image src='http://img.news18a.com/image/admin/touxiang.jpg' class="author_photo" />
-                <view class="author_info">
-                    <view class="author_name">汽车商业评论</view>
-                    <view class="author_sign">我为自己代言</view>
-                </view>
-                <image src='../../res/images/my_more.png' class="author_detail" />
-            </view>
-            <view class="author_nr" @tap='authorDetail()'>
-                <image src='http://img.news18a.com/image/admin/touxiang.jpg' class="author_photo" />
-                <view class="author_info">
-                    <view class="author_name">汽车商业评论汽车商业评论汽车商业评论汽车商业评论汽车商业评论</view>
-                    <view class="author_sign">我为自己代言</view>
+                    <view class="author_name">{{item.name}}</view>
+                    <view class="author_sign">{{item.description}}</view>
                 </view>
                 <image src='../../res/images/my_more.png' class="author_detail" />
             </view>
@@ -47,10 +31,11 @@
         };
 
         onLoad(options){
-            
+            this.getAuthorList();
         };
         data = {
-
+            authorList:[],
+            columnPage:1
         };
         methods = {
             handleScroll(){
@@ -62,23 +47,44 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                // this.columnPage = this.columnPage*1 + 1;
-                // this.$broadcast('requestType',this.columnType,this.columnPage);
+                this.columnPage = this.columnPage*1 + 1;
+                this.getAuthorList();
+                console.log( this.columnPage );
             },
-            authorDetail(){
+            authorDetail(id){
                 wepy.navigateTo({
-                    url: '../../pages/detail/authorDetail'
+                    url: '../../pages/detail/authorDetail?id='+id
                 })
             }
         };
         events = {
 
         };
+        async getAuthorList(){
+            let that = this;
+            let params = {
+                query:{
+                    page: that.columnPage
+                }
+            }
+            const res = await api.GETAUTHORLIST(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.authorList.push( res.data.data[i] );
+                }
+            }
+            this.$apply();
+        };
         
     }
 </script>
 
 <style lang="less">
+    .wrapSroll{
+        width: 100vw;
+        height: 100vh;
+    }
     .author_con{
         padding: 0 24rpx;
         .author_nr{

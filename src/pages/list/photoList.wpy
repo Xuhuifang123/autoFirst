@@ -1,16 +1,16 @@
 <template lang="wxml">
     <view class="photo_bg">
         <view class="photo_top">
-            <view class="photo_model">奔腾T99</view>
-            <image class='photo_top_img' src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+            <view class="photo_model">{{photoInfo.prd_brand}}{{photoInfo.prd_sign}}</view>
+            <image class='photo_top_img' src='{{photoInfo.cover}}'></image>
         </view>
         <view class="photo_wrap">
-            <block wx:for="{{photoList}}" wx:key="{{index}}">
+            <block wx:for="{{photoInfo.images}}" wx:key="index">
                 <view class="photo_con">
-                    <view class="photo_nr_bt">{{item.name}}</view>
+                    <view class="photo_nr_bt">{{item.title}}</view>
                     <view class="photo_nr">
-                        <block wx:for="{{item.imgList}}" wx:key="{{inx}}">
-                            <image @tap='photoDetail()' src='{{item}}'></image>
+                        <block wx:for="{{item.list}}" wx:for-item='elem' wx:key="index">
+                            <image wx:if='{{elem}}' @tap='photoDetail({{photoId}},{{item.title}},{{index}})' src='{{elem}}'></image>
                         </block>
                     </view>
                 </view>
@@ -29,44 +29,45 @@
         components = {
             
         };
-
         onLoad(options){
-            
+            console.log( options.id );
+            this.photoId = options.id;
+            this.getPhotoDetail( options.id );           
         };
         data = {
-            photoList:[
-                {
-                    name:'外观',
-                    imgList:[
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'
-                    ]
-                },
-                {
-                    name:'内饰',
-                    imgList:[
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg','http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                        'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'
-                    ]
-                }
-            ]
+            photoInfo:{},
+            photoId:0
         };
         methods = {
-            photoDetail:function(){
+            photoDetail:function(id,title,inx){
+                console.log( id,title,inx );
                 wepy.navigateTo({
-                    url: '../detail/photoDetail'
+                    url: '../detail/photoDetail?id='+id+'&title='+title+'&inx='+inx
                 })
             }
         };
         events = {
 
         };
+        async getPhotoDetail( id ){
+            let that = this;
+            let params = {
+                query:{
+                    id:id
+                }
+            }
+            api.loading();
+            const res = await api.GETPHOTODETAIL(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                if( res.data.data ){
+                    that.photoInfo = res.data.data;
+                }
+                api.finishLoading();
+            }
+            this.$apply();
+        };
+
         
     }
 </script>

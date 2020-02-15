@@ -1,19 +1,13 @@
 <template>
     <view class="liveWrap">
         <view class="player">
-            <!-- <view class="player_video">
+            <view class="player_video">
                 <video src="http://img.auto-first.cn/upload/special/static/video/1.mp4" id='video1' controls="true" autoplay='true'></video>
-            </view> -->
-            <view class="player_video player_advance">
-                <view class="player_tip">距开播还剩 00：18：18 
-                    <!-- <view class='player_tip_btn'><image src='../../res/images/liveNotify.png'/>提醒</view> -->
-                    <view class='player_tip_btn reminded'>已提醒</view>
-                </view>
             </view>
             <view class="player_bt">开不坏的丰田，越野男人的放飞自我！</view>
-            <view class='player_con'>
-                <view class='player_author'>汽车商业评论</view>
-                <view class='player_des'>汽车商业评论简介或直播内容简介等，或者为空，看后台的直播设置管理。</view>
+            <view class='player_info'>
+                <text class='player_author'>汽车商业评论</text>
+                <text class=""></text>
             </view>
         </view>
     </view>

@@ -4,10 +4,10 @@
         <view class="artice_con">
             <view class="author flex verCenter">
                 <view class='flex fullFlex'>
-                    <image src='{{userInfo.photo}}' class='authorPhoto'/>
+                    <image src='{{storyInfo.photo}}' class='authorPhoto'/>
                     <view class='fullFlex authorInfo'>
-                        <view class='authorInfo_bt'>{{userInfo.name}}</view>
-                        <view class='authorInfo_time'><text>{{storyInfo.story_date}}</text></view>
+                        <view class='authorInfo_bt'>{{storyInfo.authorname}}</view>
+                        <view class='authorInfo_time'><text>{{storyInfo.add_date}}</text></view>
                     </view>
                 </view>
             </view>
@@ -18,8 +18,8 @@
                 </view>
             </view>
             <view class="articleNumber">
-                <view class='articleLook'><image src="../../res/images/iconlook.png" />3569</view>
-                <view class='articleZan'><image src="../../res/images/articeZan.png" />3569</view>
+                <view class='articleLook'><image src="../../res/images/iconlook.png" />{{storyInfo.pv}}</view>
+                <!-- <view class='articleZan'><image src="../../res/images/articeZan.png" />{{storyInfo.like_count}}</view> -->
             </view>
             <view class="artice_share flex" wx:if='{{storyInfo}}'>
                 <button class='shareMessage' open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
@@ -29,29 +29,29 @@
             <view class="recommend">
                 <view class="recommend_bt"><image src='../../res/images/icon_recommend.png' /> 相关推荐</view>
                 <view class="recommend_list">
-                    <view class="three_img recommend_list_dl">
-                        <view class='recommend_list_bt'>新手第一次购车上路，应该如何注意“保养”呢？</view>
-                        <view class="flex recommend_list_img">
-                            <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg' @tap="storyDetail({{item.id}})"></image>
-                            <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg' @tap="storyDetail({{item.id}})"></image>
-                            <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg' @tap="storyDetail({{item.id}})"></image>
-                        </view>
-                        <view class='recommend_list_info'>
-                            <text class="recommend_author">马拉车市</text>
-                            <text class="recommend_top">置顶</text>
-                            <view class="recommend_view"><image src="./../../res/images/iconlook.png" />3568</view>
-                        </view>
-                    </view>
-                    <view class="recommend_list_dl one_img flex">
-                        <view class="fullFlex recommend_list_dd">
-                            <view class='recommend_list_bt'><a href="javascript:;">国产新车发布，能否力挽狂澜？</a></view>
+                    <block wx:for='{{storyInfo.hot_info}}' wx:key="index">
+                        <view wx:if='{{item.imgs && item.imgs.length > 0}}' class="three_img recommend_list_dl" @tap="storyDetail({{item.id}})">
+                            <view class='recommend_list_bt'>{{item.title}}</view>
+                            <view class="flex recommend_list_img">
+                                <image wx:for="{{item.imgs}}" wx:key="inx" src='{{item}}'></image>
+                            </view>
                             <view class='recommend_list_info'>
-                                <text class="recommend_author">汽车商业评论</text>
-                                <view class="recommend_view"><image src="./../../res/images/iconlook.png" />3568</view>
+                                <text class="recommend_author">{{item.source}}</text>
+                                <!-- <text class="recommend_top">置顶</text> -->
+                                <view class="recommend_view"><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
                             </view>
                         </view>
-                        <image class='recommend_list_img' src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg' @tap="storyDetail({{item.id}})"></image>
-                    </view>
+                        <view wx:else class="recommend_list_dl one_img flex"  @tap="storyDetail({{item.id}})">
+                            <view class="fullFlex recommend_list_dd">
+                                <view class='recommend_list_bt'><a href="javascript:;">{{item.title}}</a></view>
+                                <view class='recommend_list_info'>
+                                    <text class="recommend_author">{{item.source}}</text>
+                                    <view class="recommend_view"><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
+                                </view>
+                            </view>
+                            <image class='recommend_list_img' src='{{item.title_pic1}}'></image>
+                        </view>
+                    </block>
                 </view>
             </view>
 
@@ -101,9 +101,10 @@
             if( res.data.code == 200 ){
                 api.finishLoading();
                 const storyDetail = res.data.data;
-                that.userInfo = storyDetail.userInfo;
-                that.storyInfo = storyDetail.storyInfo;
-                that.storyList = storyDetail.storyList;
+                // that.userInfo = storyDetail.userInfo;
+                that.storyInfo = res.data.data;
+                // that.storyList = storyDetail.storyList;
+
                 that.parserContent = WxParse.wxParse('parserContent', 'html', that.storyInfo.content, that, 0);
                 that.$apply();
                 // that.$invoke('组件名', '组件里对应事件');

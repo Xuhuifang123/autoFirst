@@ -9,42 +9,18 @@
         <view class='liveCon'>
             <block>
                 <!-- 预告 -->
-                <view class='live_nr' @tap="liveDetail()">
+                <view class='live_nr' wx:for="{{liveData}}" wx:key='index' @tap="liveDetail({{item.id}})">
                     <view class='live_dt'>
-                        <image class='liveImg' src='http://img.news18a.com/images/video/201909/video_1568732395648.jpeg' />
-                        <view class='live_status live_advance'>预告</view>
+                        <image class='liveImg' src='{{item.title_pic1}}' mode='aspectFit'/>
+                        <view class='live_status live_advance' wx:if='{{liveinfo.status == 1}}'>预告</view>
+                        <view class='live_status living' wx:elif='{{liveinfo.status == 2}}'><text></text>直播中</view>
+                        <view class='live_status living' wx:else='{{liveinfo.status == 3}}'><text></text>回看</view>
                         <view class='live_info'>
-                            <view class="live_author">丈母娘唠车</view>
-                            <view class="live_view"><image src='../../res/images/liveSee.png' />3.6万</view>
+                            <view class="live_author">{{item.source}}</view>
+                            <view class="live_view"><image src='../../res/images/liveSee.png'/>{{item.pv}}</view>
                         </view>
                     </view>
-                    <view class='live_dd'>为大奔披上金砖为大奔披上金砖为大奔披上金砖为大奔披上金砖</view>
-                </view>
-
-                <!-- 直播中 -->
-                <view class='live_nr' @tap="liveDetail()">
-                    <view class='live_dt'>
-                        <image class='liveImg' src='http://img.news18a.com/images/video/201909/video_1568732395648.jpeg' />
-                        <view class='live_status living'><text></text>直播中</view>
-                        <view class='live_info'>
-                            <view class="live_author">丈母娘唠车</view>
-                            <view class="live_view"><image src='../../res/images/liveSee.png' />3.6万</view>
-                        </view>
-                    </view>
-                    <view class='live_dd'>为大奔披上金砖</view>
-                </view>
-
-                <!-- 复播 -->
-                <view class='live_nr' @tap="liveDetail()">
-                    <view class='live_dt'>
-                        <image class='liveImg' src='http://img.news18a.com/images/video/201909/video_1568732395648.jpeg' />
-                        <view class='live_status'>复播</view>
-                        <view class='live_info'>
-                            <view class="live_author">丈母娘唠车</view>
-                            <view class="live_view"><image src='../../res/images/liveSee.png' />3.6万</view>
-                        </view>
-                    </view>
-                    <view class='live_dd'>为大奔披上金砖</view>
+                    <view class='live_dd'>{{item.title}}</view>
                 </view>
             </block>
         </view>
@@ -54,20 +30,22 @@
 
 <script>
     import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
     export default class Live extends wepy.page {
         config = {
             navigationBarTitleText: '直播'
         };
         onLoad(options){
-            
+            this.getLiveList();
         };
         data = {
-            
+            columnPage:1,
+            liveData:[]
         };
         methods = {
-            liveDetail(){
+            liveDetail(id){
                 wepy.navigateTo({
-                    url: '../../pages/detail/liveDetail'
+                    url: '../../pages/detail/liveDetail?id='+id
                 })
             },
             handleScroll(){
@@ -79,8 +57,26 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                // this.columnPage = this.columnPage*1 + 1;
-                // this.$broadcast('requestType',this.columnType,this.columnPage);
+                this.columnPage = this.columnPage*1 + 1;
+                this.getLiveList();
+            }
+        };
+        async getLiveList(){
+            let that = this;
+            let params = {
+                query:{
+                    page:this.columnPage
+                }
+            }
+            api.loading();
+            const res = await api.GETLIVELIST(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.liveData.push( res.data.data[i] );
+                }
+                api.finishLoading();
+                that.$apply();
             }
         };
 
@@ -103,7 +99,7 @@
                 .liveImg{
                     display: block;
                     width: 100%;
-                    height: 236rpx;
+                    height: 394rpx;
                 }
                 .live_status{
                     position: absolute;

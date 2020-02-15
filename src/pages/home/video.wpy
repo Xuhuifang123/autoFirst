@@ -9,56 +9,38 @@
         <view class='videoCon'>
             <block wx:for='{{videoData}}' wx:key='{{index}}'>
                 <view class='video_nr'>
-                    <view class='video_bt' @tap='liveDetail()'>{{item.videoTitle}}</view>
+                    <view class='video_bt' @tap='liveDetail({{item.id}})'>{{item.title}}</view>
                     <view class="video_player">
-                        <video src="{{item.videoUrl}}" controls='true'></video>
+                        <video src="{{item.video}}" controls='true'></video>
                     </view>
                     <view class="video_info">
-                        <view class="video_author"><image src='{{item.authorPhoto}}'/>{{item.authorName}}</view>
-                        <view class="video_view"><image src='../../res/images/iconlook.png'/>35689</view>
+                        <view class="video_author"><image src='{{item.photo}}'/>{{item.source}}</view>
+                        <view class="video_view"><image src='../../res/images/iconlook.png'/>{{item.pv}}</view>
                     </view>
                 </view>
             </block>
         </view>
-
     </scroll-view>
 </template>
 
 <script>
     import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
     export default class Video extends wepy.page {
         config = {
             navigationBarTitleText: '视频'
         };
         onLoad(options){
-            
+            this.getVideoList();
         };
         data = {
-            videoData:[
-                {
-                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
-                    'authorName':'孙琦',
-                    'videoTitle':'电动车续航里程为什么会有不同标准？',
-                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/1.mp4'
-                },
-                {
-                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
-                    'authorName':'孙琦',
-                    'videoTitle':'电动车续航里程为什么会有不同标准？',
-                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/2.mp4'
-                },
-                {
-                    'authorPhoto':'http://img.news18a.com/userPhoto/user_15078893498028.JPG',
-                    'authorName':'孙琦',
-                    'videoTitle':'电动车续航里程为什么会有不同标准？',
-                    'videoUrl':'http://img.auto-first.cn/upload/special/static/video/3.mp4'
-                },
-            ]
+            columnPage:1,
+            videoData:[]
         };
         methods = {
-            liveDetail(){
+            liveDetail(id){
                 wepy.navigateTo({
-                    url: '../../pages/detail/liveDetail'
+                    url: '../../pages/detail/videoDetail?id='+id
                 })
             },
             handleScroll(){
@@ -70,15 +52,37 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                // this.columnPage = this.columnPage*1 + 1;
-                // this.$broadcast('requestType',this.columnType,this.columnPage);
+                this.columnPage = this.columnPage*1 + 1;
+                this.getVideoList();
             }
         };
-
+        async getVideoList(){
+            let that = this;
+            let params = {
+                query:{
+                    page:this.columnPage
+                }
+            }
+            api.loading();
+            const res = await api.GETVIDEOLIST(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                console.log( res.data.data.length );
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.videoData.push( res.data.data[i] );
+                }
+                api.finishLoading();
+                that.$apply();
+            }
+        };
     }
 </script>
 
 <style lang="less">
+    .wrapSroll{
+        width: 100vw;
+        height: 100vh;
+    }
     .videoCon{
         padding: 24rpx 24rpx 0 24rpx;
         .video_nr{

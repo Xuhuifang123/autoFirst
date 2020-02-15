@@ -22,7 +22,7 @@
     import api from './../api/ApiConstants';
     export default class Menu extends wepy.component {
         data = {
-            currentName: '1',
+            currentName: 'jiaodian',
             scrollLeft: 0,
             winWidth: 375,
             navList:[]
@@ -41,7 +41,6 @@
                     that.currentName = cat_spell;
                     let itemId = e.target.id,
                         itemLeft = e.target.offsetLeft;
-
                     var query = wx.createSelectorQuery();
                     query.select('#'+itemId).boundingClientRect(function (rect) {
                         var setLeft = itemLeft - that.winWidth/2 + rect.width/2;
@@ -62,11 +61,11 @@
             }
             api.loading();
             const res = await api.GETMENU(params);
-            console.log( res );
+            console.log( res.data );
             if( res.data.code == 200 ){
                 api.finishLoading();
                 that.navList = res.data.data;
-                that.currentName = that.navList[0].cat_name;
+                that.currentName = that.navList[0].cat_spell;
             }
             that.$apply();
         }

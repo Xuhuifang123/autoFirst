@@ -23,7 +23,7 @@
                     :colPage.sync="columnPage"
                     :colId="menu_id"
                     :colId.sync="menu_id"
-                    :colSpell="columnSpellcolSpell"
+                    :colSpell="columnSpell"
                     :colSpell.sync="columnSpell"
                     ></Column>
             </scroll-view>
@@ -78,7 +78,7 @@
                 this.column_id = cat_id;
                 this.menu_id = menu_id;
                 this.columnPage = 1;
-
+                this.columnSpell = cat_spell;
                 //使用$broadcast事件广播，父组件向各个子组件发送广播事件
                 this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
             },
@@ -92,7 +92,8 @@
             /* 上拉加载更多 */
             loadMore(){
                 this.columnPage = this.columnPage*1 + 1;
-                this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
+                // this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
+                this.$broadcast('requestType',this.column_id,this.menu_id,this.columnType,this.columnSpell,this.columnPage);
             }
         };  
 

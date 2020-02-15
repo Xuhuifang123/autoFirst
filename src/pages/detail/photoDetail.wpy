@@ -1,6 +1,6 @@
 <template>
     <view class='photo_detail'>
-        <view class='photo_sort'>中控</view>
+        <view class='photo_sort'>{{title}}</view>
         <view class='photo_swiper'>
             <swiper class='swiper'
             indicator-dots='false'
@@ -8,11 +8,12 @@
             interval='2000'
             duration='500 '
             circular='true'
+            current={{swiperCur}}
             indicator-color='#fff'
             indicator-active-color='#000'
             bindchange='changeSwiper'>
                 <block wx:for="{{imgUrls}}" wx:key='{{index}}'>
-                    <swiper-item>
+                    <swiper-item wx:if='item'>
                         <image src="{{item}}" class="slide-image"/>
                     </swiper-item>
                 </block>
@@ -33,25 +34,24 @@
         };
         onLoad(options){
             const that = this;
-            that.swiperLen = that.imgUrls.length;
+            console.log( options );
+            that.title = options.title;
+            that.swiperCur = options.inx * 1;
+            that.getPhotoDetail( options.id );
         };
         data = {
-            imgUrls:[
-                'http://img.news18a.com/site/other/202001/ina_15788154311752686037.jpg',
-                'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-                'http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg',
-            ],
+            imgUrls:[],
             autoplay:false,
             swiperLen:0,
-            swiperCur:0
+            swiperCur:0,
+            title:'',
+            imgInx:0
         };
         methods = {
-            changeSwiper:function(current,source){
+            changeSwiper:function(current){
                 const that = this;
                 that.swiperCur = current.detail.current;
-                console.log( current,source );
+                console.log( current );
             },
             downloadImg:function(){
                 const that = this;
@@ -82,9 +82,44 @@
                                 }
                             });
                         }
+                    },
+                    fail: function(error){
+                        wepy.showToast({
+                            title: 'error',
+                            icon: 'success',
+                            duration: 2000
+                        });
                     }
                 });
+            },
+        };
+        async getPhotoDetail( id ){
+            let that = this;
+            let params = {
+                query:{
+                    id:id
+                }
             }
+            api.loading();
+            const res = await api.GETPHOTODETAIL(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                if( res.data.data ){
+                    const imgArr = res.data.data.images;
+                    for( let i=0; i<imgArr.length; i++ ){
+                        if( imgArr[i].title == that.title ){
+                            for( let j=0; j<imgArr[i].list.length; j++ ){
+                                if( imgArr[i].list[j] ){
+                                    that.imgUrls.push( imgArr[i].list[j] );
+                                }
+                            }
+                        }
+                    }
+                }
+                api.finishLoading();
+            }
+            that.swiperLen = that.imgUrls.length;
+            this.$apply();
         };
 
     }

@@ -1,78 +1,90 @@
 <template>
-    <view class="author_detail">
-        <image src='../../res/images/author_bg.png' class="author_bg" />
-        <view class="author_info">
-            <view class="author_count">
-                <image src='http://img.news18a.com/image/admin/touxiang.jpg' class="author_photo" />
-                <view class="count_list">
-                    <view class="count_nr">
-                        <view class="count_bt">5</view>
-                        <view class="count_sign">关注</view>
-                    </view>
-                    <view class="count_nr">
-                        <view class="count_bt">5</view>
-                        <view class="count_sign">已发布</view>
-                    </view>
-                    <view class="count_nr">
-                        <view class="count_bt">5</view>
-                        <view class="count_sign">粉丝</view>
+    <scroll-view
+            @scroll="handleScroll"
+            @scrolltoupper="upper"
+            @scrolltolower="loadMore"
+            scroll-y
+            scroll-with-animation="{{true}}"
+            class='wrapSroll'>
+        <view class="author_detail">
+            <image src='../../res/images/author_bg.png' class="author_bg" />
+            <view class="author_info">
+                <view class="author_count">
+                    <image src='{{userInfo.photo}}' class="author_photo" />
+                    <view class="count_list">
+                        <view class="count_nr">
+                            <view class="count_bt">{{userInfo.focusCount}}</view>
+                            <view class="count_sign">关注</view>
+                        </view>
+                        <view class="count_nr">
+                            <view class="count_bt">{{userInfo.publishCount}}</view>
+                            <view class="count_sign">已发布</view>
+                        </view>
+                        <view class="count_nr">
+                            <view class="count_bt">{{userInfo.fansCount}}</view>
+                            <view class="count_sign">粉丝</view>
+                        </view>
                     </view>
                 </view>
-            </view>
-            <view class="author_des">
-                <view class="author_bt">汽车预言家</view>
-                <view class="author_sign">我为自己代言 我为自己代言 </view>
+                <view class="author_des">
+                    <view class="author_bt">{{userInfo.name}}</view>
+                    <view class="author_sign">{{userInfo.description}}</view>
+                </view>
             </view>
         </view>
-    </view>
-    <view class="news_list">
-        <block
-            wx:for="{{newsList}}"
-            wx:key="{{index}}">
-            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
-                <view class='news_con' @tap="storyDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
-                </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
-                </view>
-                <view class='news_info'>
-                    <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
-                    <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
-                </view>
-            </view>
-            <view class="news_nr" wx:else>
-                <view class='news_con'>
-                    <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
-                    <view class='news_info'>
-                        <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
-                        <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
+        <view class="news_list">
+            <block
+                wx:for="{{storyList}}"
+                wx:key="index">
+                <block wx:if="{{item.data_type==('story')}}">
+                    <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                        <view class='news_con' @tap="storyDetail({{item.id}})">
+                            <view class='news_title'>{{item.title}}</view>
+                        </view>
+                        <view class='img_con' @tap="storyDetail({{item.id}})">
+                            <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="inx"/>
+                        </view>
+                        <view class='news_info'>
+                            <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
+                            <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.likeCount}}</view>
+                        </view>
                     </view>
-                </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item.img}}" />
-                </view>
-            </view>
-            <!-- 视频 -->
-            <view class='news_imgs_nr news_nr news_video'> 
-                <view class='news_con' @tap="videoDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
-                </view>
-                <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
-                    <image class='blockImg' src="http://img.news18a.com/images/video/202001/video_1577950607227.jpeg"/>
-                    <view class='videoMask'><image src="../../res/images/iconplay.png" /></view>
-                </view>
-                <view class='news_info'>
-                    <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
-                    <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.user_id}}</view>
-                </view>
-            </view>
-        </block>
-    </view>
+                    <view class="news_nr" wx:else>
+                        <view class='news_con'>
+                            <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                            <view class='news_info'>
+                                <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
+                                <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.likeCount}}</view>
+                            </view>
+                        </view>
+                        <view class='img_con' @tap="storyDetail({{item.id}})">
+                            <image src="{{item.title_pic1}}" />
+                        </view>
+                    </view>
+                </block>
+                <block wx:else>
+                    <!-- 视频 -->
+                    <view class='news_imgs_nr news_nr news_video'> 
+                        <view class='news_con' @tap="videoDetail({{item.id}})">
+                            <view class='news_title'>{{item.title}}</view>
+                        </view>
+                        <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
+                            <image class='blockImg' src="{{item.title_pic1}}"/>
+                            <view class='videoMask'><image src="../../res/images/iconplay.png" /></view>
+                        </view>
+                        <view class='news_info'>
+                            <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
+                            <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.likeCount}}</view>
+                        </view>
+                    </view>
+                </block>
+            </block>
+        </view>
 
-    <view class="moreLoading" wx:if='{{loading}}'>
-        <image src="../res/images/homeLoading.png" />数据加载 更多精彩
-    </view>
+        <view class="moreLoading" wx:if='{{loading}}'>
+            <image src="../res/images/homeLoading.png" />数据加载 更多精彩
+        </view>
+    </scroll-view>
 </template>
 
 <script>
@@ -83,39 +95,71 @@
             navigationBarTitleText: ''
         };
         onLoad(options){
-            this.getNewsList( this.colType,this.colPage );
+            console.log( options.id );
+            this.userId = options.id;
+            this.getAuthor(options.id);
         };
         data = {
-            newsList:[],
-        };
+            storyList:[],
+            userInfo:{},
+            columnPage:1,
+            userId:0
+        };  
         methods = {
-            
+            storyDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/story?id='+id
+                })
+            },
+            videoDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/videoDetail?id='+id
+                })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                this.columnPage = this.columnPage*1 + 1;
+                this.getAuthor(  );
+            }
         };
-        async getNewsList( type,curPage ){
+        async getAuthor( id ){
             let that = this;
-            // that.loading = true;
             let params = {
                 query:{
-                    page: curPage,
-                    columnid:2524
+                    user_id:that.userId,
+                    page:that.columnPage
                 }
             }
-            const res = await api.GETTUIJIAN(params);
+            api.loading();
+            const res = await api.GETAUTHORDETAIL(params);
+            console.log( res );
             if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
+                if( that.columnPage == 1 ){
+                    that.userInfo = res.data.data.userInfo
                 }
+                for( let i=0; i<res.data.data.storyList.length; i++ ){
+                    that.storyList.push( res.data.data.storyList[i] );
+                }
+                api.finishLoading();
             }
             this.$apply();
-            // that.loading = false;
-            console.log( that.newsList )
         };
 
     }
 </script>
 
 <style lang="less">
+    .wrapSroll{
+        width: 100vw;
+        height: 100vh;
+    }
     .author_detail{
         background: #fff;
         position: relative;

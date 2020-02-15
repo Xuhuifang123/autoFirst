@@ -1,75 +1,37 @@
 <template lang="wxml">
     <!-- 图片 -->
-    <view class='photo_list' wx:if="{{colType==('tupian')}}">
+    <view class='photo_list' wx:if="{{colSpell==('photo')}}">
         <view class='photo_con'>
-            <view class='photo_nr'>
-                <view class='photo_bt' @tap="photoList()">一汽奔腾-T99</view>
-                <view class='photo_img' @tap="photoList()">
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
+            <view class='photo_nr' wx:for="{{newsList}}" wx:key="index">
+                <view class='photo_bt' @tap="photoList({{item.id}})">{{item.prd_brand}}-{{item.prd_sign}}</view>
+                <view class='photo_img' @tap="photoList({{item.id}})">
+                    <!-- <image wx:for="{{item.imgs}}" wx:key="{{inx}}" src="{{item}}"/> -->
+                    <image src='{{item.cover}}'></image>
+                    <image src='{{item.cover}}'></image>
+                    <image src='{{item.cover}}'></image>
                 </view>
                 <view class='photo_info'>
-                    <view class='photo_author'>汽车商业评论</view>
-                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
-                </view>
-            </view>
-            <view class='photo_nr'>
-                <view class='photo_bt'>一汽奔腾-T99</view>
-                <view class='photo_img'>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                </view>
-                <view class='photo_info'>
-                    <view class='photo_author'>汽车商业评论</view>
-                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
-                </view>
-            </view>
-            <view class='photo_nr'>
-                <view class='photo_bt'>一汽奔腾-T99</view>
-                <view class='photo_img'>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                    <image src='http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg'></image>
-                </view>
-                <view class='photo_info'>
-                    <view class='photo_author'>汽车商业评论</view>
-                    <view class='photo_view'><image src="./../res/images/iconlook.png" />1256</view>
+                    <view class='photo_author'>{{item.source}}</view>
+                    <view class='photo_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
                 </view>
             </view>
         </view>
     </view>
     
     <!-- 专题 -->
-    <view class='special_list' wx:elif="{{colType==('zhuanti')}}">
+    <view class='special_list' wx:elif="{{colSpell==('splice')}}">
         <view class='special_con'>
-            <view class='special_nr' @tap="specialList('行业专题')">
-                <view class='special_type'>行业专题</view>
-                <image class='special_img' src="http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg" />
-                <view class='special_enter'>进入专题</view>
-            </view>
-            <view class='special_nr' @tap="specialList('品牌专题')">
-                <view class='special_type'>品牌专题</view>
-                <image class='special_img' src="http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg" />
-                <view class='special_enter'>进入专题</view>
-            </view>
-            <view class='special_nr' @tap="specialList('车展专题')">
-                <view class='special_type'>车展专题</view>
-                <image class='special_img' src="http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg" />
-                <view class='special_enter'>进入专题</view>
-            </view>
-            <view class='special_nr' @tap="specialList('合作专题')">
-                <view class='special_type'>合作专题</view>
-                <image class='special_img' src="http://img3.news18a.com/site/other/201912/ina_1575357598825030454.jpg" />
+            <view class='special_nr' wx:for="{{newsList}}" wx:key='index' @tap="specialList({{item.id}})">
+                <view class='special_type'>{{item.name}}</view>
+                <image class='special_img' src="{{item.cover}}" />
                 <view class='special_enter'>进入专题</view>
             </view>
         </view>
     </view>
 
     <!-- 播报 -->
-    <view class='report_list' wx:elif="{{colType==('bobao')}}">
-        <block wx:for='{{bobaoData}}' wx:key="index" wx:for-item='item' wx:for-index='parentIndex'>
+    <view class='report_list' wx:elif="{{colSpell==('letter')}}">
+        <block wx:for='{{newsList}}' wx:key="index" wx:for-item='item' wx:for-index='parentIndex'>
             <view class='report_con'>
                 <view class='report_date'><view><image src="../res/images/icon_time.png" />{{item[0].day}}</view></view>
                 <view class='report_nr' wx:for='{{item}}' wx:key="index" wx:for-item='report' wx:for-index='childInx'>
@@ -87,7 +49,7 @@
 
     <!-- 文章信息流 -->
     <view class='news_list' wx:else>
-        <swiper class='swiper'
+        <swiper class='swiper' wx:if="{{colSpell==('jiaodian')}}"
             indicator-dots='true'
             autoplay='true'
             interval='2000'
@@ -95,9 +57,17 @@
             circular='true'
             indicator-color='#fff'
             indicator-active-color='#000' >
-            <block wx:for="{{imgUrls}}" wx:key='index'>
+            <block wx:for="{{focus}}" wx:key='index'>
                 <swiper-item>
-                    <image src="{{item}}" class="slide-image"/>
+                    <image wx:if="{{ item.type == ('video') }}"  
+                        @tap="videoDetail({{item.id}})" 
+                        src="{{item.title_pic1}}" 
+                        title="{{item.title}}" class="slide-image"/>
+
+                    <image wx:else
+                        @tap="storyDetail({{item.id}})" 
+                        src="{{item.title_pic1}}" 
+                        title="{{item.title}}" class="slide-image"/>
                 </swiper-item>
             </block>
         </swiper>
@@ -105,47 +75,52 @@
         <block
             wx:for="{{newsList}}"
             wx:key="index">
-            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
-                <view class='news_con' @tap="storyDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
-                </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
-                </view>
-                <view class='news_info'>
-                    <text class='news_type'>{{item.author}}</text>
-                    <text class='news_author'>{{item.author}}</text>
-                    <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.user_id}}</view>
-                </view>
-            </view>
-            <view class="news_nr" wx:else>
-                <view class='news_con'>
-                    <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+
+            <block wx:if="{{item.type==('story')}}">
+                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                    <view class='news_con' @tap="storyDetail({{item.id}})">
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                    </view>
                     <view class='news_info'>
-                        <text class='news_type'>{{item.author}}</text>
-                        <text class='news_author'>{{item.author}}</text>
-                        <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.user_id}}</view>
+                        <!-- <text class='news_type'>{{item.author}}</text> -->
+                        <text class='news_author'>{{item.source}}</text>
+                        <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
                     </view>
                 </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item.img}}" />
+                <view class="news_nr" wx:else>
+                    <view class='news_con'>
+                        <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                        <view class='news_info'>
+                            <!-- <text class='news_type'>{{item.author}}</text> -->
+                            <text class='news_author'>{{item.source}}</text>
+                            <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
+                        </view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item.title_pic1}}" />
+                    </view>
                 </view>
-            </view>
-            <!-- 视频 -->
-            <view class='news_imgs_nr news_nr'> 
-                <view class='news_con' @tap="videoDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
+            </block>
+            <block wx:elif="{{item.type==('video')}}">
+                <!-- 视频 -->
+                <view class='news_imgs_nr news_nr'> 
+                    <view class='news_con' @tap="videoDetail({{item.id}})">
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
+                        <image class='blockImg' src="{{item.title_pic1}}"/>
+                        <view class='videoMask'><image src="./../res/images/iconplay.png" /></view>
+                    </view>
+                    <view class='news_info'>
+                        <!-- <text class='news_type'>{{item.source}}</text> -->
+                        <text class='news_author'>{{item.source}}</text>
+                        <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
+                    </view>
                 </view>
-                <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
-                    <image class='blockImg' src="http://img.news18a.com/images/video/202001/video_1577950607227.jpeg"/>
-                    <view class='videoMask'><image src="./../res/images/iconplay.png" /></view>
-                </view>
-                <view class='news_info'>
-                    <text class='news_type'>{{item.author}}</text>
-                    <text class='news_author'>{{item.author}}</text>
-                    <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.user_id}}</view>
-                </view>
-            </view>
+            </block>
         </block>
 
         <view class="moreLoading" wx:if='{{loading}}'>
@@ -181,7 +156,6 @@
             
         };
         onLoad(){
-            // console.log( this.colType ,this.colPage,this.colId );
             this.getNewsList( this.colId,this.colType,this.colPage,this.colSpell );
             // this.getNewsList( cat_id,menu_id,type,cat_spell,page );
             if( this.colType == 'bobao' ){
@@ -189,78 +163,10 @@
             }
         };
         data = {
-            imgUrls:[
-                'http://img.news18a.com/site/other/202001/ina_1578027487439130199.jpg',
-                'http://img3.news18a.com/site/other/202001/ina_15780195421103210169.jpg',
-                'http://img2.news18a.com/site/other/202001/ina_15779565111520011350.jpg',
-                'http://img4.news18a.com/site/other/202001/ina_1577931813985703965.jpg',
-                'http://img3.news18a.com/site/other/202001/ina_15779476811409811595.jpg'
-            ],
+            focus:[],
             newsList:[],
             loading:false,
-            bobaoData:[
-                {
-                    "cloum": "汽势播报",
-                    "content": "英国时间1月8日，阿斯顿·马丁官方确认将限量生产V12 SPEEDSTER车型，数量88辆，计划2021年第一季度交付客户。阿斯顿·马丁V12 SPEEDSTER是庆祝阿斯顿·马丁悠久的赛车传统和现代化设计相结合的车型，同时其开放式的驾驶舱也在向阿斯顿·马丁1959年获得勒芒赛事大奖的DBR1和CC100 Speedster百年概念车致敬。",
-                    "day": "2020.01.08",
-                    "id": "915",
-                    "img": [],
-                    "time": "16:32",
-                    "title": "限量88辆！阿斯顿·马丁V12 SPEEDSTER确认生产",
-                    "type": "seat",
-                },
-                {
-                    "cloum": "汽势播报",
-                    "content": "据最新消息，威马汽车将于2020年底发布一款全新SUV，该车的整体设计获奖依旧使用威马家族设计，并将使用5G技术，最快或于2020年底正式上市。新车整体设计将依旧采用威马家族式设计，整体车身尺寸也与威马EX5大体相似，只不过新车车尾使用了与刚刚上市威马EX6 Plus更为相似。据悉，该车将是全球首台搭载5G技术的智能新能源车，该车最快或将于2020年底上市。",
-                    "day": "2020.01.08",
-                    "id": "914",
-                    "img": [],
-                    "time": "16:31",
-                    "title": "威马将推出全新SUV车型 搭载5G技术/最快或于2020年底上市",
-                    "type": "seat",
-                },
-                {
-                    "cloum": "汽势播报",
-                    "content": "1月8日，东风风神召开发布会，公布了公司全新的战略规划，包括2020年度“312”新产品规划。同时东风风神宣布，其还将在2020年4月发布全新品牌形象。2019年，东风风神全年销量达到了75025台，同比2018年增长了8.5%。借着销量增长，东风风神乘胜追击，于今日发布了2020年度“312”新产品计划，即3款全新车型+1款中期改款车型+2款年度改款车型。",
-                    "day": "2020.01.08",
-                    "id": "913",
-                    "img": [],
-                    "time": "16:30",
-                    "title": "6款新车 东风风神2020年新产品规划公布",
-                    "type": "seat",
-                },
-                {
-                    "cloum": "汽势播报",
-                    "content": "据外媒报道，大众汽车1月7日宣布，Luca de Meo已经辞去西班牙汽车品牌西雅特CEO一职。与此同时，其竞争对手雷诺正在加紧寻找新任CEO。大众在1月7日发表的一份声明中称：“西雅特首席执行官Luca de Meo自己提出不再担任西雅特CEO一职，双方已经达成一致。“一位知情人士对外媒透露，De Meo是雷诺CEO的竞争者之一，然而他与大众签署的竞业禁止条款比较严格，有可能成为他加盟雷诺的最大障碍。另一位消息人士表示：“目前双方还没有就潜在的‘冷却期’达成一致。“这名消息人士表示，如果真的加盟雷诺，De Meo将不得不推迟自己在雷诺上任的时间，毕竟他对大众集团的战略了如指掌。因此，当前还尚不明确De Meo是否会完全离开大众，大众集团旗下拥有包括兰博基尼、布加迪、宾利、斯柯达、大众、奥迪、保时捷和杜卡迪等多个品牌。第三名消息人士表示：“Luca de Meo将离开西雅特，但是仍将留在大众集团。",
-                    "day": "2020.01.08",
-                    "id": "912",
-                    "img": [],
-                    "time": "16:29",
-                    "title": "大众西雅特CEO辞职 或将竞聘雷诺CEO",
-                    "type": "seat",
-                },
-                {
-                    "cloum": "汽势播报",
-                    "content": "一汽集团最新发布的数据显示，2019年集团营业收入首次突破6000亿大关达6200亿元，同比增长4.4%；实现利润440.5亿元，同比增长2.2%。营收利润双增长的背景下，2019年集团销量也逆势增长。数据显示，2019年一汽集团共实现整车销售346.4万辆，同比增长1.3%。",
-                    "day": "2020.01.07",
-                    "id": "911",
-                    "img": [],
-                    "time": "18:13",
-                    "title": "同比增长4.4% 一汽集团2019年营收超6000亿",
-                    "type": "seat",
-                },
-                {
-                    "cloum": "汽势播报",
-                    "content": "1月7日，特斯拉上海超级工厂，国产Model 3交付仪式正式开启。这是国产Model 3的首次面向社会车主的交付，因此特斯拉公司上下异常重视，就连马斯克也从美国跑了过来，为上海工厂站台！在活动现场，马斯克宣布特斯拉新车Model Y项目正式启动。在介绍Model Y项目时马斯克表示：“Model Y是致力于打造一辆大家都能负担得起的SUV，就像Model 3是一辆大家都负担得起的轿车一样。这两个市场部分对特斯拉都是非常重要的车型，Model Y将会用更先进的生产技术，未来会逐渐给大家揭晓，我个人对其采用的生产技术非常欣喜。”",
-                    "data_id": "",
-                    "day": "2020.01.07",
-                    "id": "910",
-                    "img": [],
-                    "time": "18:11",
-                    "title": "国产特斯拉今日交付，马斯克宣布Model Y项目正式启动",
-                    "type": "seat",
-                }
-            ]
+            cat_spell:'jiaodian'
         };
         methods = {
             storyDetail:function(id){
@@ -268,14 +174,14 @@
                     url: '../../pages/detail/story?id='+id
                 })
             },
-            specialList:function(type){
+            specialList:function(id){
                 wepy.navigateTo({
-                    url: '../../pages/list/specialList?type='+type
+                    url: '../../pages/list/specialList?id='+id
                 })
             },
-            photoList:function(){
+            photoList:function(id){
                 wepy.navigateTo({
-                    url: '../../pages/list/photoList'
+                    url: '../../pages/list/photoList?id='+id
                 })
             },
             toggleDetail:function(type,e){
@@ -284,19 +190,19 @@
                     childInx = e.currentTarget.dataset.child;
                 console.log( type,parentIndex,childInx );
                 if( type == 'show' ){
-                    that.bobaoData[parentIndex][childInx].falg = true;
+                    that.newsList[parentIndex][childInx].falg = true;
                 }else{
-                    that.bobaoData[parentIndex][childInx].falg = false;
+                    that.newsList[parentIndex][childInx].falg = false;
                 }
             }     
         };
         disposeReport(){
             const that = this;
-            let curDate = that.bobaoData[0].day;
+            let curDate = that.newsList[0].day;
             let newReport = [];
             let inx = 0;
             newReport[inx] = [];
-            that.bobaoData.forEach(item => {
+            that.newsList.forEach(item => {
                 item.falg = false;
                 if( item.day == curDate ){
                     newReport[inx].push( item );
@@ -308,18 +214,23 @@
                 }
             });
             console.log( newReport );
-            that.bobaoData = newReport;
+            that.newsList = newReport;
         };
         events = {
             requestType( cat_id,menu_id,type,cat_spell,page ){
+                console.log( cat_id,menu_id,type,cat_spell,page );
                 const that = this;
-                if( cat_spell == "bobao" ){
-                    that.bobaoData = [];
-                    that.disposeReport();
-                }else{
+                if( that.cat_spell != cat_spell ){
                     that.newsList = [];
+                    that.bobaoData = [];
+                    that.cat_spell = cat_spell;
                     // 模板数据变更后更新
                     that.$apply();
+                }
+                if( cat_spell == "bobao" ){
+                    // that.bobaoData = [];
+                    // that.disposeReport();
+                }else{
                     that.getNewsList( menu_id,type,page,cat_spell,cat_id );
                 }
             }
@@ -328,36 +239,53 @@
         // this.colId,this.colType,this.colPage,this.colSpell
         async getNewsList( menu_id,type,page,spell,cat_id ){ // id,type(index),page,spell
             let that = this;
+            // 首页默认列表
             if( type=='index' ){
                 let params = {
                     query:{
                         page: page,
-                        type: 'jiaodian',
-                        id:1,
+                        type: spell,
+                        id:menu_id,
                         ua_from:'program'
                     }
                 };
                 const res = await api.GETTYPEINDEX( params );
                 console.log( res );
                 if( res.data.code == 200 ){
-                    for( let i=0; i<res.data.data.length; i++ ){
-                        that.newsList.push( res.data.data[i] );
+                    if(page == 1){
+                        that.focus = res.data.data.focus;
+                    }
+                    for( let i=0; i<res.data.data.storyData.length; i++ ){
+                        that.newsList.push( res.data.data.storyData[i] );
                     }
                 }
-            } else if( type=='hand' ) {
+            } else if( type=='hand' ) {//首页手动列表
                 let params = {
                     query:{
                         page: page,
-                        type: 'jiaodian',
-                        id:1
+                        type: spell,
+                        id:menu_id,
+                        ua_from:'program',
+                        typeData:{cat_api_filed:cat_id}
                     }
                 };
-                const res = await api.GETTYPEINDEX( params );
+                const res = await api.GETTYPEHAND( params );
                 console.log( res );
                 if( res.data.code == 200 ){
-                    for( let i=0; i<res.data.data.length; i++ ){
-                        that.newsList.push( res.data.data[i] );
-                    }
+                    if( spell == 'letter' ){
+                        for( let i=0; i<res.data.data.length; i++ ){
+                            that.newsList.push( res.data.data[i] );
+                        }
+                        that.disposeReport();
+                    } else if( spell == 'photo' || spell == 'splice' ){
+                        for( let i=0; i<res.data.data.length; i++ ){
+                            that.newsList.push( res.data.data[i] );
+                        }
+                    } else {
+                        for( let i=0; i<res.data.data.storyData.length; i++ ){
+                            that.newsList.push( res.data.data.storyData[i] );
+                        }
+                    } 
                 }
             } else {
                 let params = {
@@ -365,18 +293,18 @@
                         page: page,
                         type: spell,
                         id:menu_id,
+                        ua_from:'program',
                         column_id:cat_id
                     }
                 };
-                const res = await api.GETTYPEINDEX( params );
+                const res = await api.GETTYPEAUTO( params );
                 console.log( res );
                 if( res.data.code == 200 ){
-                    for( let i=0; i<res.data.data.length; i++ ){
-                        that.newsList.push( res.data.data[i] );
+                    for( let i=0; i<res.data.data.storyData.length; i++ ){
+                        that.newsList.push( res.data.data.storyData[i] );
                     }
                 }
             }
-            
             this.$apply();
             console.log( that.newsList )
         };

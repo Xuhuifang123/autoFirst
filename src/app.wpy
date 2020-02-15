@@ -24,6 +24,7 @@ export default class extends wepy.app {
       "pages/detail/photoDetail",
       "pages/detail/story",
       "pages/detail/liveDetail",
+      "pages/detail/videoDetail",
       "pages/detail/authorDetail"
     ],
     window: {

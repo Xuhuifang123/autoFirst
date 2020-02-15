@@ -7,13 +7,11 @@
         scroll-with-animation="{{true}}"
         class='wrapSroll'>
         <view class='artName_list'>
-            <block
-                wx:for="{{shareList}}"
-                wx:key="{{index}}">
+            <block wx:for="{{shareTop}}" wx:key="{{index}}">
                 <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
                     <view class='news_info'>
                         <image class='news_photo' src="{{item.photo}}" />
-                        <text class='news_author'>{{item.author}}</text>
+                        <text class='news_author'>{{item.source}}</text>
                     </view>
                     <view class='news_con' @tap="storyDetail({{item.id}})">
                         <view class='news_title'>{{item.title}}</view>
@@ -22,80 +20,72 @@
                         <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
                     </view>
                     <view class='news_view'>
-                        <view class='news_type'>置顶</view>
-                        <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
+                        <view class='news_type'>{{item.columnName}}</view>
+                        <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
                     </view>
                 </view>
                 <view class="news_nr" wx:else>
                     <view class='news_info'>
                         <image class='news_photo' src="{{item.photo}}" />
-                        <text class='news_author'>{{item.author}}</text>                      
+                        <text class='news_author'>{{item.source}}</text>                      
                     </view>
                     <view class='news_con'>
                         <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
-                        <image src="{{item.img}}" class='storyImg'/>
+                        <image src="{{item.title_pic1}}" class='storyImg'/>
                         <view class='news_view'>
-                            <view class='news_type'>置顶</view>
-                            <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view></view>
+                            <view class='news_type'>{{item.columnName}}</view>
+                            <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.pv}}</view></view>
                     </view>                    
                 </view>
             </block>
+
             <view class="media_recom">
                 <view class="media_recom_bt">热门汽势媒体推荐<view class="media_recom_bt_more" @tap="authorList()">更多<image src="../../res/images/my_more.png" /></view></view>
-                <view class="media_recom_con">
-                    <view class="media_recom_nr">
-                        <image src="http://img.news18a.com/image/admin/touxiang.jpg" />
-                        <view class="media_recom_author">汽车杂志</view>
-                        <view class="media_recom_btn">查看</view>
+                <scroll-view scroll-x scroll-with-animation="{{true}}">
+                    <view class="media_recom_con">
+                        <view class="media_recom_nr" wx:for="{{authorList}}" wx:key="{{index}}">
+                            <image src="{{item.photo}}" />
+                            <view class="media_recom_author">{{item.name}}</view>
+                            <view class="media_recom_btn" @tap='authorDetail({{item.id}})'>查看</view>
+                        </view>
                     </view>
-                    <view class="media_recom_nr">
-                        <image src="http://img.news18a.com/image/admin/touxiang.jpg" />
-                        <view class="media_recom_author">汽车杂志</view>
-                        <view class="media_recom_btn">查看</view>
-                    </view>
-                    <view class="media_recom_nr">
-                        <image src="http://img.news18a.com/image/admin/touxiang.jpg" />
-                        <view class="media_recom_author">汽车杂志</view>
-                        <view class="media_recom_btn">查看</view>
-                    </view>
-                </view>
+                </scroll-view> 
             </view>
-            <view class='media_ad'>
-                <image src="http://img1.news18a.com/site/other/201911/ina_15749217701404020045.jpg" class='ad_img' />
-                <image class="ad_close" src="../../res/images/icon_login_del.png" class='ad_close' />
-            </view>
+        
             <block
                 wx:for="{{shareList}}"
                 wx:key="{{index}}">
-                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
-                    <view class='news_info'>
-                        <image class='news_photo' src="{{item.photo}}" />
-                        <text class='news_author'>{{item.author}}</text>
-                    </view>
-                    <view class='news_con' @tap="storyDetail({{item.id}})">
-                        <view class='news_title'>{{item.title}}</view>
-                    </view>
-                    <view class='img_con' @tap="storyDetail({{item.id}})">
-                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
-                    </view>
-                    <view class='news_view'>
-                        <view class='news_type'>置顶</view>
-                        <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view>
-                    </view>
-                </view>
-                <view class="news_nr" wx:else>
-                    <view class='news_info'>
-                        <image class='news_photo' src="{{item.photo}}" />
-                        <text class='news_author'>{{item.author}}</text>                      
-                    </view>
-                    <view class='news_con'>
-                        <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
-                        <image src="{{item.img}}" class='storyImg'/>
+                <block wx:if='{{index>1}}'>
+                    <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                        <view class='news_info'>
+                            <image class='news_photo' src="{{item.photo}}" />
+                            <text class='news_author'>{{item.source}}</text>
+                        </view>
+                        <view class='news_con' @tap="storyDetail({{item.id}})">
+                            <view class='news_title'>{{item.title}}</view>
+                        </view>
+                        <view class='img_con' @tap="storyDetail({{item.id}})">
+                            <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                        </view>
                         <view class='news_view'>
-                            <view class='news_type'>置顶</view>
-                            <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.user_id}}</view></view>
-                    </view>                    
-                </view>
+                            <view class='news_type'>{{item.columnName}}</view>
+                            <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
+                        </view>
+                    </view>
+                    <view class="news_nr" wx:else>
+                        <view class='news_info'>
+                            <image class='news_photo' src="{{item.photo}}" />
+                            <text class='news_author'>{{item.source}}</text>                      
+                        </view>
+                        <view class='news_con'>
+                            <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                            <image src="{{item.title_pic1}}" class='storyImg'/>
+                            <view class='news_view'>
+                                <view class='news_type'>{{item.columnName}}</view>
+                                <view class='news_view_num'><image src="../../res/images/iconlook.png" />{{item.pv}}</view></view>
+                        </view>
+                    </view>
+                </block>
             </block>
         </view>
         <view class="moreLoading" wx:if='{{loading}}'>
@@ -118,50 +108,14 @@
             
         }; 
         onLoad(options){
-            // this.getNewsList( val,page );
-            console.log( this.data.shareList );
+            this.getNewsList();
         };
         data = {
-            shareList:[
-                {
-                    author: "梁子辰",
-                    id: 139416,
-                    img: "http://img4.news18a.com/site/other/202001/ina_1578984082418625961.jpg",
-                    imgs: [],
-                    photo: "http://img.news18a.com/image/admin/touxiang.jpg",
-                    time: "1天前",
-                    title: "提供不同功率电动机 东风富康e爱丽舍申报图曝光",
-                    url: "http://m.news18a.com/ina_app/storys_139416.html",
-                    user_id: 426200 
-                },
-                {
-                    author: "奚筱林",
-                    id: 139394,
-                    img: "http://img1.news18a.com/site/other/202001/ina_1578974240685788502.jpg",
-                    imgs: [
-                        "http://img4.news18a.com/site/other/202001/ina_1578974247158687805.jpg",
-                        "http://img4.news18a.com/site/other/202001/ina_15789742511135244242.jpg",
-                        "http://img1.news18a.com/site/other/202001/ina_1578974240685788502.jpg"
-                    ],
-                    photo: "http://img.news18a.com/userPhoto/user_14562697981057.jpg",
-                    time: "1天前",
-                    title: "外观灵动/配置高 别克全新纯电动车命名VELITE 7",
-                    url: "http://m.news18a.com/ina_app/storys_139394.html",
-                    user_id: 28199
-                },
-                {
-                    author: "梁子辰",
-                    id: 139416,
-                    img: "http://img4.news18a.com/site/other/202001/ina_1578984082418625961.jpg",
-                    imgs: [],
-                    photo: "http://img.news18a.com/image/admin/touxiang.jpg",
-                    time: "1天前",
-                    title: "提供不同功率电动机 东风富康e爱丽舍申报图曝光",
-                    url: "http://m.news18a.com/ina_app/storys_139416.html",
-                    user_id: 426200 
-                },
-            ],
-            loading:true
+            shareList:[],
+            authorList:[],
+            loading:true,
+            columnPage:1,
+            shareTop:[]
         };
         methods = {
             storyDetail:function(id){
@@ -174,6 +128,11 @@
                     url: '../../pages/list/authorList'
                 })
             },
+            authorDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/authorDetail?id='+id
+                })
+            },
             handleScroll(){
                 // console.log( 222 );
             },
@@ -183,31 +142,35 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                // this.columnPage = this.columnPage*1 + 1;
-                // this.$broadcast('requestType',this.columnType,this.columnPage);
+                this.columnPage = this.columnPage*1 + 1;
+                this.getNewsList();
             }
         };
         events = {
 
         };
-        
-        async getNewsList( type,curPage ){
+        async getNewsList(){
             let that = this;
             let params = {
                 query:{
-                    page: curPage,
-                    columnid:2524
+                    page: that.columnPage
                 }
             }
-            const res = await api.GETTUIJIAN(params);
+            const res = await api.GETARTLIST(params);
+            console.log( res );
             if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
+                if( that.columnPage == 1 ){
+                    for( let i=0; i<res.data.data.author.length; i++ ){
+                        that.authorList.push( res.data.data.author[i] );
+                    }
                 }
+                for( let i=0; i<res.data.data.storyList.length; i++ ){
+                    that.shareList.push( res.data.data.storyList[i] );
+                }
+                that.shareTop[0] = that.shareList[0];
+                that.shareTop[1] = that.shareList[1];
             }
             this.$apply();
-            console.log( that.newsList )
         };
     }
 </script>
@@ -332,12 +295,19 @@
             }
         }
         .media_recom_con{
-            display: flex;
-            justify-content: space-around;
+            // display: flex;
+            // justify-content: space-around;
+            white-space: nowrap;
             .media_recom_nr{
                 width: 220rpx;
                 background: #fff;
                 padding: 40rpx 0;
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 20rpx;
+                &:last-child{
+                    margin-right: 0;
+                }
                 image{
                     width: 112rpx;
                     height: 112rpx;

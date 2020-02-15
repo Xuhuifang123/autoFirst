@@ -23,10 +23,26 @@ const GETTYPEHAND = (params) => wxRequest(params, HOST + "/init.php?m=api&c=inde
 // 首页栏目type为auto时
 const GETTYPEAUTO = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=storyList",false);
 
+// 直播列表
+const GETLIVELIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=get_live_list",false);
 
+// 视频列表 
+const GETVIDEOLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=videoList",false);
+
+// 汽势号列表
+const GETARTLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=qiShiList",false);
+
+// 热门作者列表
+const GETAUTHORLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=hotAuthorList",false);
 
 // 文章详情
-const GETSTORY = (params) => wxRequest(params, HOST + "/init.php?m=program&c=story_related&a=getStoryInfo",false);
+const GETSTORY = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=storyInfo",false);
+
+// 作者详情
+const GETAUTHORDETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=uCenter",false);
+
+// 图库详情
+const GETPHOTODETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=photoInfo",false);
 
 
 
@@ -72,8 +88,14 @@ module.exports = {
     GETTYPEINDEX,
     GETTYPEHAND,
     GETTYPEAUTO,
-
+    GETLIVELIST,
+    GETVIDEOLIST,
+    GETARTLIST,
+    GETAUTHORLIST,
     GETSTORY,
+    GETAUTHORDETAIL,
+    GETPHOTODETAIL,
+
     LOGINURL,
     ABOUTUS,
     toast:showToast,
