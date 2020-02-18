@@ -9,7 +9,9 @@
                         <view class='authorInfo_bt'>{{storyInfo.authorname}}</view>
                         <view class='authorInfo_time'><text>{{storyInfo.add_date}}</text></view>
                     </view>
+                    <view class='special_label' wx:if='{{storyInfo.tagname}}'>{{storyInfo.tagname}}</view>
                 </view>
+
             </view>
             <view class="artice_nr">
                 <view class="artice_bt">{{storyInfo.title}}</view>
@@ -25,6 +27,8 @@
                 <button class='shareMessage' open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
                 <button class='shareTimeline' open-type="share"><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
             </view>
+
+            <!-- <shareSelectLayout></shareSelectLayout> -->
 
             <view class="recommend">
                 <view class="recommend_bt"><image src='../../res/images/icon_recommend.png' /> 相关推荐</view>
@@ -63,13 +67,14 @@
     import wepy from 'wepy'
     import api from '../../../src/api/ApiConstants';
     import WxParse from '../../../src/wxParse/wxParse';
-    // import htmlParse from '../../components/htmlParse';
+    // import shareSelectLayout from './../../components/shareSelectLayout';
     export default class Story extends wepy.page{
         config = {
             navigationBarTitleText: '文章详情'
         };
         components = {
             // WxParse: WxParse
+            // shareSelectLayout:shareSelectLayout
         };
         onLoad(options){
             this.getStoryCon( options.id );
@@ -79,7 +84,8 @@
             storyInfo:{},
             parserName:'storyCon',
             parserContent: '',
-            storyList:{}
+            storyList:{},
+            setShareInfor:[]
         };
         methods = {
             storyDetail:function(id){
@@ -99,18 +105,48 @@
             const res = await api.GETSTORY(params);
             console.log( res );
             if( res.data.code == 200 ){
-                api.finishLoading();
                 const storyDetail = res.data.data;
-                // that.userInfo = storyDetail.userInfo;
                 that.storyInfo = res.data.data;
-                // that.storyList = storyDetail.storyList;
-
                 that.parserContent = WxParse.wxParse('parserContent', 'html', that.storyInfo.content, that, 0);
+                api.finishLoading();
                 that.$apply();
-                // that.$invoke('组件名', '组件里对应事件');
-                // that.$invoke('htmlParse', 'htmlParseNotice');                
+            }else{
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
         };
+        onShareAppMessage(){
+            let that = this;
+            let imgUrl = that.storyInfo.photo;
+            let storyTitle = that.storyInfo.title;
+            let storyId = that.storyInfo.id;
+            let setSharePath;
+            setSharePath = 'pages/detail/story?id='+storyId;
+            return {
+                title: storyTitle,
+                imageUrl: imgUrl,
+                path: setSharePath,
+                success: (res) => {
+                    // 转发成功
+                    wepy.showToast({
+                        title: '转发成功',
+                        icon: 'success',
+                        duration: 2000
+                    });
+                },
+                fail: (res) => {
+                    // 转发失败
+                    wepy.showToast({
+                        title: '转发失败',
+                        icon: 'success',
+                        duration: 2000
+                    });
+                }
+            }
+        }
     }
 
 </script>
@@ -167,6 +203,7 @@
                 padding: 0 20rpx;
                 line-height: 36rpx;
                 margin-right: 30rpx;
+                margin-top: 14rpx;
             }
             .attention{
                 width: 120rpx; 
@@ -203,31 +240,6 @@
                 line-height: 48rpx;
                 font-weight: bold;
                 margin-bottom: 20rpx;
-            }
-            .authorInfo{
-                margin-bottom: 20rpx;
-                display: flex;
-                justify-content: space-between;
-                .authorInfo_bt{
-                    font-weight: normal; 
-                    font-size: 24rpx; 
-                    color: #52A3FF; 
-                    line-height: 34rpx;
-                }
-                .authorInfo_time{
-                    font-size: 24rpx; 
-                    line-height: 24rpx; 
-                    color: #818181;
-                }
-                .special_label{ 
-                    height: 34rpx; 
-                    background:rgba(230,0,18,0.1);
-                    border-radius: 18rpx;
-                    color: rgba(255,38,0,1);
-                    font-size: 24rpx;
-                    padding: 0 20rpx;
-                    line-height: 34rpx;
-                }
             }
             .wxParse-p{
                 text-indent: 0;

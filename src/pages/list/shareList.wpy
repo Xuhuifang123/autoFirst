@@ -138,8 +138,16 @@
                     that.newsList.push( res.data.data[i] );
                     // that.setData({ newsList : that.newsList });
                 }
+                api.finishLoading();
+                that.$apply();
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            this.$apply();
             console.log( that.newsList )
         };
     }

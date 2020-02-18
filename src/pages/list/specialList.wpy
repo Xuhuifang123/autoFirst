@@ -1,38 +1,43 @@
 <template lang="wxml">
-
-    <view class='news_list'>
-        <block
-            wx:for="{{newsList}}"
-            wx:key="{{index}}">
-            <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr' wx:key='{{index}}'>
-                <view class='news_con' @tap="storyDetail({{item.id}})">
-                    <view class='news_title'>{{item.title}}</view>
-                </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
-                </view>
-                <view class='news_info'>
-                    <text class='news_type'>行业专题</text>
-                    <text class='news_author'>{{item.author}}</text>
-                    <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.user_id}}</view>
-                </view>
-            </view>
-            <view class="news_nr" wx:else>
-                <view class='news_con'>
-                    <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+    <scroll-view
+        @scroll="handleScroll"
+        @scrolltoupper="upper"
+        @scrolltolower="loadMore"
+        scroll-y
+        scroll-with-animation="{{true}}"
+        class='wrapSroll'>
+        <view class='news_list'>
+            <block
+                wx:for="{{newsList}}"
+                wx:key="index">
+                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr' wx:key='index'>
+                    <view class='news_con' @tap="storyDetail({{item.id}})">
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="index"/>
+                    </view>
                     <view class='news_info'>
-                        <text class='news_type'>车展专题</text>
-                        <text class='news_author'>{{item.author}}</text>
-                        <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.user_id}}</view>
+                        <text class='news_author'>{{item.source}}</text>
+                        <text class='news_type'>{{item.tagname}}</text>
+                        <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
                     </view>
                 </view>
-                <view class='img_con' @tap="storyDetail({{item.id}})">
-                    <image src="{{item.img}}" />
+                <view class="news_nr" wx:else>
+                    <view class='news_con'>
+                        <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                        <view class='news_info'>
+                            <text class='news_author'>{{item.source}}</text>
+                            <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
+                        </view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item.title_pic1}}" />
+                    </view>
                 </view>
-            </view>
-        </block>
-    </view>
-
+            </block>
+        </view>
+    </scroll-view>
 </template>
 
 <script>
@@ -45,66 +50,72 @@
         components = {
             
         };
-        props = {
-            colType:{
-                type: String,
-                default: 'tuijian'
-            },
-            colPage:{
-                type: Number,
-                default: 1 
-            },
-        };
         onLoad(options){
             const that = this;
-            wx.setNavigationBarTitle({
-                title: options.type
-            });
-            this.getNewsList( this.colType,this.colPage );
+            that.columnId = options.id;
+            that.getSpecialList( options.id );
         };
         data = {
-            newsList:[]
+            newsList:[],
+            columnPage:1,
+            columnId:0
         };
         methods = {
             storyDetail:function(id){
                 wepy.navigateTo({
                     url: '../../pages/detail/story?id='+id
                 })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                // console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                this.columnPage = this.columnPage*1 + 1;
+                this.getSpecialList();
             }
         };
-        events = {
-            requestType( val,page ){
-                if( val != this.colType ){
-                    this.newsList = [];
-                    // 模板数据变更后更新
-                    this.$apply();
-                }
-                this.getNewsList( val,page );
-            }
-        };
-        
-        async getNewsList( type,curPage ){
+        async getSpecialList( id ){
             let that = this;
             let params = {
                 query:{
-                    page: curPage,
-                    columnid:2524
+                    tagid:that.columnId,
+                    page:that.columnPage
                 }
             }
-            const res = await api.GETTUIJIAN(params);
+            api.loading();
+            const res = await api.GETSPECIALLIST(params);
+            console.log( res );
             if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
+                for( let i=0; i<res.data.data.storyData.length; i++ ){
+                    that.newsList.push( res.data.data.storyData[i] );
                 }
+                wx.setNavigationBarTitle({
+                    title: that.newsList[0].tagname
+                });
+                api.finishLoading();
+                that.$apply();
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            this.$apply();
-            console.log( that.newsList )
         };
     }
 </script>
 
 <style lang="less">
+    .wrapSroll{
+        width: 100vw;
+        height: 100vh;
+    }
     .news_list{
         padding: 0 24rpx;
     }
@@ -118,6 +129,7 @@
             height: 184rpx;
             border-radius: 10rpx;
             display: block;
+            background: #ccc;
         }
         .news_con{
             flex: 1;
@@ -146,11 +158,11 @@
                 height: 34rpx;
                 color:  #FF2600;
                 float: left;
-                margin-right: 10rpx;
             }
             .news_author{
                 float: left;
                 color: #52A3FF;
+                margin-right: 10rpx;
             }
             .news_view{
                 float: right;
@@ -160,6 +172,7 @@
                     height: 18rpx;
                     display: inline-block;
                     margin-right: 4rpx;
+                    background: rgba(0,0,0,0);
                 }
             }
         }
@@ -179,6 +192,7 @@
             image{
                 width: 228rpx;
                 height: 152rpx;
+                background: #ccc;
             }
         }
         .img_con.news_nr_video{
@@ -204,6 +218,7 @@
                     left: 50%;
                     top: 50%;
                     margin: -40rpx 0 0 -40rpx;
+                    background: rgba(0,0,0,0)
                 }
             }
         }

@@ -68,14 +68,14 @@
                                 filePath: img,
                                 success(res) {
                                     wepy.showToast({
-                                        title: '保存成功',
+                                        title: '已保存到手机相册 ~',
                                         icon: 'success',
                                         duration: 2000
                                     });
                                 },
                                 fail(res) {
                                     wepy.showToast({
-                                        title: '保存失败',
+                                        title: '保存失败 ~',
                                         icon: 'success',
                                         duration: 2000
                                     });
@@ -86,7 +86,7 @@
                     fail: function(error){
                         wepy.showToast({
                             title: 'error',
-                            icon: 'success',
+                            icon: 'none',
                             duration: 2000
                         });
                     }
@@ -115,13 +115,19 @@
                             }
                         }
                     }
+                    that.swiperLen = that.imgUrls.length;
                 }
                 api.finishLoading();
+                this.$apply();
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            that.swiperLen = that.imgUrls.length;
-            this.$apply();
         };
-
     }
 </script>
 

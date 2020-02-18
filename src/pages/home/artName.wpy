@@ -156,6 +156,7 @@
                     page: that.columnPage
                 }
             }
+            api.loading();
             const res = await api.GETARTLIST(params);
             console.log( res );
             if( res.data.code == 200 ){
@@ -169,8 +170,16 @@
                 }
                 that.shareTop[0] = that.shareList[0];
                 that.shareTop[1] = that.shareList[1];
+                api.finishLoading();
+                that.$apply();
+            } else {
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            this.$apply();
         };
     }
 </script>
@@ -197,6 +206,7 @@
                 border-radius: 10rpx;
                 display: block;
                 margin-left: 20rpx;
+                background: #ccc;
             }
             .news_title{
                 flex: 1;
@@ -266,6 +276,7 @@
             image{
                 width: 228rpx;
                 height: 152rpx;
+                background: #ccc;
             }
         }
         .news_view{

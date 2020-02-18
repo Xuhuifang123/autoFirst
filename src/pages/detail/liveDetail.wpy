@@ -1,19 +1,33 @@
 <template>
     <view class="liveWrap">
         <view class="player">
-            <!-- <view class="player_video">
-                <video src="http://img.auto-first.cn/upload/special/static/video/1.mp4" id='video1' controls="true" autoplay='true'></video>
-            </view> -->
-            <view class="player_video player_advance">
-                <view class="player_tip">距开播还剩 00：18：18 
-                    <!-- <view class='player_tip_btn'><image src='../../res/images/liveNotify.png'/>提醒</view> -->
-                    <view class='player_tip_btn reminded'>已提醒</view>
+            <!-- 预告 -->
+            <block wx:if="{{liveData.liveinfo.status == 1}}">
+                <view class="player_video player_advance">
+                        <view class="player_tip" wx:if="{{timeData.day}}">距开播还剩 {{timeData.day}} ：{{timeData.hour}} ：{{timeData.minute}} : {{timeData.second}}</view>
+                        <view class="player_tip" wx:else>距开播还剩 {{timeData.hour}} ：{{timeData.minute}} : {{timeData.second}}</view>
+                        <!-- <view class='player_tip_btn'><image src='../../res/images/liveNotify.png'/>提醒</view> -->
+                        <!-- <view class='player_tip_btn reminded'>已提醒</view> -->
+                    </view>
                 </view>
-            </view>
-            <view class="player_bt">开不坏的丰田，越野男人的放飞自我！</view>
+            </block>
+            <!-- 直播 -->
+            <block wx:elif="{{liveData.liveinfo.status == 2}}">
+                <view class="player_video">
+                    <live-player src="{{liveData.liveinfo.liveurl}}" mode="live" autoplay='true' style="width: 100%; height: 100%;" />
+                </view>
+            </block>
+            <!-- 会看 -->
+            <block wx:else>
+                <view class="player_video">
+                    <video src="{{liveData.liveinfo.playurl[0]}}" id='video' controls="true" autoplay='true'></video>
+                </view>
+            </block>
+
+            <view class="player_bt">{{liveData.title}}</view>
             <view class='player_con'>
-                <view class='player_author'>汽车商业评论</view>
-                <view class='player_des'>汽车商业评论简介或直播内容简介等，或者为空，看后台的直播设置管理。</view>
+                <view class='player_author'>{{liveData.source}}</view>
+                <view class='player_des'>{{liveData.short_summary}}</view>
             </view>
         </view>
     </view>
@@ -21,20 +35,83 @@
 
 <script>
     import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
     export default class Livedetail extends wepy.page {
         config = {
-            navigationBarTitleText: '详情'
+            navigationBarTitleText: '直播详情'
         };
         onLoad(options){
-            
+            this.getLiveList( options.id );
         };
         data = {
-            
+            liveData:{},
+            startTime:'',
+            timeData:{
+                'day':0,
+                'hour':0,
+                'minute':0,
+                'second':0
+            },
+            interval:null
         };
         methods = {
             
         };
-
+        onUnload(){
+            clearInterval(this.interval);
+        };
+        countDown(){
+            let that = this;
+            //剩余时间
+            let time_tool = function (){
+                var date = new Date(that.startTime);
+                var time1 = date.getTime();
+                var ina_ts = time1 - (new Date());//计算剩余的毫秒数
+                var ina_dd = parseInt(ina_ts / 1000 / 60 / 60 / 24, 10);
+                var ina_hh = parseInt(ina_ts / 1000 / 60 / 60 % 24, 10);
+                var ina_mm = parseInt(ina_ts / 1000 / 60 % 60, 10);
+                var ina_ss = parseInt(ina_ts / 1000 % 60, 10);
+                if( ina_dd != 0 ){
+                    that.timeData.day = ina_dd < 10 ? '0'+ina_dd : ina_dd;
+                } else {
+                    that.timeData.day = null;                 
+                }
+                that.timeData.hour = ina_hh < 10 ? '0'+ina_hh : ina_hh;
+                that.timeData.minute = ina_mm < 10 ? '0'+ina_mm : ina_mm;
+                that.timeData.second = ina_ss < 10 ? '0'+ ina_ss : ina_ss;
+                that.$apply();
+            };
+            that.interval = setInterval(function () {
+                time_tool();
+            },1000);
+        };
+        async getLiveList(id){
+            let that = this;
+            let params = {
+                query:{
+                    id:id
+                }
+            }
+            api.loading();
+            const res = await api.GETLIVEDETAIL(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                that.liveData = res.data.data;
+                if( that.liveData.liveinfo.status == 1 ){
+                    that.startTime = that.liveData.liveinfo.start_time;
+                    that.countDown();
+                }
+                api.finishLoading();
+                that.$apply();
+            } else {
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+        };
     }
 </script>
 

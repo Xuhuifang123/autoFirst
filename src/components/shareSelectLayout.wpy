@@ -1,0 +1,218 @@
+<template>
+<!-- <view wx:if="{{setShareInfor.length > 0}}" animation="{{maskanimData}}" class="{{layoutData == 'shareBox' ? 'mask' : 'maskHidden'}}" >
+	<view class="opacityEmpty" @tap="layoutClose()"></view>
+	<view class="layout" animation="{{animationData}}">
+		<view class="shareCon {{setShareInfor.length == 3 ? 'shareDownimgCon' : ''}} {{setShareInfor.length == 1 ? 'shareDownimgConOne' : ''}}">
+			<block wx:for="{{setShareInfor}}" wx:for-index="index" wx:key="key">
+
+				<button wx:if="{{item.type == 'shareFriendBtn'}}" class="shareList list{{index+1}}" data-track="share_btn_friend_or_group" hover-class='changeOpacity' open-type='share' hover-stop-propagation='true'>
+					<image src="{{item.iconUrl}}" />
+					<text>{{item.text}}</text>
+				</button>
+
+				<view wx:else class="shareList list{{index+1}}" data-track="share_btn_circle_of_friends" hover-class='change-opacity'  @tap="saveImgToPhotos({{item.type}})">
+					<image src="{{item.iconUrl}}" />
+					<text>{{item.text}}</text>
+				</view>
+			</block>
+		</view>
+		<view class='shareCancle' hover-class='changeOpacity' @tap="layoutClose()">取消</view>
+	</view>
+</view> -->
+
+  <view class="artice_share flex">
+    <button class='shareMessage' data-track="share_btn_friend_or_group" open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
+    <view class='shareTimeline' data-track="share_btn_circle_of_friends"><image src="../../res/images/iconShareLine.png" @tap="saveImgToPhotos()"/>分享至朋友圈</view>
+  </view>
+
+</template>
+<script>
+import wepy from 'wepy';
+export default class shareSelectLayout extends wepy.component {
+    props = {
+      setShareInfor:{
+        type:Array,
+        default:[
+          {
+            iconUrl:'../../res/images/loginWeixin.png',
+            text:'分享至好友',
+            type:'shareFriendBtn'//微信自带转发好友/群
+          },
+          {
+            iconUrl:'../../res/images/loginWeixin.png',
+            text:'分享至朋友圈',
+            type:'single'//定义单个生成图片
+          }
+        ]
+      },
+      layoutCloseCallBack:{//是否
+        type:Boolean,
+        default:false
+      }
+    }
+    data = {
+      animation:{},
+      maskanimData:{},
+      animationData:{},
+      maskanimation:{},
+      layoutData:'',
+      layoutCloseCallBack:false,
+    };
+    shareShow(getCallBack){//展示弹出层的显示
+      this.layoutData = 'shareBox';
+      this.$apply();
+      this.maskanimation.backgroundColor('rgba(0,0,0,.5)').step();
+      this.animation.bottom("0rpx").opacity(1).step();
+      this.animationData = this.animation.export();
+      this.maskanimData = this.maskanimation.export();
+      this.$apply();
+    }
+    shareHide(e){
+      this.setLayoutClose()
+    }
+    async hideDownAnimation(){//关闭弹出层
+      this.animation.bottom("-1000rpx").step();
+      this.maskanimation.backgroundColor('rgba(0,0,0,0)').step();
+      this.animationData = this.animation.export();
+      this.maskanimData = this.maskanimation.export();
+      this.$apply();
+      setTimeout(()=>{
+        this.layoutData='';
+        this.animationData = {};
+        this.maskanimData = {};
+        this.$apply();
+      },300)
+    }
+    onLoad(){
+      this.animation = wx.createAnimation({
+        transformOrigin:"50% 50%",
+        duration:300,
+        timingFunction:"ease-out"
+      })
+      this.maskanimation = wx.createAnimation({
+        transformOrigin:"50% 50%",
+        duration:300,
+        timingFunction:"ease-out"
+      })
+      this.$apply()
+    }
+    setLayoutClose(){//关闭弹出层
+      this.hideDownAnimation();
+      console.log(this.layoutCloseCallBack)
+      if(this.layoutCloseCallBack){//是否设置了关闭弹出层的触发通过getShareLayoutOff通知调用次组件的
+        this.$emit('getShareLayoutOff',false)
+      }
+    }
+    methods = {
+      layoutClose(e){
+        this.setLayoutClose()
+      },
+      saveImgToPhotos(getSaveType){
+        console.log(getSaveType)
+        wx.getSetting({
+          success:(res) => {
+            if (!res.authSetting['scope.writePhotosAlbum']) {
+              wx.authorize({
+                scope: 'scope.writePhotosAlbum',
+                success:() => {
+                  this.$emit('saveImgToPhotos',getSaveType);
+                  //this.hideDownAnimation();
+                },
+                fail:() => {
+                  wx.showModal({
+                    content: '您还未开启相册权限，开启后即可下载图片',
+                    showCancel: true,
+                    confirmText:'去开启',
+                    cancelColor: '#999999',
+                    confirmColor: '#e11616',
+                    success: (res) => {
+                      if (res.confirm) {
+                        wx.openSetting({
+                          success: (res) => {
+
+                          }
+                        })
+                      }
+                    }
+                  });
+                }
+              })
+            }else{
+              this.$emit('saveImgToPhotos',getSaveType);
+              //this.hideDownAnimation();
+            }
+          }
+        })
+      }
+    };
+}
+</script>
+<style lang="less" scoped>
+.opacityEmpty{
+	width: 100%;height: 100%;background-color: rgba(255,255,255,0);
+}
+.mask,.maskHidden{
+    display:block;width:100%;height:100%;position: fixed;background:rgba(0,0,0,0);top:0;left:0;z-index: 100;
+}
+.maskHidden{
+	display:none;
+}
+.changeOpacity{
+    opacity: 0.8;
+}
+.layout{
+	position: fixed;background:#fff;width:100%;bottom:-300rpx;z-index: 3;display: block;
+	.layoutTop{
+		width:100%;height:78rpx;line-height:78rpx;text-align: left;font-size:28rpx;color:#999999;border-bottom: 1px solid @border-color;position:relative;
+		.layoutClose{
+			width:31rpx;position: absolute;padding:25rpx 20rpx;top:0;right:10rpx;
+		}
+		.bag-empty{
+			color:#E11616;position: absolute;height: 78rpx;padding: 0 20rpx;top:0;right:10rpx;font-size: 32rpx;
+		}
+		.shopIcon{
+			width: 44rpx;vertical-align: middle;margin-right: 10rpx;
+		}
+		.shop-tit{
+			font-size:28rpx;color:#333333;vertical-align: middle;width:450rpx;display:inline-block;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;
+		}
+	}
+	.shareCon{
+		display: flex;
+		.shareList{
+			border:none;background-color: #fff;flex: 1;text-align: center;padding: 80rpx 0rpx 80rpx 80rpx;box-sizing: border-box;width: 50%;overflow: hidden;
+			image{
+				width: 100rpx;height: 100rpx;display:block;margin:0 auto;
+			}
+			text{
+				display: block;font-size: 24rpx;color: #666;margin-top: 15rpx;line-height: 34rpx;
+			}
+		}
+		button::after{
+			border: none;
+		}
+		.list2{
+			z-index: 1;text-align: center;padding: 80rpx 80rpx 80rpx 0rpx;box-sizing: border-box;
+		}
+		.list3{
+			display:none;
+		}
+	}
+  .shareDownimgCon{
+    .list2{
+      z-index: 1;text-align: center;padding: 80rpx 80rpx 80rpx 80rpx;box-sizing: border-box;
+    }
+    .list3{
+      z-index: 1;display:block;text-align: center;padding: 80rpx 80rpx 80rpx 0rpx;box-sizing: border-box;
+    }
+  }
+  .shareDownimgConOne{
+    .shareList{
+      padding: 80rpx 0rpx 80rpx 0;
+    }
+  }
+	.shareCancle{
+		width: 100%;height:98rpx;background: #F4F4F4;font-size:36rpx;color: #666;text-align: center;line-height: 100rpx;z-index: 1;position: relative;
+	}
+}
+</style>

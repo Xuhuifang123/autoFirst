@@ -1,46 +1,45 @@
 <template>
     <view wx:if="{{canIUse}}">
-        <!-- 授权成功 -->
-        <!-- <view wx:if='{{userInfo!=null}}'>
-            <image src='{{userInfo.avatarUrl}}'/>
-            <view>{{userInfo.nickName}}</view>
-        </view> -->
         <!-- 授权失败 -->
         <!-- <button open-type='getUserInfo' lang="zh_CN" bindgetuserinfo="onGotUserInfo">获取权限</button> -->
-        <!-- 未登录 -->
-        <!-- <view class="loginOut">
-            <image src='../../res/images/logoutBg.png' class='loginOut_bg'/>
-            <view class="loginOut_nr">
-                <view class="loginOut_left">
-                    <view class="loginOut_bt">登录/注册</view>
-                    <view class="loginOut_tip">点击登录 享受更多精彩信息</view>
-                </view>
-                <image src='../../res/images/defaultAvatar.png' />
-            </view>
-        </view> -->
-
+        
         <!-- 已登录 -->
-        <view class="loginIn">
+        <view class="loginIn" wx:if="{{userInfo!=null}}">
             <image src='../../res/images/photobg.jpg' class='loginIn_bg'/>
             <view class="loginIn_nr">
                 <view class="avatar_nr">
-                    <image src='../../res/images/defaultAvatar.png' class='avatar'/>
+                    <image src='{{userInfo.photo}}' class='avatar'/>
                 </view>
-                <view class="loginIn_bt">昵称：小势八万</view>
+                <view class="loginIn_bt">昵称：{{userInfo.name}}</view>
                 <view class="loginIn_tip">这个用户还没有设置个性签名呢..</view>
             </view>
         </view>
 
+        <!-- 未登录 -->
+        <view class="loginOut" wx:else>
+            <image src='../../res/images/logoutBg.png' class='loginOut_bg'/>
+            <view class="loginOut_nr">
+                <view class="loginOut_left">
+                    <button class="loginOut_bt" open-type='getUserInfo' lang="zh_CN" bindgetuserinfo="onGotUserInfo">登录/注册</button>
+                    <view class="loginOut_tip">点击登录 享受更多精彩信息</view>
+                </view>
+                <button class='loginOut_img' open-type='getUserInfo' lang="zh_CN" bindgetuserinfo="onGotUserInfo"><image src='../../res/images/defaultAvatar.png'/></button>
+            </view>
+        </view>
+
         <view class="my_list">
-            <view class="my_nr">
+            <view class="my_nr" wx:if="{{userInfo!=null}}">
                 <image src='../../res/images/icon_share.png' class='my_icon'/>
                 <view class="my_bt" @tap='shareList()'>我的分享<image src='../../res/images/my_more.png' class='my_more' />
                 </view>
             </view>
             <view class="my_nr">
                 <image src='../../res/images/icon_feedback.png' class='my_icon'/>
-                <view class="my_bt" @tap='feedBack()'>意见反馈<image src='../../res/images/my_more.png' class='my_more' />
-                </view>
+                <!-- 已登录 -->
+                <button class="my_bt" @tap='feedBack()' wx:if="{{userInfo!=null}}">意见反馈<image src='../../res/images/my_more.png' class='my_more' /></button>
+                <!-- 未登录 -->
+                <button wx:else class="my_bt" open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">意见反馈<image src='../../res/images/my_more.png' class='my_more' />
+                </button>
             </view>
             <view class="my_nr">
                 <image src='../../res/images/icon_about.png' class='my_icon'/>
@@ -69,16 +68,21 @@
             //判断小程序的API，回调，参数，组件等是否在当前版本可用。
             canIUse: wx.canIUse('button.open-type.getUserInfo'),
             userInfo: null,
+            collectCar: [],
+            likeModels: [],
         };
         onLoad(){
-            const that = this, 
-                userInfo = wepy.$instance.globalData.userInfo;
-            if( userInfo != null ){
-                that.userInfo = userInfo;
-            }
+            // const that = this, 
+            // userInfo = wepy.$instance.globalData.userInfo;
+            // if( userInfo != null ){
+            //     that.userInfo = userInfo;
+            // }
+            // console.log( userInfo );
         };
         onShow() {
-
+            if (wepy.$instance.isLogin()) {
+                this.updateUserInfo()
+            }
         };
         methods = {
             shareList:function(){
@@ -102,61 +106,102 @@
                 })
             }
         };
-        onGotUserInfo(e) {
+        onGotUserInfo(e){
             let that = this;
             let userInfo = e.detail.userInfo || null;
-            if (userInfo != null) {
-                // httpUtil.loading();
+            if ( userInfo != null ) {
                 wx.login({
-                    success: function (res) {
+                    success: function(res) {
                         let code = res.code;
                         if (code) {
                             //发起网络请求
+                            console.log( code );
                             that.loginFromServer(code, userInfo);
                         } else {
-                            console.log(456);
-                            // httpUtil.finishLoading();
-                            // httpUtil.toast("登录失败~" + res.errMsg);
+                            wepy.showToast({
+                                title: '登录失败~' + res.errMsg,
+                                icon: 'none',
+                                duration: 2000
+                            });
                         }
                     }
                 })
             }
-        };
+        }
 
-        async loginFromServer(code, user) {
+        async loginFromServer(code,user) {
             let that = this;
             let params = {
-                code: code
+                query:{
+                    code: code
+                }
             };
-            console.log( params );
-            const res = await api.LOGINURL(params);
+            api.loading();
+            const res = await api.GETLOGIN(params);
             console.log( res );
             if( res.data.code == 200 ){
-                // httpUtil.finishLoading();
-                // if (data) {
-                //     if (data.is_bind == 'yes') {
-                //         app.setUserInfo(data.user_info);
-                //         that.updateUserInfo();
-                //         that.loadUserCenter();
-                //     } else {
-                //         app.setSessionId(data.user_info.session_id);
-                //         wx.navigateTo({
-                //             url: '/pages/home/login/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + data.bind_id
-                //         })
-                //     }
-                // } else {
-                //     httpUtil.toast("登录失败~" + res.errMsg);
-                // }
+                api.finishLoading();
             }else{
-                // httpUtil.finishLoading();
-                // httpUtil.toast("登录失败~" + res.errMsg);
+                api.finishLoading();
+                wepy.showToast({
+                    title: '登录失败~' + res.errMsg,
+                    icon: 'none',
+                    duration: 2000
+                });
             }
         };
+
+        // loginFromServer(code, user) {
+        //     let that = this;
+        //     let params = {
+        //         code: code
+        //     }
+        //     httpUtil.executePost(api.URL_LOGIN, params, {
+        //     onSuccess(data) {
+        //         httpUtil.finishLoading();
+        //         if (data) {
+        //             if (data.is_bind == 'yes') {
+        //                 app.setUserInfo(data.user_info);
+        //                 that.updateUserInfo();
+        //                 that.loadUserCenter();
+        //             } else {
+        //                 app.setSessionId(data.user_info.session_id);
+        //                 wx.navigateTo({
+        //                 url: '/pages/home/login/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + data.bind_id
+        //                 })
+        //             }
+        //         } else {
+        //             httpUtil.toast("登录失败~" + res.errMsg);
+        //         }
+        //     },
+        //     onFailed(error) {
+        //         httpUtil.finishLoading();
+        //         httpUtil.toast("登录失败~" + res.errMsg);
+        //     }
+        //     });
+        // }
+
+        updateUserInfo() {
+            this.userInfo = wepy.$instance.globalData.userInfo
+        }
         
     }
 </script>
 
 <style lang="less">
+    button{
+        padding: 0;
+        margin: 0;
+        text-align: left;
+        background: rgba(0,0,0,0);
+        border-radius: 0;
+        font-size: 0;
+        line-height: auto;
+        box-sizing: content-box;
+        &::after{
+            display: none;
+        }
+    }
     .loginOut{
         position: relative;
         padding-bottom: 94rpx;
@@ -186,6 +231,7 @@
                     color: #2C2C2C;
                     line-height: 66rpx;
                     overflow: hidden;
+
                 }
                 .loginOut_tip{
                     height: 40rpx;

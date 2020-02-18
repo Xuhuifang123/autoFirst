@@ -3,13 +3,15 @@
         <view class='feedback_nr'>
             <form bindsubmit="bindFormSubmit">
                 <textarea 
-                placeholder="请写下您的意见或建议"
-                placeholder-class='feedbackHolder'
-                cursor-spacing='5'
-                hold-keyboard='true'
-                disable-default-padding='true'
-                name='feedback'></textarea>
-                <button form-type="submit" class='submit_feedback'><image src='../../res/images/login_btn.png' /></button>
+                    placeholder="请写下您的意见或建议"
+                    placeholder-class='feedbackHolder'
+                    maxlength='200'
+                    cursor-spacing='5'
+                    hold-keyboard='true'
+                    disable-default-padding='true'
+                    bindinput="onInputChange"
+                    name='feedback'></textarea>
+                <button form-type="submit" class="submit_feedback"><image src='../../res/images/login_btn.png' /></button>
             </form>
         </view>
     </view>
@@ -17,6 +19,7 @@
 
 <script>
     import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
     export default class Feedback extends wepy.page {
         config = {
             navigationBarTitleText: '意见反馈'
@@ -25,13 +28,49 @@
             
         };
         data = {
-            
+            otherContent:''
         };
         methods = {
             bindFormSubmit:function(e){
-                console.log( e.detail.value.feedback );
+                let that = this;
+                if( e.detail.value.feedback ){
+                    that.otherContent = e.detail.value.feedback;
+                    that.getRecommend();
+                }else{
+                    wepy.showToast({
+                        title: '请输入反馈内容~',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
             }
-        }
+        };
+        async getRecommend() {
+            let that = this;
+            let params = {
+                query:{
+                    recommend: that.otherContent
+                }
+            };
+            api.loading();
+            const res = await api.RECOMMEND(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                api.finishLoading();
+                wepy.showToast({
+                    title: '反馈成功~',
+                    icon: 'success',
+                    duration: 2000
+                });
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: res.data.message,
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+        };
     }
 </script>
 
@@ -64,6 +103,9 @@
                 height: 92rpx;
                 vertical-align: top;
             }
+        }
+        .disbale{
+            background: #ccc;
         }
         .submit_feedback::after{
             display: none;

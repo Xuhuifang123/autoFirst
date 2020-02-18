@@ -1,0 +1,319 @@
+<template>
+    <view class='wrap'>
+        <view class='login_logo'>
+            <image class='login_bg' src='../../res/images/login_bg.png'/>
+            <image class='login_logo' src='../../res/images/login_logo.png'/>
+        </view>
+        <view class='login_con'>
+            <form action="" bindsubmit='formSubmit'>
+                <view class='login_li login_phone'>
+                    <image class='phone_icon' src='../../res/images/login_phone.png'/>
+                    <input type="number" name='phone' 
+                        data-id='phone'
+                        placeholder='请输入手机号' 
+                        placeholder-class='holderClass' 
+                        bindinput='changeTel'/>
+                    <image src='../../res/images/login_del.png' class='phone_del'/>
+                </view>
+                <view class='login_li login_code'>
+                    <image class='phone_code' src='../../res/images/login_code.png'/>
+                    <input type="number" name='code' 
+                        data-id='code'
+                        placeholder='请输入验证码' 
+                        placeholder-class='holderClass' 
+                        bindinput='changeTel'/>
+                    <button class="getCode {{ disabled ? 'disable' : '' }}" wx:if="{{!isGetCode}}" catchtap='getPhoneCode'>{{btnTxt}}</button>
+                    <text wx:else>{{countDown}}s重新获取</text>
+                </view>
+                <button 
+                    class="login_btn {{ btnDisabled ? 'disable' : '' }}"
+                    form-type="submit">登录
+                </button>
+            </form>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
+    var nickName;
+    var avatarUrl;
+    var bind_id;
+    export default class Login extends wepy.page {
+        config = {
+            navigationBarTitleText: '登录'
+        };
+        onLoad(options){
+            nickName = options.nickName;
+            avatarUrl = decodeURIComponent(options.avatarUrl);
+            bind_id = options.bind_id;
+        };
+        data = {
+            btnTxt: "获取验证码",
+            disabled: true,
+            isGetCode: false,
+            countDown: 60,
+            btnDisabled: true,
+            formData: {
+                phone: '',
+                code: ''
+            }
+        };
+        methods = {
+            /* 手机号,验证码 */
+            changeTel: function (e) {
+                let that = this,
+                    formData = that.formData,
+                    inputType = e.currentTarget.dataset.id,
+                    inputValue = e.detail.value;
+                inputType === 'phone' ? formData.phone = inputValue : formData.code = inputValue;
+                that.formData = formData;
+                if (inputType === 'phone') {
+                    if ((/^1[34578]\d{9}$/.test(inputValue))) {
+                        that.disabled = false;
+                    } else {
+                        that.disabled = true;
+                    }
+                } else {
+                    if ((/^\d{6}$/).test(inputValue)) {
+                        that.btnDisabled = false;
+                    } else {
+                        that.btnDisabled = true;
+                    }
+                }
+            },
+            /* 获取验证码 */
+            getPhoneCode: function () {
+                var that = this,
+                formData = that.formData;
+                if (!that.disabled) {
+                    //连接服务器进行获取验证码操作
+                    that.getCode();
+                } else {
+                    wepy.showToast({
+                        title: '请输入正确的手机号码 ~',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+            },
+            
+            /* 点击登录 */
+            formSubmit: function (e) {
+                let that = this,
+                    formData = e.detail.value,
+                    errMsg = '';
+                if (that.disabled && that.btnDisabled) {
+                    return false;
+                } else {
+                    if (!formData.phone) {
+                        errMsg = '手机号不能为空！';
+                    }
+                    if (!formData.code) {
+                        errMsg = '验证码不能为空！';
+                    }
+                    if (formData.phone) {
+                        if ((/^1[34578]\d{9}$/.test(formData.phone))) {
+                            errMsg = '手机号格式有误！';
+                        }
+                    }
+                    if (formData.code) {
+                        if (!(/^\d{6}$/).test(formData.code)) {
+                            errMsg = '验证码格式有误！';
+                        }
+                    }
+                    wepy.showToast({
+                        title: errMsg,
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+                that.loginByCode();
+            }
+
+        };
+
+        async getCode(){
+            let that = this;
+            let params = {
+                query:{
+                    phone: that.formData.phone,
+                    type: 1
+                }
+            };
+            api.loading();
+            const res = await api.GETCODE(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                api.finishLoading();
+                wepy.showToast({
+                    title: '验证码已发送，请注意查收~',
+                    icon: 'success',
+                    duration: 2000
+                });
+                that.isGetCode = true;
+                that.timer(); 
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '验证码发送失败~',
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+            that.$apply();
+        }
+
+        timer() { //验证码倒计时
+            let that = this,
+                countDown = that.countDown;
+            let clock = setInterval(() => {
+                countDown--;
+                if (countDown >= 0) {
+                    that.countDown = countDown;
+                } else {
+                    clearInterval(clock)
+                    that.countDown = 60;
+                    that.isGetCode = false;
+                    that.btnTxt = '重新获取'
+                }
+                that.$apply();
+            }, 1000)
+        };
+        /**
+         * 验证码登录
+         */
+        async loginByCode(){
+            let that = this;
+            let params = {
+                query:{
+                    phone: that.formData.phone,
+                    login_code: that.formData.code,
+                    nickName: nickName,
+                    avatarUrl: avatarUrl,
+                    bid: bind_id
+                }
+            };
+            api.loading();
+            const res = await api.GETPHONE(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                api.finishLoading();
+                if( res.data.data ){
+                    wepy.$instance.setUserInfo(res.data.data);
+                }else{
+                    wepy.showToast({
+                        title: '登录失败~',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+                console.log('11');
+                wx.navigateBack({
+                    delta: 1
+                })
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '登录失败~',
+                    icon: 'none',
+                    duration: 2000
+                });
+                wx.navigateBack({
+                    delta: 1
+                })
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    button{
+        padding: 0;
+        margin: 0;
+        text-align: left;
+        background: rgba(0,0,0,0);
+        border-radius: 0;
+        font-size: 0;
+        line-height: auto;
+        box-sizing: content-box;
+        &::after{
+            display: none;
+        }
+    }
+    .login_logo{
+        width: 100%;
+        height: 362rpx;
+        position: relative;
+        .login_bg{
+            width: 100%;
+            height: 100%;
+        }
+        .login_logo{
+            width: 180rpx;
+            height: 196rpx;
+            position: absolute;
+            top: 130rpx;
+            left: 284rpx;
+        }
+    }
+    .login_con{
+        margin: 80rpx 80rpx 0 80rpx;
+        .login_li{
+            width: 100%;
+            height: 56rpx;
+            padding-bottom: 6rpx;
+            border-bottom: 4rpx solid #eaeaea;
+            margin-bottom: 44rpx;
+            display: flex;
+            .phone_icon{
+                width: 40rpx;
+                height: 56rpx;
+                margin-right: 40rpx;
+            }
+            .phone_code{
+                width: 42rpx;
+                height: 54rpx;
+                margin-right: 40rpx;
+            }
+            input{
+                flex: 1;
+                height: 54rpx;
+                line-height: 54rpx;
+            }
+            .phone_del{
+                width: 24rpx;
+                height: 24rpx;
+                margin-top: 16rpx;
+                margin-left: 20rpx;
+            }
+            .getCode{
+                color: #E60012;
+                font-size: 30rpx;
+                line-height: 56rpx;
+                margin-left: 20rpx;
+            }
+            .getCode.disable{
+                color: #999;
+            }
+        }
+        .login_code{
+            margin-bottom: 58rpx;
+        }
+        .login_btn{
+            width: 100%;
+            height: 92rpx;
+            line-height: 92rpx;
+            text-align: center;
+            font-size: 36rpx;
+            color: #fff;
+            background: #d90000;
+            border-radius: 48rpx;
+        }
+        .login_btn.disable{
+            background: #c1c1c1;
+        }
+    }
+
+</style>

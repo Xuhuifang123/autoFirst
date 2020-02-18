@@ -23,8 +23,8 @@
     export default class Menu extends wepy.component {
         data = {
             currentName: 'jiaodian',
-            scrollLeft: 0,
-            winWidth: 375,
+            scrollLeft: 326,
+            winWidth: 0,
             navList:[]
         };
         onLoad(){
@@ -45,8 +45,10 @@
                     query.select('#'+itemId).boundingClientRect(function (rect) {
                         var setLeft = itemLeft - that.winWidth/2 + rect.width/2;
                         that.scrollLeft = setLeft;
+                        that.$apply();
                     }).exec();
-
+                    
+                    return false;
                     // 传值给父页面
                     that.$emit('tabClick',cat_id,menu_id,type,cat_spell);
                 }
@@ -63,11 +65,19 @@
             const res = await api.GETMENU(params);
             console.log( res.data );
             if( res.data.code == 200 ){
-                api.finishLoading();
                 that.navList = res.data.data;
                 that.currentName = that.navList[0].cat_spell;
+                api.finishLoading();
+                that.$apply();
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            that.$apply();
+            
         }
     }
 

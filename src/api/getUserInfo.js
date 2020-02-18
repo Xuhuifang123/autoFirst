@@ -32,10 +32,10 @@ export const author = (context) => {
                                 success: (res) => {
                                     if (res.authSetting["scope.userInfo"] || res.authSetting["scope.userLocation"]){////如果用户重新同意了授权登录
                                         wepy.getUserInfo({
-                                        success:function(res){
-                                        resolve(res.userInfo)
-                                        that.$parent.globalData.userInfo = res.userInfo;
-                                        }
+                                            success:function(res){
+                                                resolve(res.userInfo)
+                                                that.$parent.globalData.userInfo = res.userInfo;
+                                            }
                                         })
                                     }
                                 },

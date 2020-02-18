@@ -17,7 +17,7 @@
             this.aboutUs();
         };
         data = {
-            aboutStr:'正在加载...',
+            aboutStr:'',
             aboutcode:'11'
         };
         async aboutUs(){
@@ -27,14 +27,18 @@
             const res = await api.ABOUTUS(params);
             console.log( res );
             if( res.data.code == 200 ){
-                api.finishLoading();
                 that.aboutStr = res.data.data;
                 that.aboutcode = res.data.code;
-                console.log( that.aboutStr );   
+                api.finishLoading();
+                that.$apply();
             }else{
-                that.aboutStr = '加载失败';
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
             }
-            that.$apply();
         };
 
     }

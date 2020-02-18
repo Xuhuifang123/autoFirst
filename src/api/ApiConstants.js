@@ -8,8 +8,17 @@ import {
 
 // HOST:https://api.news18a.com
 
-// 登录
-const LOGINURL = (params) => wxRequest(params, HOST + "/init.php?m=program&c=user_related&a=login",false);
+// 获取openid
+const GETOPEN = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=getOpen",false);
+
+// 授权登录
+const GETLOGIN = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=login",false);
+
+// 获取验证码
+const GETCODE = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=code",false);
+
+// 手机号登录
+const GETPHONE = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=phone_login",false);
 
 // 首页栏目展示
 const GETMENU = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=firstColumn",false);
@@ -35,6 +44,9 @@ const GETARTLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&
 // 热门作者列表
 const GETAUTHORLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=hotAuthorList",false);
 
+// 专题列表
+const GETSPECIALLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=splicestoryList",false);
+
 // 文章详情
 const GETSTORY = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=storyInfo",false);
 
@@ -44,10 +56,17 @@ const GETAUTHORDETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=
 // 图库详情
 const GETPHOTODETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=photoInfo",false);
 
+// 视频详情 
+const GETVIDEODETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=videoInfo",false);
 
+// 直播详情
+const GETLIVEDETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=liveInfo",false);
 
 // 关于我们
 const ABOUTUS = (params) => wxRequest(params, HOST + "/init.php?m=api&c=api&a=withUs",false);
+
+// 意见反馈
+const RECOMMEND = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=recommend",false);
 
 
 /**
@@ -92,12 +111,18 @@ module.exports = {
     GETVIDEOLIST,
     GETARTLIST,
     GETAUTHORLIST,
+    GETSPECIALLIST,
     GETSTORY,
     GETAUTHORDETAIL,
     GETPHOTODETAIL,
-
-    LOGINURL,
+    GETVIDEODETAIL,
+    GETLIVEDETAIL,
+    GETOPEN,
+    GETLOGIN,
+    GETCODE,
+    GETPHONE,
     ABOUTUS,
+    RECOMMEND,
     toast:showToast,
     empty:showEmpty,
     loading:showLoading,
