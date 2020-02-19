@@ -45,6 +45,7 @@
             navigationBarTitleText: '登录'
         };
         onLoad(options){
+            console.log( options );
             nickName = options.nickName;
             avatarUrl = decodeURIComponent(options.avatarUrl);
             bind_id = options.bind_id;
@@ -195,6 +196,7 @@
                     bid: bind_id
                 }
             };
+            console.log( params );
             api.loading();
             const res = await api.GETPHONE(params);
             console.log( res );
@@ -209,7 +211,6 @@
                         duration: 2000
                     });
                 }
-                console.log('11');
                 wx.navigateBack({
                     delta: 1
                 })

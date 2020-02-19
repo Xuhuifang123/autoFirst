@@ -1,5 +1,5 @@
 <template>
-    <import src="/wxParse/wxParse.wxml"/>
+    <!-- <import src="/wxParse/wxParse.wxml"/> -->
     <view class="wrap">
         <view class="artice_con">
             <view class="author flex verCenter">
@@ -16,7 +16,7 @@
             <view class="artice_nr">
                 <view class="artice_bt">{{storyInfo.title}}</view>
                 <view class="artice_main">
-                    <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/>
+                    <!-- <template is="wxParse" data="{{wxParseData:parserContent.nodes}}"/> -->
                 </view>
             </view>
             <view class="articleNumber">
@@ -25,8 +25,12 @@
             </view>
             <view class="artice_share flex" wx:if='{{storyInfo}}'>
                 <button class='shareMessage' open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
-                <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
+                <button class='shareTimeline' type='primary' @tap='share()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
             </view>
+
+            <canvas canvas-id="storyCanvas" style="width:282px; height:365px;"></canvas>
+
+            <!-- <shareSelectLayout></shareSelectLayout> -->
 
             <view class="recommend">
                 <view class="recommend_bt"><image src='../../res/images/icon_recommend.png' /> 相关推荐</view>
@@ -58,23 +62,6 @@
             </view>
 
         </view>
-
-        <view class="shareMask {{shareFlag ? 'show' : '' }}">
-            <view class='storyShare'>
-
-                <!-- 分享图 -->
-                <view class='shareCanvas'>
-                    <canvas canvas-id="storyCanvas" style="width:282px; height:365px;"></canvas>
-                </view>
-
-                <!-- 关闭按钮 -->
-                <image src='../../res/images/close_btn.png' class='close_btn' @tap='hideShare()'/>
-
-                <!-- 保存图片 -->
-                <image src='../../res/images/save_btn.png' class='save_btn' @tap='saveSharePhoto()'/>
-            </view>
-        </view>
-
     </view>
 </template>
 
@@ -84,7 +71,7 @@
     import WxParse from '../../../src/wxParse/wxParse';
     import WxmlCanvas from './../../components/canvasJS/index';
     // import shareSelectLayout from './../../components/shareSelectLayout';
-    export default class Story extends wepy.page{
+    export default class ShareStory extends wepy.page{
         config = {
             navigationBarTitleText: '文章详情'
         };
@@ -93,7 +80,8 @@
             // shareSelectLayout:shareSelectLayout
         };
         onLoad(options){
-            this.getStoryCon( options.id );
+            let that = this;
+            that.getStoryCon( options.id );
         };
         data = {
             userInfo:{},
@@ -105,9 +93,7 @@
             Width:0,
             Height:0,
             ctx:null,
-            storyImage:'',
-            shareFlag:false,
-            imagePath:''
+            storyImage:''
         };
         methods = {
             storyDetail:function(id){
@@ -115,60 +101,6 @@
                     url: '../../pages/detail/story?id='+id
                 })
             },
-            // 显示分享图
-            shareTimeLine:function(){
-                let that = this;
-                that.shareFlag = true;
-                that.$apply();
-            },
-            // 隐藏分享图
-            hideShare:function(){
-                let that = this;
-                that.shareFlag = false;
-                that.$apply();
-            },
-            // 保存图片至本地
-            saveSharePhoto:function(){
-                let that = this;
-                wepy.showLoading({
-                    title: '保存中...', 
-                    mask: true,
-                });
-                wx.downloadFile({
-                    url: that.imagePath,
-                    success: function(res) {
-                        if (res.statusCode === 200) {
-                            let img = res.tempFilePath;
-                            wx.saveImageToPhotosAlbum({
-                                filePath: img,
-                                success(res) {
-                                    wepy.showToast({
-                                        title: '已保存到手机相册 ~',
-                                        icon: 'success',
-                                        duration: 2000
-                                    });
-                                    that.shareFlag = false;
-                                    that.$apply();
-                                },
-                                fail(res) {
-                                    wepy.showToast({
-                                        title: '保存失败 ~',
-                                        icon: 'none',
-                                        duration: 2000
-                                    });
-                                }
-                            });
-                        }
-                    },
-                    fail: function(error){
-                        wepy.showToast({
-                            title: '保存失败 ~',
-                            icon: 'none',
-                            duration: 2000
-                        });
-                    }
-                });
-            }
         };
 
         share () {
@@ -241,10 +173,12 @@
                 destHeight: that.Height,
                 canvasId: 'storyCanvas',
                 success: function (res) {
-                    console.log('imagePath'+res.tempFilePath);
+                    console.log(res.tempFilePath);
                     /* 这里 就可以显示之前写的 预览区域了 把生成的图片url给image的src */
-                    that.imagePath = res.tempFilePath;
-                    that.$apply();
+                    that.setData({
+                        imagePath: res.tempFilePath,
+                        hidden: false
+                    })
                 },
                 fail: function (res) {
                     console.log(res)
@@ -385,6 +319,7 @@
             }
             that.ctx.restore();
         };
+
 
     }
 
@@ -708,50 +643,6 @@
                     }
                 }
             }
-        }
-    }
-
-    .shareMask{
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background:rgba(0,0,0,0.6);
-        transform: translateX(-300%);
-        transition: transform 0.3s linear;
-    }
-    .shareMask.show{
-        transform: translateX(0);
-    }
-    .storyShare{
-        width: 282px;
-        height: 365px;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%,-50%);
-        overflow: visible;
-        .shareCanvas{
-            width: 282px;
-            height: 365px;
-            background: #fff;
-            border-radius: 16px;
-        }
-        .close_btn{
-            position: absolute;
-            right: 0;
-            top: -76rpx;
-            width: 56rpx;
-            height: 56rpx;
-        }
-        .save_btn{
-            position: absolute;
-            width: 220rpx;
-            height: 66rpx;
-            left: 50%;
-            bottom: -96rpx;
-            margin-left: -110rpx;
         }
     }
 

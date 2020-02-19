@@ -28,11 +28,6 @@
         </view>
 
         <view class="my_list">
-            <view class="my_nr" wx:if="{{userInfo!=null}}">
-                <image src='../../res/images/icon_share.png' class='my_icon'/>
-                <view class="my_bt" @tap='shareList()'>我的分享<image src='../../res/images/my_more.png' class='my_more' />
-                </view>
-            </view>
             <view class="my_nr">
                 <image src='../../res/images/icon_feedback.png' class='my_icon'/>
                 <!-- 已登录 -->
@@ -46,11 +41,11 @@
                 <view class="my_bt" @tap='aboutUs()'>关于我们<image src='../../res/images/my_more.png' class='my_more' />
                 </view>
             </view>
-            <view class="my_nr">
+            <!-- <view class="my_nr">
                 <image src='../../res/images/APP.png' class='my_icon'/>
                 <view class="my_bt" @tap='toAPP()'>APP<image src='../../res/images/my_more.png' class='my_more' />
                 </view>
-            </view>
+            </view> -->
         </view>
     </view>
 
@@ -72,12 +67,12 @@
             likeModels: [],
         };
         onLoad(){
-            // const that = this, 
-            // userInfo = wepy.$instance.globalData.userInfo;
-            // if( userInfo != null ){
-            //     that.userInfo = userInfo;
-            // }
-            // console.log( userInfo );
+            const that = this, 
+            userInfo = wepy.$instance.globalData.userInfo;
+            if( userInfo != null ){
+                that.userInfo = userInfo;
+            }
+            console.log( userInfo );
         };
         onShow() {
             if (wepy.$instance.isLogin()) {
@@ -115,7 +110,7 @@
                         let code = res.code;
                         if (code) {
                             //发起网络请求
-                            console.log( code );
+                            console.log( code,userInfo );
                             that.loginFromServer(code, userInfo);
                         } else {
                             wepy.showToast({
@@ -141,45 +136,34 @@
             console.log( res );
             if( res.data.code == 200 ){
                 api.finishLoading();
+                if( res.data.data ){
+                    let _data = res.data.data;
+                    if (_data.is_bind == 'yes') {
+                        wepy.$instance.setUserInfo(_data.user_info);
+                        that.updateUserInfo();
+                        that.$apply();
+                    } else {
+                        wepy.$instance.setSessionId(_data.user_info.session_id);
+                        wepy.navigateTo({
+                            url: './../aboutMy/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + _data.bind_id
+                        })
+                    }
+                }else{
+                    wepy.showToast({
+                        title: '登录失败~' + res.data.message,
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
             }else{
                 api.finishLoading();
                 wepy.showToast({
-                    title: '登录失败~' + res.errMsg,
+                    title: '登录失败~' + res.data.message,
                     icon: 'none',
                     duration: 2000
                 });
             }
         };
-
-        // loginFromServer(code, user) {
-        //     let that = this;
-        //     let params = {
-        //         code: code
-        //     }
-        //     httpUtil.executePost(api.URL_LOGIN, params, {
-        //     onSuccess(data) {
-        //         httpUtil.finishLoading();
-        //         if (data) {
-        //             if (data.is_bind == 'yes') {
-        //                 app.setUserInfo(data.user_info);
-        //                 that.updateUserInfo();
-        //                 that.loadUserCenter();
-        //             } else {
-        //                 app.setSessionId(data.user_info.session_id);
-        //                 wx.navigateTo({
-        //                 url: '/pages/home/login/login?nickName=' + user.nickName + '&avatarUrl=' + encodeURIComponent(user.avatarUrl) + '&bind_id=' + data.bind_id
-        //                 })
-        //             }
-        //         } else {
-        //             httpUtil.toast("登录失败~" + res.errMsg);
-        //         }
-        //     },
-        //     onFailed(error) {
-        //         httpUtil.finishLoading();
-        //         httpUtil.toast("登录失败~" + res.errMsg);
-        //     }
-        //     });
-        // }
 
         updateUserInfo() {
             this.userInfo = wepy.$instance.globalData.userInfo
@@ -263,6 +247,7 @@
                 border-radius: 50%; 
                 margin: 0 auto 18rpx auto;
                 background: #fff;
+                overflow: hidden;
                 .avatar{
                     width: 100%;
                     height: 100%;

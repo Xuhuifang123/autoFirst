@@ -39,7 +39,7 @@
                 </view>
             </block>
 
-            <view class="media_recom">
+            <view class="media_recom" wx:if='{{authorList.length>0}}'>
                 <view class="media_recom_bt">热门汽势媒体推荐<view class="media_recom_bt_more" @tap="authorList()">更多<image src="../../res/images/my_more.png" /></view></view>
                 <scroll-view scroll-x scroll-with-animation="{{true}}">
                     <view class="media_recom_con">
@@ -88,9 +88,14 @@
                 </block>
             </block>
         </view>
-        <view class="moreLoading" wx:if='{{loading}}'>
-            <image src="../../res/images/homeLoading.png" />数据加载 更多精彩
-        </view>
+        <block wx:if='{{loadFlag}}'>
+            <view class="moreLoading" wx:if='{{loading}}'>
+                <image src="../../res/images/homeLoading.png"/>数据加载 更多精彩
+            </view>
+        </block>
+        <block wx:else>
+            <view class="moreLoading">内容已全部加载完成 ~</view>
+        </block>
     </scroll-view>
 </template>
 
@@ -113,9 +118,10 @@
         data = {
             shareList:[],
             authorList:[],
-            loading:true,
+            loading:false,
             columnPage:1,
-            shareTop:[]
+            shareTop:[],
+            loadFlag:true
         };
         methods = {
             storyDetail:function(id){
@@ -142,8 +148,10 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                this.columnPage = this.columnPage*1 + 1;
-                this.getNewsList();
+                if( this.loadFlag ){
+                    this.columnPage = this.columnPage*1 + 1;
+                    this.getNewsList();
+                }
             }
         };
         events = {
@@ -156,24 +164,49 @@
                     page: that.columnPage
                 }
             }
-            api.loading();
+            if( that.columnPage == 1 ){
+                api.loading();;
+            }else{
+                that.loading = true;
+                that.$apply();
+            }
             const res = await api.GETARTLIST(params);
             console.log( res );
             if( res.data.code == 200 ){
-                if( that.columnPage == 1 ){
-                    for( let i=0; i<res.data.data.author.length; i++ ){
-                        that.authorList.push( res.data.data.author[i] );
+                if( res.data.data.storyList ){
+                    if( that.columnPage == 1 ){
+                        for( let i=0; i<res.data.data.author.length; i++ ){
+                            that.authorList.push( res.data.data.author[i] );
+                        }
                     }
+                    for( let i=0; i<res.data.data.storyList.length; i++ ){
+                        that.shareList.push( res.data.data.storyList[i] );
+                    }
+                    that.shareTop[0] = that.shareList[0];
+                    that.shareTop[1] = that.shareList[1];
+
+                    if( that.columnPage == 1 ){
+                        api.finishLoading();
+                    }else{
+                        that.loading = false;
+                    }
+                    that.$apply();
+                }else{
+                    // 没有更多数据
+                    that.loadFlag = false;
+                    wepy.showToast({
+                        title: '全部加载完成 ~',
+                        icon: 'none',
+                        duration: 2000
+                    });
                 }
-                for( let i=0; i<res.data.data.storyList.length; i++ ){
-                    that.shareList.push( res.data.data.storyList[i] );
-                }
-                that.shareTop[0] = that.shareList[0];
-                that.shareTop[1] = that.shareList[1];
-                api.finishLoading();
-                that.$apply();
             } else {
-                api.finishLoading();
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
                 wepy.showToast({
                     title: '加载失败 ~',
                     icon: 'none',

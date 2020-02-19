@@ -68,6 +68,11 @@ const ABOUTUS = (params) => wxRequest(params, HOST + "/init.php?m=api&c=api&a=wi
 // 意见反馈
 const RECOMMEND = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=recommend",false);
 
+// 我的分享
+const MYSHARE = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=shareList",false);
+
+// 分享添加
+const ADDSHARE = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program&a=insShare",false);
 
 /**
  *公用的Toast
@@ -123,6 +128,8 @@ module.exports = {
     GETPHONE,
     ABOUTUS,
     RECOMMEND,
+    MYSHARE,
+    ADDSHARE,
     toast:showToast,
     empty:showEmpty,
     loading:showLoading,

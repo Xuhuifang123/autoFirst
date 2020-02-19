@@ -24,6 +24,14 @@
                 </view>
             </block>
         </view>
+        <block wx:if='{{loadFlag}}'>
+            <view class="moreLoading" wx:if='{{loading}}'>
+                <image src="../../res/images/homeLoading.png"/>数据加载 更多精彩
+            </view>
+        </block>
+        <block wx:else>
+            <view class="moreLoading">内容已全部加载完成 ~</view>
+        </block>
 
     </scroll-view>
 </template>
@@ -40,7 +48,9 @@
         };
         data = {
             columnPage:1,
-            liveData:[]
+            liveData:[],
+            loadFlag:true,
+            loading:false,
         };
         methods = {
             liveDetail(id){
@@ -57,8 +67,10 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                this.columnPage = this.columnPage*1 + 1;
-                this.getLiveList();
+                if( lthis.oadFlag ){
+                    this.columnPage = this.columnPage*1 + 1;
+                    this.getLiveList();
+                }
             }
         };
         async getLiveList(){
@@ -68,17 +80,42 @@
                     page:this.columnPage
                 }
             }
-            api.loading();
+            if( that.columnPage == 1 ){
+                api.loading();;
+            }else{
+                that.loading = true;
+                that.$apply();
+            }
             const res = await api.GETLIVELIST(params);
             console.log( res );
             if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.liveData.push( res.data.data[i] );
+                if( res.data.data.length > 0 ){
+                    for( let i=0; i<res.data.data.length; i++ ){
+                        that.liveData.push( res.data.data[i] );
+                    }
+                    api.finishLoading();
+                    that.$apply();
+                }else{
+                    that.loadFlag = false;
+                    wepy.showToast({
+                        title: '全部加载完成 ~',
+                        icon: 'none',
+                        duration: 2000
+                    });
                 }
-                api.finishLoading();
-                that.$apply();
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
             }else{
-                api.finishLoading();
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
                 wepy.showToast({
                     title: '加载失败 ~',
                     icon: 'none',
@@ -170,6 +207,21 @@
                 padding: 0 16rpx;
                 font-weight: bold;
             }
+        }
+    }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
         }
     }
 </style>

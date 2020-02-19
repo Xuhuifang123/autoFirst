@@ -5,10 +5,7 @@
             <view class='photo_nr' wx:for="{{newsList}}" wx:key="index">
                 <view class='photo_bt' @tap="photoList({{item.id}})">{{item.prd_brand}}-{{item.prd_sign}}</view>
                 <view class='photo_img' @tap="photoList({{item.id}})">
-                    <!-- <image wx:for="{{item.imgs}}" wx:key="{{inx}}" src="{{item}}"/> -->
-                    <image src='{{item.cover}}'></image>
-                    <image src='{{item.cover}}'></image>
-                    <image src='{{item.cover}}'></image>
+                    <image wx:for="{{item.images}}" wx:key="{{inx}}" src="{{item}}"/>
                 </view>
                 <view class='photo_info'>
                     <view class='photo_author'>{{item.source}}</view>
@@ -49,6 +46,7 @@
 
     <!-- 文章信息流 -->
     <view class='news_list' wx:else>
+        {{newsList.length}}
         <swiper class='swiper' wx:if="{{colSpell==('jiaodian')}}"
             indicator-dots='true'
             autoplay='true'
@@ -122,11 +120,16 @@
                 </view>
             </block>
         </block>
-
-        <view class="moreLoading" wx:if='{{loading}}'>
-            <image src="../res/images/homeLoading.png" />数据加载 更多精彩
-        </view>
     </view>
+
+    <block wx:if='{{loadFlag}}'>
+        <view class="moreLoading" wx:if='{{loading}}'>
+            <image src="./../res/images/homeLoading.png"/>数据加载 更多精彩
+        </view>
+    </block>
+    <block wx:else>
+        <view class="moreLoading">内容已全部加载完成 ~</view>
+    </block>
 
 </template>
 
@@ -153,20 +156,17 @@
             }
         };
         components = {
-            
+            // that.$emit('tabClick',cat_id,menu_id,type,cat_spell);
         };
         onLoad(){
             this.getNewsList( this.colId,this.colType,this.colPage,this.colSpell );
-            // this.getNewsList( cat_id,menu_id,type,cat_spell,page );
-            if( this.colType == 'bobao' ){
-                this.disposeReport();
-            }
         };
         data = {
             focus:[],
             newsList:[],
             letter:[],
             loading:false,
+            loadFlag:true,
             cat_spell:'jiaodian'
         };
         methods = {
@@ -228,14 +228,16 @@
                     that.newsList = [];
                     that.bobaoData = [];
                     that.cat_spell = cat_spell;
+                    that.loadFlag = true;
                     // 模板数据变更后更新
                     that.$apply();
                 }
-                that.getNewsList( menu_id,type,page,cat_spell,cat_id );
+                if( that.loadFlag ){
+                    that.getNewsList( menu_id,type,page,cat_spell,cat_id );
+                }
             }
         };
         
-        // this.colId,this.colType,this.colPage,this.colSpell
         async getNewsList( menu_id,type,page,spell,cat_id ){ // id,type(index),page,spell
             let that = this;
             // 首页默认列表
@@ -248,25 +250,35 @@
                         ua_from:'program'
                     }
                 };
-                api.loading();
+                if( that.columnPage == 1 ){
+                    api.loading();;
+                }else{
+                    that.loading = true;
+                    that.$apply();
+                }
                 const res = await api.GETTYPEINDEX( params );
                 console.log( res );
                 if( res.data.code == 200 ){
-                    if(page == 1){
-                        that.focus = res.data.data.focus;
+                    if( res.data.data.storyData.length > 0 ){
+                        if(page == 1){
+                            that.focus = res.data.data.focus;
+                        }
+                        for( let i=0; i<res.data.data.storyData.length; i++ ){
+                            that.newsList.push( res.data.data.storyData[i] );
+                        }
+                        if( that.columnPage == 1 ){
+                            api.finishLoading();
+                        }else{
+                            that.loading = false;
+                        }
+                        that.$apply();
+                    } else {
+                        // 没有更多数据
+                        that.setLoadFlag();
                     }
-                    for( let i=0; i<res.data.data.storyData.length; i++ ){
-                        that.newsList.push( res.data.data.storyData[i] );
-                    }
-                    api.finishLoading();
-                    that.$apply();
                 }else{
-                    api.finishLoading();
-                    wepy.showToast({
-                        title: '加载失败 ~',
-                        icon: 'none',
-                        duration: 2000
-                    });
+                    // 加载失败
+                    that.setLoadError();
                 }
             } else if( type=='hand' ) {//首页手动列表
                 let params = {
@@ -278,34 +290,54 @@
                         typeData:{cat_api_filed:cat_id}
                     }
                 };
-                api.loading();
+                if( that.columnPage == 1 ){
+                    api.loading();;
+                }else{
+                    that.loading = true;
+                    that.$apply();
+                }
                 const res = await api.GETTYPEHAND( params );
                 console.log( res );
                 if( res.data.code == 200 ){
                     if( spell == 'letter' ){
-                        for( let i=0; i<res.data.data.length; i++ ){
-                            // that.newsList.push( res.data.data[i] );
-                            that.letter.push( res.data.data[i] );
+                        if( res.data.data.length > 0 ){
+                            for( let i=0; i<res.data.data.length; i++ ){
+                                that.letter.push( res.data.data[i] );
+                            }
+                            that.disposeReport();
+                        }else{
+                            // 没有更多数据
+                            that.setLoadFlag();
                         }
-                        that.disposeReport();
-                    } else if( spell == 'photo' || spell == 'splice' ){
-                        for( let i=0; i<res.data.data.length; i++ ){
-                            that.newsList.push( res.data.data[i] );
+                    }else if( spell == 'photo' || spell == 'splice' ){
+                        if( res.data.data.length > 0 ){
+                            for( let i=0; i<res.data.data.length; i++ ){
+                                that.newsList.push( res.data.data[i] );
+                            }
+                        }else{
+                            // 没有更多数据
+                            that.setLoadFlag();
                         }
-                    } else {
-                        for( let i=0; i<res.data.data.storyData.length; i++ ){
-                            that.newsList.push( res.data.data.storyData[i] );
+                    }else{
+                        let _length = res.data.data.storyData.length;
+                        if( _length > 0 ){
+                            for( let i=0; i<_length; i++ ){
+                                that.newsList.push( res.data.data.storyData[i] );
+                            }
+                        }else{
+                            // 没有更多数据
+                            that.setLoadFlag();
                         }
                     }
-                    api.finishLoading();
+                    if( that.columnPage == 1 ){
+                        api.finishLoading();
+                    }else{
+                        that.loading = false;
+                    }
                     that.$apply();
                 }else{
-                    api.finishLoading();
-                    wepy.showToast({
-                        title: '加载失败 ~',
-                        icon: 'none',
-                        duration: 2000
-                    });
+                    // 加载失败
+                    that.setLoadError();
                 }
             } else {
                 let params = {
@@ -317,26 +349,62 @@
                         column_id:cat_id
                     }
                 };
-                api.loading();
+                if( that.columnPage == 1 ){
+                    api.loading();;
+                }else{
+                    that.loading = true;
+                    that.$apply();
+                }
                 const res = await api.GETTYPEAUTO( params );
                 console.log( res );
                 if( res.data.code == 200 ){
-                    for( let i=0; i<res.data.data.storyData.length; i++ ){
-                        that.newsList.push( res.data.data.storyData[i] );
+                    if( res.data.data.storyData.length > 0 ){
+                        for( let i=0; i<res.data.data.storyData.length; i++ ){
+                            that.newsList.push( res.data.data.storyData[i] );
+                        }
+                    }else{
+                        // 没有更多数据
+                        that.setLoadFlag();
                     }
-                    api.finishLoading();
+                    if( that.columnPage == 1 ){
+                        api.finishLoading();
+                    }else{
+                        that.loading = false;
+                    }
                     that.$apply();                    
                 }else{
-                    api.finishLoading();
-                    wepy.showToast({
-                        title: '加载失败 ~',
-                        icon: 'none',
-                        duration: 2000
-                    });
+                    // 加载失败
+                    that.setLoadError();
                 }
             }
             console.log( that.newsList )
         };
+
+        setLoadFlag(){
+            let that = this;
+            that.loadFlag = false;
+            that.$apply();
+            wepy.showToast({
+                title: '全部加载完成 ~',
+                icon: 'none',
+                duration: 2000
+            });
+        }
+
+        setLoadError(){
+            let that = this;
+            if( that.columnPage == 1 ){
+                api.finishLoading();
+            }else{
+                that.loading = false;
+                that.$apply();
+            }
+            wepy.showToast({
+                title: '加载失败 ~',
+                icon: 'none',
+                duration: 2000
+            });
+        }
     }
 </script>
 

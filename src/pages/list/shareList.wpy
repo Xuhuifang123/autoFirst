@@ -56,10 +56,10 @@
             
         }; 
         onLoad(options){
-            // this.getNewsList( val,page );
-            console.log( this.data.shareList );
+            this.getNewsList();
         };
         data = {
+            curPage:1,
             shareList:[
                 {
                     author: "梁子辰",
@@ -124,19 +124,20 @@
 
         };
         
-        async getNewsList( type,curPage ){
+        async getNewsList(){
             let that = this;
             let params = {
                 query:{
-                    page: curPage,
-                    columnid:2524
+                    page: that.curPage,
                 }
             }
-            const res = await api.GETTUIJIAN(params);
+            api.loading();
+            const res = await api.MYSHARE(params);
+            console.log( res );
+            return false;
             if( res.data.code == 200 ){
                 for( let i=0; i<res.data.data.length; i++ ){
                     that.newsList.push( res.data.data[i] );
-                    // that.setData({ newsList : that.newsList });
                 }
                 api.finishLoading();
                 that.$apply();

@@ -113,10 +113,11 @@
             font-weight: bold;
         }
         .photo_nr{
-            padding: 24rpx 24rpx 4rpx 24rpx;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            padding: 24rpx 0 4rpx 24rpx;
+            overflow: hidden;
+            // display: flex;
+            // flex-wrap: wrap;
+            // justify-content: space-between;
             image{
                 width: 222rpx;
                 height: 148rpx;
@@ -124,6 +125,11 @@
                 border-radius: 8rpx;
                 margin-bottom: 20rpx;
                 background: #ccc;
+                float: left;
+                margin-right: 18rpx;
+                &:nth-child(3n){
+                    margin-right: 0;
+                }
             }
         }
     }

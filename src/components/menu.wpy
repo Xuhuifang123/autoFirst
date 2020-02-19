@@ -47,8 +47,6 @@
                         that.scrollLeft = setLeft;
                         that.$apply();
                     }).exec();
-                    
-                    return false;
                     // 传值给父页面
                     that.$emit('tabClick',cat_id,menu_id,type,cat_spell);
                 }

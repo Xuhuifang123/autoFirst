@@ -10,6 +10,7 @@
                     hold-keyboard='true'
                     disable-default-padding='true'
                     bindinput="onInputChange"
+                    value="{{more_content}}"
                     name='feedback'></textarea>
                 <button form-type="submit" class="submit_feedback"><image src='../../res/images/login_btn.png' /></button>
             </form>
@@ -28,13 +29,15 @@
             
         };
         data = {
-            otherContent:''
+            otherContent:'',
+            more_content:''
         };
         methods = {
             bindFormSubmit:function(e){
                 let that = this;
                 if( e.detail.value.feedback ){
                     that.otherContent = e.detail.value.feedback;
+                    that.more_content = e.detail.value.feedback;
                     that.getRecommend();
                 }else{
                     wepy.showToast({
@@ -62,6 +65,8 @@
                     icon: 'success',
                     duration: 2000
                 });
+                that.more_content = '';
+                that.$apply();
             }else{
                 api.finishLoading();
                 wepy.showToast({

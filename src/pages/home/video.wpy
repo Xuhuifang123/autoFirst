@@ -11,8 +11,16 @@
                 <view class='video_nr'>
                     <view class='video_bt' @tap='liveDetail({{item.id}})'>{{item.title}}</view>
                     <view class="video_player">
-                        <!-- <video src="{{item.video}}" controls='true'></video> -->
-                        <image src='{{item.title_pic1}}'></image>
+                        <video src="{{item.video}}" controls='true' id='video{{item.id}}'></video>
+                        <view class='coverCon' style="display: {{ playIndex == item.id ? 'none' : 'block' }};" id="{{item.id}}" @tap='setVideo({{item.id}})'>
+                            <cover-view class="controls" id="controls" >
+                                <cover-image src="{{item.title_pic1}} " />
+                            </cover-view>
+                            <cover-view class="play" style="z-index:200;">
+                                <cover-image src="./../../res/images/iconplay.png"/>
+                            </cover-view>
+                        </view>
+                        <!-- <image src='{{item.title_pic1}}'></image> -->
                     </view>
                     <view class="video_info">
                         <view class="video_author"><image src='{{item.photo}}'/>{{item.source}}</view>
@@ -21,6 +29,15 @@
                 </view>
             </block>
         </view>
+        <block wx:if='{{loadFlag}}'>
+            <view class="moreLoading" wx:if='{{loading}}'>
+                <image src="../../res/images/homeLoading.png"/>数据加载 更多精彩
+            </view>
+        </block>
+        <block wx:else>
+            <view class="moreLoading">内容已全部加载完成 ~</view>
+        </block>
+        
     </scroll-view>
 </template>
 
@@ -36,7 +53,10 @@
         };
         data = {
             columnPage:1,
-            videoData:[]
+            videoData:[],
+            playIndex:-1,
+            loading:false,
+            loadFlag:true
         };
         methods = {
             liveDetail(id){
@@ -44,8 +64,27 @@
                     url: '../../pages/detail/videoDetail?id='+id
                 })
             },
-            handleScroll(){
-                // console.log( 222 );
+            handleScroll(e){
+                let that = this;
+                let query = wx.createSelectorQuery();//查询
+                let wh = wx.getSystemInfoSync().windowHeight;//可视区域高度
+                if ( that.playIndex>0 ) {
+                    const id = that.playIndex;
+                    query
+                        .select('#video' + id)
+                        .boundingClientRect(rect => { // 我查询的是包裹视频的元素，可根据需求
+                            let top = rect.top;//距离顶部高度
+                            let vh = rect.height;//元素高度
+                            if (top < 0 || bottom > (vh+wh) ){//当视频距离顶部为零，测了下，这个为0，视频不可见。
+                                var videoContextPrev = wx.createVideoContext("video" + that.playIndex)
+                                videoContextPrev.seek(0)
+                                videoContextPrev.pause();
+                                that.playIndex = -1;
+                                that.$apply();
+                            }
+                        })
+                        .exec();
+                }
             },
             /* 下拉加载 */
             upper(){
@@ -53,28 +92,73 @@
             },
             /* 上拉加载更多 */
             loadMore(){
-                this.columnPage = this.columnPage*1 + 1;
-                this.getVideoList();
+                if( this.loadFlag ){
+                    this.columnPage = this.columnPage*1 + 1;
+                    this.getVideoList();
+                }
+            },
+            setVideo( videoId ){
+                // var index = e.currentTarget.dataset.id;
+                var that = this;
+                // that.playIndex = videoId;
+
+                //停止正在播放的视频
+                var videoContextPrev = wx.createVideoContext("video" + that.playIndex)
+                videoContextPrev.seek(0)
+                videoContextPrev.pause()
+
+                setTimeout(function () {
+                    //将点击视频进行播放
+                    var videoContext = wx.createVideoContext('video' + videoId)
+                    videoContext.play();
+                    that.playIndex = videoId;
+                    that.$apply();
+                }, 100)
             }
         };
         async getVideoList(){
             let that = this;
             let params = {
                 query:{
-                    page:this.columnPage
+                    page:that.columnPage
                 }
             }
-            api.loading();
+            if( that.columnPage == 1 ){
+                api.loading();;
+            }else{
+                that.loading = true;
+                that.$apply();
+            }
             const res = await api.GETVIDEOLIST(params);
             console.log( res );
             if( res.data.code == 200 ){
-                for( let i=0; i<res.data.data.length; i++ ){
-                    that.videoData.push( res.data.data[i] );
+                if( res.data.data.length > 0 ){
+                    for( let i=0; i<res.data.data.length; i++ ){
+                        that.videoData.push( res.data.data[i] );
+                    }
+                    that.$apply();
+                }else{
+                    // 没有更多数据
+                    that.loadFlag = false;
+                    wepy.showToast({
+                        title: '全部加载完成 ~',
+                        icon: 'none',
+                        duration: 2000
+                    });
                 }
-                api.finishLoading();
-                that.$apply();
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
             }else{
-                api.finishLoading();
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
                 wepy.showToast({
                     title: '加载失败 ~',
                     icon: 'none',
@@ -109,14 +193,37 @@
                 border-radius: 10rpx;
                 overflow: hidden;
                 margin: 16rpx 0 20rpx 0;
+                position: relative;
                 video{
                     width: 100%;
                     height: 100%;
                 }
-                image{
-                    width: 100%;
-                    height: 100%;
-                    background: #ccc;
+                .coverCon{
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    .controls{
+                        width: 100%;
+                        height: 100%;
+                        background: #ccc;
+                        cover-image{
+                            background: #ccc;
+                        }
+                    }
+                    .play{
+                        width: 80rpx;
+                        height: 80rpx;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        margin-top: -40rpx;
+                        margin-left: -40rpx;
+                        image{
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
                 }
             }
             .video_info{
@@ -145,6 +252,21 @@
                     }
                 }
             }
+        }
+    }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
         }
     }
 </style>

@@ -8,7 +8,13 @@ const wxRequest = async (params = {}, url, noLoadingStatus, navigateBackStatus) 
     }
     let data = params.query || {}
     //let header = params.header || {'Content-Type': 'application/json'}
-    let header = params.header || {'Content-Type': 'application/x-www-form-urlencoded'}
+    let ContentType = params.header || 'application/x-www-form-urlencoded';
+    var session_id = wepy.$instance.globalData.session || '';
+
+    let header = {
+        "Content-Type": ContentType,
+        Cookie: "session_id=" + session_id
+    }
     // header.version = MINI_APPS_VERSION
     try {
         let res = await wepy.request({
