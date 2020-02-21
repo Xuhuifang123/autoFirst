@@ -172,7 +172,7 @@
         };
 
         share () {
-            var that = this
+            var that = this 
             //获取系统信息，具体的属性请前往微信小程序官网查看
             wx.getSystemInfo({
                 success: res => {
@@ -184,6 +184,7 @@
             
             var qrcode = '../../res/images/APP.png'//二维码图片一般为网络图片后台生成
             var bgImgPath = that.storyImage //首先你需要准备一张背景图
+            var bgborder = '../../res/images/border_icon.png'
             var width = that.Width
             var height = that.Height
             that.ctx = wx.createCanvasContext('storyCanvas')//创建 canvas 绘图上下文
@@ -193,7 +194,7 @@
             that.ctx.fillStyle = "#fff";
             that.ctx.fill();
             
-            //将背景图绘制到画布中
+            //将文章图绘制到画布中
             that.ctx.drawImage(bgImgPath, 0, 0, 282, 188)
             that.ctx.save() 
 
@@ -214,15 +215,15 @@
             };
             that.textWrap(title);
 
-            // that.ctx.beginPath()
-            // that.ctx.moveTo(20, 20)
-            // that.ctx.lineTo(20, 100)
-            // that.ctx.setStrokeStyle('#000')
-            // that.ctx.stroke()
-
-            that.ctx.drawImage(qrcode, 24, 258, 98, 98);
-
+            // 标题下直线
+            that.ctx.drawImage(bgborder, 12, 248, 259, 1);
             that.ctx.save();
+            
+            // 绘制二维码
+            that.ctx.drawImage(qrcode, 24, 258, 98, 98);
+            that.ctx.save();
+
+            // 提示阅读
             that.ctx.setFillStyle('#000000');
             that.ctx.setFontSize(12);
             that.ctx.setTextAlign('left');
