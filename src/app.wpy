@@ -23,6 +23,7 @@ export default class extends wepy.app {
       "pages/list/photoList",
       "pages/list/shareList",
       "pages/list/authorList",
+      "pages/list/specialActive",
       "pages/detail/photoDetail",
       "pages/detail/story",
       "pages/detail/shareStory",

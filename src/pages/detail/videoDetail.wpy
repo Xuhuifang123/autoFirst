@@ -11,9 +11,10 @@
             </view>
             <view class="video_share flex">
                 <button class='shareMessage' open-type="share"><image src="../../res/images/loginWeixin.png" />分享至好友</button>
-                <button class='shareTimeline' open-type="share"><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
+                <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
             </view>
         </view>
+
         <view class="recommend">
             <view class="recommend_bt">相关推荐</view>
             <view class="recommend_list">
@@ -43,12 +44,30 @@
                 </block>
             </view>
         </view>
+
+        <view class="shareMask {{shareFlag ? 'show' : '' }}">
+            <view class='storyShare'>
+
+                <!-- 分享图 -->
+                <view class='shareCanvas'>
+                    <canvas canvas-id="videoCanvas" style="width:282px; height:365px;"></canvas>
+                </view>
+
+                <!-- 关闭按钮 -->
+                <image src='../../res/images/close_btn.png' class='close_btn' @tap='hideShare()'/>
+
+                <!-- 保存图片 -->
+                <image src='../../res/images/save_btn.png' class='save_btn' @tap='saveSharePhoto()'/>
+            </view>
+        </view>
+
     </view>
 </template>
 
 <script>
     import wepy from 'wepy'
     import api from '../../../src/api/ApiConstants';
+    import SHARE from '../../../src/api/sharephoto';
     export default class Videodetail extends wepy.page {
         config = {
             navigationBarTitleText: '视频详情'
@@ -58,13 +77,82 @@
             this.getVideoList( options.id );
         };
         data = {
-            videoInfo:{}
+            videoInfo:{},
+            Width:0,
+            Height:0,
+            ctx:null,
+            videoImage:'',
+            shareFlag:false,
+            imagePath:'',
+            code:''
         };
         methods = {
             videoDetail:function(id){
                 wepy.navigateTo({
                     url: '../../pages/detail/videoDetail?id='+id
                 })
+            },
+            // 显示分享图
+            shareTimeLine:function(){
+                let that = this;
+                that.shareFlag = true;
+                that.$apply();
+            },
+            // 隐藏分享图
+            hideShare:function(){
+                let that = this;
+                that.shareFlag = false;
+                that.$apply();
+            },
+            // 保存图片至本地
+            saveSharePhoto:function(){
+                let that = this;
+                if( that.imagePath ){
+                    wepy.showLoading({
+                        title: '保存中...', 
+                        mask: true,
+                    });
+                    wx.downloadFile({
+                        url: that.imagePath,
+                        success: function(res) {
+                            if (res.statusCode === 200) {
+                                let img = res.tempFilePath;
+                                wx.saveImageToPhotosAlbum({
+                                    filePath: img,
+                                    success(res) {
+                                        wepy.showToast({
+                                            title: '已保存到手机相册 ~',
+                                            icon: 'success',
+                                            duration: 2000
+                                        });
+                                        that.shareFlag = false;
+                                        that.$apply();
+                                    },
+                                    fail(res) {
+                                        wepy.showToast({
+                                            title: '保存失败 ~',
+                                            icon: 'none',
+                                            duration: 2000
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        fail: function(error){
+                            wepy.showToast({
+                                title: '保存失败 ~',
+                                icon: 'none',
+                                duration: 2000
+                            });
+                        }
+                    });
+                } else {
+                    wepy.showToast({
+                        title: '图片加载失败，请刷新重试 ~',
+                        icon: 'success',
+                        duration: 2000
+                    });
+                }
             }
         };
         async getVideoList(id){
@@ -79,6 +167,7 @@
             console.log( res );
             if( res.data.code == 200 ){
                 that.videoInfo = res.data.data;
+                that.saveImageLocal();
                 api.finishLoading();
                 that.$apply();
             }else{
@@ -88,6 +177,59 @@
                     duration: 2000
                 });
             }
+        };
+
+        // 转发好友
+        onShareAppMessage(options){
+            let that = this;
+            let imgUrl = that.storyInfo.photo;
+            let storyTitle = that.storyInfo.title;
+            let storyId = that.storyInfo.id;
+            let setSharePath;
+            setSharePath = 'pages/detail/story?id='+storyId;
+            let shareObj = {
+                title: storyTitle,
+                imageUrl: imgUrl,
+                path: setSharePath,
+            };
+            // 来自页面内的按钮的转发
+            if( options.from == 'button' ){
+                var eData = options.target.dataset;
+                console.log( eData.name );     // shareBtn
+                // 此处可以修改 shareObj 中的内容
+                // shareObj.path = '/pages/btnname/btnname?btn_name='+eData.name;
+            }
+        };
+
+        // 保存文章题图到本地
+        saveImageLocal(){
+            let that = this;
+            wx.downloadFile({
+                url: that.videoInfo.title_pic1,
+                success: function(res) {
+                    if (res.statusCode === 200){
+                        let img = res.tempFilePath;
+                        that.videoImage = img;
+                        wx.downloadFile({
+                            url: that.videoInfo.qrcode,
+                            success: function(Dres) {
+                                if (Dres.statusCode === 200){
+                                    let codeImg = Dres.tempFilePath;
+                                    that.code = codeImg;
+                                    console.log( that.code, that.videoImage, 'videoCanvas', that.videoInfo.title );
+                                    SHARE.Share( that.code, that.videoImage, 'videoCanvas', that.videoInfo.title )
+                                        .then( res => {
+                                            that.imagePath = res.value;
+                                        })
+                                        .catch( (res) => {
+                                            that.imagePath = false;
+                                        })
+                                }
+                            }
+                        })
+                    }
+                }
+            })
         };
     }
 </script>
@@ -290,6 +432,49 @@
                     }
                 }
             }
+        }
+    }
+    .shareMask{
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background:rgba(0,0,0,0.6);
+        transform: translateX(-300%);
+        transition: transform 0.3s linear;
+    }
+    .shareMask.show{
+        transform: translateX(0);
+    }
+    .storyShare{
+        width: 282px;
+        height: 365px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        overflow: visible;
+        .shareCanvas{
+            width: 282px;
+            height: 365px;
+            background: #fff;
+            border-radius: 16px;
+        }
+        .close_btn{
+            position: absolute;
+            right: 0;
+            top: -76rpx;
+            width: 56rpx;
+            height: 56rpx;
+        }
+        .save_btn{
+            position: absolute;
+            width: 220rpx;
+            height: 66rpx;
+            left: 50%;
+            bottom: -96rpx;
+            margin-left: -110rpx;
         }
     }
     

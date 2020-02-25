@@ -1,0 +1,341 @@
+<template lang="wxml">
+    <scroll-view
+        @scroll="handleScroll"
+        @scrolltoupper="upper"
+        @scrolltolower="loadMore"
+        scroll-y
+        scroll-with-animation="{{true}}"
+        class='wrapSroll'>
+        <view class="special_des">
+            <view class="special_des_bt">汽势策划 | 车企众志成城抗疫专题</view>
+            <image src="https://img.auto-first.cn/upload/tag/202002/img_15815640501998426564.jpg" mode='widthFix' class="special_coverImg"/>
+        </view>
+        <view class='news_list'>
+            <block
+                wx:for="{{newsList}}"
+                wx:key="index">
+                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr' wx:key='index'>
+                    <view class='news_con' @tap="storyDetail({{item.id}})">
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="index"/>
+                    </view>
+                    <view class='news_info'>
+                        <text class='news_author'>{{item.source}}</text>
+                        <text class='news_type'>{{item.tagname}}</text>
+                        <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
+                    </view>
+                </view>
+                <view class="news_nr" wx:else>
+                    <view class='news_con'>
+                        <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
+                        <view class='news_info'>
+                            <text class='news_author'>{{item.source}}</text>
+                            <view class='news_view'><image src="./../../res/images/iconlook.png" />{{item.pv}}</view>
+                        </view>
+                    </view>
+                    <view class='img_con' @tap="storyDetail({{item.id}})">
+                        <image src="{{item.title_pic1}}" />
+                    </view>
+                </view>
+            </block>
+        </view>
+        <block wx:if='{{loadFlag}}'>
+            <view class="moreLoading" wx:if='{{loading}}'>
+                <image src="../../res/images/homeLoading.png"/>数据加载 更多精彩
+            </view>
+        </block>
+        <block wx:else>
+            <view class="moreLoading">内容已全部加载完成 ~</view>
+        </block>
+    </scroll-view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '../../../src/api/ApiConstants';
+    export default class specialActive extends wepy.page {
+        config = {
+            navigationBarTitleText: '专题'
+        };
+        components = {
+            
+        };
+        onLoad(options){
+            const that = this;
+            that.columnId = options.id;
+            that.getSpecialList( options.id );
+        };
+        data = {
+            newsList:[],
+            columnPage:1,
+            columnId:0,
+            loading:false,
+            loadFlag:true
+        };
+        methods = {
+            storyDetail:function(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/story?id='+id
+                })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                // console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                if( this.loadFlag ){
+                    this.columnPage = this.columnPage*1 + 100;
+                    this.getSpecialList();
+                }
+            }
+        };
+        async getSpecialList( id ){
+            let that = this;
+            let params = {
+                query:{
+                    tagid:that.columnId,
+                    page:that.columnPage
+                }
+            }
+            if( that.columnPage == 1 ){
+                api.loading();;
+            }else{
+                that.loading = true;
+                that.$apply();
+            }
+            const res = await api.GETSPECIALLIST(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                if( res.data.data.storyData.length > 0 ){
+                    for( let i=0; i<res.data.data.storyData.length; i++ ){
+                        that.newsList.push( res.data.data.storyData[i] );
+                    }
+                    // wx.setNavigationBarTitle({
+                    //     title: that.newsList[0].tagname
+                    // });
+                }else{
+                    that.loadFlag = false;
+                    that.$apply();
+                    wepy.showToast({
+                        title: '全部加载完成 ~',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                }
+                that.$apply();
+            }else{
+                if( that.columnPage == 1 ){
+                    api.finishLoading();
+                }else{
+                    that.loading = false;
+                    that.$apply();
+                }
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+        };
+    }
+</script>
+
+<style lang="less">
+    .wrapSroll{
+        width: 100vw;
+        height: 100vh;
+    }
+    .special_des{
+        padding: 40rpx 24rpx 0 24rpx;
+        .special_des_bt{
+            color:#000000;
+            font-size: 48rpx;
+            line-height: 56rpx;
+            margin-bottom: 40rpx;
+            font-weight: bold;
+        }
+        .special_coverImg{
+            display: block;
+            width: 100%;
+        }
+    }
+    .news_list{
+        padding: 0 24rpx;
+    }
+    .news_nr{
+        display: flex;
+        background: #fff;
+        padding: 20rpx 0;
+        border-bottom: 1px solid #EEEEEE;
+        image{
+            width: 276rpx;
+            height: 184rpx;
+            border-radius: 10rpx;
+            display: block;
+            background: #ccc;
+        }
+        .news_con{
+            flex: 1;
+            padding-right: 20rpx;
+            position: relative;
+            .news_title{
+                font-size: 30rpx;
+                color: #000000;
+                line-height: 40rpx;
+                max-height: 80rpx;
+                overflow: hidden;
+                font-weight: bold;
+            }
+        }
+        .news_info{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 20rpx;
+            line-height: 34rpx;
+            font-size: 24rpx;
+            .news_type{
+                background:rgba(230,0,18,0.1);
+                border-radius:9px;
+                padding: 0 20rpx;
+                height: 34rpx;
+                color:  #FF2600;
+                float: left;
+            }
+            .news_author{
+                float: left;
+                color: #52A3FF;
+                margin-right: 10rpx;
+            }
+            .news_view{
+                float: right;
+                color: #ADADAD;
+                image{
+                    width: 28rpx;
+                    height: 18rpx;
+                    display: inline-block;
+                    margin-right: 4rpx;
+                    background: rgba(0,0,0,0);
+                }
+            }
+        }
+    }
+    .news_nr.news_imgs_nr{
+        flex-direction: column;
+        .news_title{
+            max-height: 40rpx;
+            margin-bottom: 8rpx;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .img_con{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8rpx;
+            image{
+                width: 228rpx;
+                height: 152rpx;
+                background: #ccc;
+            }
+        }
+        .img_con.news_nr_video{
+            display: block;
+            position: relative;
+            .blockImg{
+                width: 100%;
+                height: 394rpx;
+                display: block;
+            }
+            .videoMask{
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 10rpx;
+                background:rgba(0,0,0,0.45);
+                image{
+                    width: 80rpx;
+                    height: 80rpx;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    margin: -40rpx 0 0 -40rpx;
+                    background: rgba(0,0,0,0)
+                }
+            }
+        }
+        .news_info{
+            position: static;
+        }
+
+    }
+    // 专题
+    .special_con{
+        padding: 0 24rpx;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .special_nr{
+            border-radius: 8rpx;
+            border:1px solid #C92C1D;
+            width: 342rpx;
+            margin-bottom: 20rpx;
+            .special_type{
+                height: 68rpx;
+                width: 100%;
+                font-size: 30rpx;
+                color: #FFFFFF;
+                background:#C92C1D;
+                text-align: center;
+                line-height: 68rpx;
+                font-weight:bold;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .special_img{
+                display: block;
+                width: 342rpx;
+                height: 228rpx;
+            }
+            .special_enter{
+                width: 100%;
+                height: 64rpx;
+                font-weight: bold;
+                font-size: 30rpx;
+                color:#C92C1D;
+                text-align: center;
+                line-height: 64rpx;
+                background:#fff;
+                border-radius: 0 0 8rpx 8rpx;
+            }
+        }
+    }
+    .moreLoading{
+        height: 28rpx;
+        width: 100%;
+        text-align: center;
+        line-height: 28rpx;
+        font-size: 20rpx;
+        color: #B3B3B3;
+        padding: 20rpx 0;
+        image{
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 10rpx;
+            vertical-align: middle;
+        }
+    }
+</style>

@@ -297,6 +297,7 @@
                     that.$apply();
                 }
                 const res = await api.GETTYPEHAND( params );
+                console.log( params.query );
                 console.log( res );
                 if( res.data.code == 200 ){
                     if( spell == 'letter' ){
