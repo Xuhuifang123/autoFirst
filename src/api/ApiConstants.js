@@ -5,6 +5,7 @@ import {
     HOST,
     BUYHOST
 } from './setting';
+import wepy from 'wepy'
 
 // HOST:https://api.news18a.com
 

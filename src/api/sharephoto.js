@@ -1,8 +1,10 @@
 import wepy from 'wepy'
 
-let Width,
-    Height,
-    ctx;
+let winWidth,
+    winHeight,
+    ctx,
+    canvasWidth = 282,
+    canvasHeight = 365; 
 
 //参数依次为  二维码图片，
 const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
@@ -10,9 +12,9 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
     //获取系统信息，具体的属性请前往微信小程序官网查看
     wx.getSystemInfo({
         success: res => {
-            console.log(res);
-            Width = res.screenWidth;
-            Height = res.screenHeight;
+            console.log( res );
+            winWidth = res.windowHeight;
+            winHeight = res.windowWidth;
         }
     })
     
@@ -62,27 +64,32 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
     ctx.setTextBaseline('top');
     ctx.fillText( '长按图片识别小程序码', 138, 294);
     ctx.fillText( '进入汽势传媒阅读全文', 138, 310);
-    ctx.draw()
+    // ctx.draw()
     let CanvasRes = '';
     //将canvas画布转化为图片
     return new Promise(function(resolve,reject){
-        wx.canvasToTempFilePath({
-            x: 0,
-            y: 0,
-            width: Width,
-            height: Height,
-            destWidth: Width,
-            destHeight: Height,
-            canvasId: storyCanvas,
-            success: function (res) {
-                /* 这里 就可以显示之前写的 预览区域了 把生成的图片url给image的src */
-                // CanvasRes = res.tempFilePath;
-                resolve({'value':res.tempFilePath});
-            },
-            fail: function (res) {
-                resolve({'value':'图片加载失败，刷新重试 ~'});　　
-            }
-        })
+        setTimeout(()=>{
+            ctx.draw(false,function(){
+                wx.canvasToTempFilePath({
+                    x: 0,
+                    y: 0,
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    destWidth: canvasWidth * 750 *2 / winWidth,
+                    destHeight: canvasHeight * 750 *2 / winWidth,
+                    canvasId: storyCanvas,
+                    success: function (res) {
+                        console.log( res );
+                        /* 这里 就可以显示之前写的 预览区域了 把生成的图片url给image的src */
+                        resolve({'value':res.tempFilePath});
+                    },
+                    fail: function (res) {
+                        console.log( res );
+                        resolve({'value':'图片保存失败，刷新重试 ~'});　　
+                    }
+                })
+            })
+        },300)
     });
     
 }

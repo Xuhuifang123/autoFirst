@@ -60,7 +60,6 @@
 
         <view class="shareMask {{shareFlag ? 'show' : '' }}">
             <view class='storyShare'>
-
                 <!-- 分享图 -->
                 <view class='shareCanvas'>
                     <canvas canvas-id="storyCanvas" style="width:282px; height:365px;"></canvas>
@@ -69,8 +68,9 @@
                 <!-- 关闭按钮 -->
                 <image src='../../res/images/close_btn.png' class='close_btn' @tap='hideShare()'/>
 
-                <!-- 保存图片 -->
-                <image src='../../res/images/save_btn.png' class='save_btn' @tap='saveSharePhoto()'/>
+                <!-- 保存图片@tap='saveSharePhoto()' -->
+                <button wx:if='{{downFlag}}' class='save_btn' @tap='getDownFlag()'><image src='../../res/images/save_btn.png'/></button>
+                <button wx:else open-type="openSetting" class='save_btn' bindopensetting='handleSetting'><image src='../../res/images/save_btn.png'/></button>
             </view>
         </view>
 
@@ -81,9 +81,7 @@
     import wepy from 'wepy'
     import api from '../../../src/api/ApiConstants';
     import WxParse from '../../../src/wxParse/wxParse';
-    import WxmlCanvas from './../../components/canvasJS/index';
     import SHARE from '../../../src/api/sharephoto'
-    // import shareSelectLayout from './../../components/shareSelectLayout';
     export default class Story extends wepy.page{
         config = {
             navigationBarTitleText: '文章详情'
@@ -108,7 +106,8 @@
             storyImage:'',
             shareFlag:false,
             imagePath:'',
-            code:''
+            code:'',
+            downFlag:true
         };
         methods = {
             storyDetail:function(id){
@@ -128,56 +127,110 @@
                 that.shareFlag = false;
                 that.$apply();
             },
-            // 保存图片至本地
-            saveSharePhoto:function(){
+            // 是否授权登录
+            getDownFlag:function(){
                 let that = this;
                 if( that.imagePath ){
-                    wepy.showLoading({
-                        title: '保存中...', 
-                        mask: true,
-                    });
-                    wx.downloadFile({
-                        url: that.imagePath,
-                        success: function(res) {
-                            if (res.statusCode === 200) {
-                                let img = res.tempFilePath;
-                                wx.saveImageToPhotosAlbum({
-                                    filePath: img,
-                                    success(res) {
-                                        wepy.showToast({
-                                            title: '已保存到手机相册 ~',
-                                            icon: 'success',
-                                            duration: 2000
-                                        });
-                                        that.shareFlag = false;
+                    wx.getSetting({
+                        success(res) {
+                            if (!res.authSetting['scope.writePhotosAlbum']) {
+                                wx.authorize({
+                                    scope: 'scope.writePhotosAlbum',
+                                    success() {
+                                        that.downFlag = true;
                                         that.$apply();
+                                        that.saveSharePhoto();
                                     },
-                                    fail(res) {
+                                    fail() {
                                         wepy.showToast({
-                                            title: '保存失败 ~',
+                                            title: '您取消了授权,重新点击下载按钮，获取授权后可保存 ~',
                                             icon: 'none',
                                             duration: 2000
                                         });
+                                        that.downFlag = false;
+                                        that.$apply();
                                     }
                                 });
+                            } else {
+                                that.downFlag = true;
+                                that.$apply();
+                                that.saveSharePhoto();
                             }
-                        },
-                        fail: function(error){
-                            wepy.showToast({
-                                title: '保存失败 ~',
-                                icon: 'none',
-                                duration: 2000
-                            });
                         }
                     });
-                } else {
+                }else{
                     wepy.showToast({
-                        title: '图片加载失败，请刷新重试 ~',
-                        icon: 'success',
+                        title: '图片保存失败，请刷新重试 ~',
+                        icon: 'none',
                         duration: 2000
                     });
                 }
+            },
+            handleSetting:function(e){
+                let that = this;
+                if (!e.detail.authSetting['scope.writePhotosAlbum']) {
+                    wx.showToast({
+                        title: '未开启授权，无法保存图片 ~',
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    that.downFlag = false;
+                    that.$apply();
+                } else {
+                    wx.showToast({
+                        title: '授权成功 ~',
+                        icon: 'success',
+                        duration: 2000
+                    })
+                    that.downFlag = true;
+                    that.$apply();
+                }
             }
+        };
+
+        // 保存图片至本地
+        saveSharePhoto(){
+            let that = this;
+            wepy.showLoading({
+                title: '保存中...', 
+                mask: true,
+            });
+            console.log( that.imagePath );
+            // wx.downloadFile({
+            //     url: that.imagePath,
+            //     success: function(res) {
+                    // if (res.statusCode === 200) {
+                        // let img = res.tempFilePath;
+                        wx.saveImageToPhotosAlbum({
+                            filePath: that.imagePath,
+                            success(res) {
+                                wepy.showToast({
+                                    title: '已保存到手机 ~',
+                                    icon: 'success',
+                                    duration: 2000
+                                });
+                                that.shareFlag = false;
+                                that.$apply();
+                            },
+                            fail(res) {
+                                wepy.showToast({
+                                    title: '保存失败 ~',
+                                    icon: 'none',
+                                    duration: 2000
+                                });
+                            }
+                        });
+                    //}
+                // },
+                // fail: function(res){
+                //     console.log(res);
+                //     wepy.showToast({
+                //         title: '保存失败 ~',
+                //         icon: 'none',
+                //         duration: 2000
+                //     });
+                // }
+            // });
         };
 
         async getStoryCon( storyId ){
@@ -243,12 +296,15 @@
                                 if (Dres.statusCode === 200){
                                     let codeImg = Dres.tempFilePath;
                                     that.code = codeImg;
+                                    // SHARE.Share( that.code, that.storyImage, 'storyCanvas', that.storyInfo.title );
                                     SHARE.Share( that.code, that.storyImage, 'storyCanvas', that.storyInfo.title )
                                         .then( res => {
                                             that.imagePath = res.value;
+                                            console.log( that.imagePath );
                                         })
                                         .catch( (res) => {
                                             that.imagePath = false;
+                                            console.log( that.imagePath );
                                         })
                                 }
                             }
@@ -624,6 +680,16 @@
             left: 50%;
             bottom: -96rpx;
             margin-left: -110rpx;
+            padding: 0;
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0);
+            &::after{
+                display: none;
+            }
+            image{
+                width: 220rpx;
+                height: 66rpx;
+            }
         }
     }
 

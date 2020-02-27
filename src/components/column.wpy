@@ -46,7 +46,6 @@
 
     <!-- 文章信息流 -->
     <view class='news_list' wx:else>
-        {{newsList.length}}
         <swiper class='swiper' wx:if="{{colSpell==('jiaodian')}}"
             indicator-dots='true'
             autoplay='true'
@@ -159,7 +158,7 @@
             // that.$emit('tabClick',cat_id,menu_id,type,cat_spell);
         };
         onLoad(){
-            this.getNewsList( this.colId,this.colType,this.colPage,this.colSpell );
+            // this.getNewsList( this.colId,this.colType,this.colPage,this.colSpell );
         };
         data = {
             focus:[],

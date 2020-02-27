@@ -8,7 +8,7 @@
             interval='2000'
             duration='500 '
             circular='true'
-            current={{swiperCur}}
+            current='{{swiperCur}}'
             indicator-color='#fff'
             indicator-active-color='#000'
             bindchange='changeSwiper'>
@@ -21,7 +21,8 @@
             <view class="swiper_current">{{swiperCur+1}}/{{swiperLen}}</view>
         </view>
     </view>
-    <view class='downloadImg' @tap='downloadImg()'> <image src='../../res/images/down.png' /> </view>
+    <button wx:if='{{downFlag}}' class='downloadImg' @tap='getDownFlag()'> <image src='../../res/images/down.png' /> </button>
+    <button wx:else class='downloadImg' open-type="openSetting" bindopensetting='handleSetting'> <image src='../../res/images/down.png' /> </button>
 </template>
 
 <script>
@@ -45,54 +46,106 @@
             swiperLen:0,
             swiperCur:0,
             title:'',
-            imgInx:0
+            imgInx:0,
+            downFlag:true
         };
         methods = {
             changeSwiper:function(current){
                 const that = this;
                 that.swiperCur = current.detail.current;
-                console.log( current );
             },
-            downloadImg:function(){
-                const that = this;
-                wepy.showLoading({
-                    title: '保存中...', 
-                    mask: true,
-                });
-                wx.downloadFile({
-                    url: that.imgUrls[that.swiperCur],
-                    success: function(res) {
-                        if (res.statusCode === 200) {
-                            let img = res.tempFilePath;
-                            wx.saveImageToPhotosAlbum({
-                                filePath: img,
-                                success(res) {
-                                    wepy.showToast({
-                                        title: '已保存到手机相册 ~',
-                                        icon: 'success',
-                                        duration: 2000
-                                    });
+            getDownFlag:function(){
+                let that = this;
+                wx.getSetting({
+                    success(res) {
+                        if (!res.authSetting['scope.writePhotosAlbum']) {
+                            wx.authorize({
+                                scope: 'scope.writePhotosAlbum',
+                                success() {
+                                    that.downFlag = true;
+                                    that.$apply();
+                                    that.downloadImg();
                                 },
-                                fail(res) {
+                                fail() {
                                     wepy.showToast({
-                                        title: '保存失败 ~',
-                                        icon: 'success',
+                                        title: '您取消了授权,重新点击下载按钮，获取授权后可保存 ~',
+                                        icon: 'none',
                                         duration: 2000
                                     });
+                                    that.downFlag = false;
+                                    that.$apply();
                                 }
                             });
+                        } else {
+                            that.downFlag = true;
+                            that.$apply();
+                            that.downloadImg();
                         }
-                    },
-                    fail: function(error){
-                        wepy.showToast({
-                            title: 'error',
-                            icon: 'none',
-                            duration: 2000
-                        });
                     }
                 });
             },
+            handleSetting:function(e){
+                let that = this;
+                if (!e.detail.authSetting['scope.writePhotosAlbum']) {
+                    wx.showToast({
+                        title: '未开启授权，无法保存图片 ~',
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    that.downFlag = false;
+                    that.$apply();
+                } else {
+                    wx.showToast({
+                        title: '授权成功 ~',
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    that.downFlag = true;
+                    that.$apply();
+                }
+            }
         };
+
+        downloadImg (){
+            const that = this;
+            wepy.showLoading({
+                title: '保存中...', 
+                mask: true,
+            });
+            wx.downloadFile({
+                url: that.imgUrls[that.swiperCur],
+                success: function(res) {
+                    if (res.statusCode === 200) {
+                        let img = res.tempFilePath;
+                        wx.saveImageToPhotosAlbum({
+                            filePath: img,
+                            success(res) {
+                                wepy.showToast({
+                                    title: '已保存到手机相册 ~',
+                                    icon: 'success',
+                                    duration: 2000
+                                });
+                            },
+                            fail(res) {
+                                wepy.showToast({
+                                    title: '保存失败 ~',
+                                    icon: 'none',
+                                    duration: 2000
+                                });
+                            }
+                        });
+                    }
+                },
+                fail: function(error){
+                    wepy.showToast({
+                        title: 'error',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+            });
+        }
+
         async getPhotoDetail( id ){
             let that = this;
             let params = {
@@ -171,14 +224,20 @@
         } 
     }
     .downloadImg{
-            position: fixed;
-            right: 40rpx;
-            bottom: 60rpx;
-            z-index: 6;
-            image{
-                display: block;
-                width: 32rpx;
-                height: 36rpx;
-            }
+        position: fixed;
+        right: 40rpx;
+        bottom: 60rpx;
+        z-index: 6;
+        padding: 0;
+        border-radius: 0;
+        background: rgba(0,0,0,0);
+        image{
+            display: block;
+            width: 32rpx;
+            height: 36rpx;
         }
+    }
+    .downloadImg::after{
+        display: none;
+    }
 </style>

@@ -1,10 +1,10 @@
 <template>
     <view class="wrap">
         <!-- 菜单 -->
-        <Menu @tabClick.user="tabChange"></Menu>
-        
-        <!-- 编辑频道 -->
-        <!-- <EditChannel></EditChannel> -->
+        <Menu 
+            @tabClick.user="tabChange"
+            @initMenu.user="initMenu">
+        </Menu>
 
         <!-- 栏目内容 -->
         <view class="content">
@@ -34,14 +34,17 @@
 
 <script>
     import wepy from 'wepy';
-    import Menu from '../../components/menu';
-    import Column from '../../components/column';
-    import EditChannel from '../../components/editChannel';
+    import Menu from './../../components/menu';
+    import Column from './../../components/column';
+    // import EditChannel from './../../components/editChannel';
     export default class Index extends wepy.page {
         customData = {}  // 自定义数据
         customFunction ()　{}  //自定义方法
 
-        onLoad () {}  // 在Page和Component共用的生命周期函数
+        // 在Page和Component共用的生命周期函数
+        onLoad () {
+
+        }
 
         onShow () {}  // 只在Page中存在的页面生命周期函数
         // 只在Page实例中存在的配置数据，对应于原生的page.json文件
@@ -62,7 +65,7 @@
         components = {
             Menu:Menu,
             Column:Column,
-            EditChannel:EditChannel
+            // EditChannel:EditChannel
         };  
 
         mixins = [];  // 声明页面所引用的Mixin实例
@@ -83,6 +86,16 @@
                 //使用$broadcast事件广播，父组件向各个子组件发送广播事件
                 this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
             },
+            initMenu(listData){
+                let that = this;
+                console.log( listData );
+                that.columnType = listData.cat_api_type;
+                that.columnSpell = listData.cat_spell;
+                that.column_id = listData.cat_ids;
+                that.menu_id = listData.id;
+                that.columnPage = 1;
+                that.$broadcast('requestType',that.column_id,that.menu_id,that.columnType,that.columnSpell,this.columnPage);
+            },
             handleScroll(){
                 // console.log( 222 );
             },
@@ -95,7 +108,7 @@
                 this.columnPage = this.columnPage*1 + 1;
                 // this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
                 this.$broadcast('requestType',this.column_id,this.menu_id,this.columnType,this.columnSpell,this.columnPage);
-            }
+            },
         };  
 
         events = {};  // 声明组件之间的事件处理函数

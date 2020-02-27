@@ -26,10 +26,10 @@ export default class extends wepy.app {
       "pages/list/specialActive",
       "pages/detail/photoDetail",
       "pages/detail/story",
-      "pages/detail/shareStory",
       "pages/detail/liveDetail",
       "pages/detail/videoDetail",
-      "pages/detail/authorDetail"
+      "pages/detail/authorDetail",
+      "pages/list/dragPage",
     ],
     window: {
       backgroundTextStyle: 'light',
