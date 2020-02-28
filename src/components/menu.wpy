@@ -10,7 +10,7 @@
                     <repeat for="{{navList}}" key="index" index="index" item="item">
                         <view class="{{currentName == item.cat_spell ? 'ina_cur' : ''}}"
                             id="{{item.cat_spell}}"
-                            @tap="goNext( {{item.cat_ids}},{{item.id}},{{item.cat_api_type}},{{item.cat_spell}} )">{{item.cat_name}}</view>
+                            @tap="goNext( {{item.cat_ids}},{{item.id}},{{item.cat_api_type}},{{item.cat_spell}},{{item.cat_api_filed}} )">{{item.cat_name}}</view>
                     </repeat>
             </scroll-view>
         </view>
@@ -61,11 +61,11 @@
           Drag:Drag  
         };
         methods = {
-            goNext ( cat_id,menu_id,type,cat_spell,e ){
+            goNext ( cat_id,menu_id,type,cat_spell,filed,e ){
                 let that = this;
                 var e_id = e.target.id,
                     e_left = e.target.offsetLeft;
-                that.changeColumn( cat_id,menu_id,type,cat_spell,e_id,e_left );
+                that.changeColumn( cat_id,menu_id,type,cat_spell,filed,e_id,e_left );
             },
             // 拖拽完成
             upDateList(_list) {
@@ -76,14 +76,13 @@
                 this.navList = temData;
                 this.$apply();
                 var _item = this.navList[0];
-                this.changeColumn( _item.cat_ids,_item.id,_item.cat_api_type,_item.cat_spell,_item.cat_spell,0 );
+                this.changeColumn( _item.cat_ids,_item.id,_item.cat_api_type,_item.cat_spell,_item.cat_api_filed,_item.cat_spell,0 );
                 wx.setStorage({
                     key: 'afterData',
                     data: this.navList
                 })
             },
             showChannel(e){
-                
                 // if( this.dragFlag ){
                     this.$broadcast('getListData',this.navList);
                     // this.dragFlag = false;
@@ -97,7 +96,7 @@
                 this.$broadcast('getListData',this.navList);
             }
         };
-        changeColumn( cat_id,menu_id,type,cat_spell,item_id,item_left ){
+        changeColumn( cat_id,menu_id,type,cat_spell,filed,item_id,item_left ){
             let that = this;
             if( that.currentName == cat_spell ){
                 return false;
@@ -112,7 +111,7 @@
                     that.$apply();
                 }).exec();
                 // 传值给父页面
-                that.$emit('tabClick',cat_id,menu_id,type,cat_spell);
+                that.$emit('tabClick',cat_id,menu_id,type,cat_spell,filed);
             }
         }
         async getMenuList(){
@@ -124,7 +123,7 @@
             }
             api.loading();
             const res = await api.GETMENU(params);
-            console.log( res.data );
+            console.log( res.data.data );
             if( res.data.code == 200 ){
                 // 判断是否缓存过栏目列表
                 let initialData = wx.getStorageSync('initialData');

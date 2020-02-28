@@ -58,7 +58,8 @@
             columnPage:1,
             column_id:-1,
             menu_id:1,
-            loadFlag:true,
+            filed:[],
+            loadFlag:true
         };  // 页面所需数据均需在这里声明，可用于模板数据绑定
         
         //声明页面中所引用的组件，或声明组件中所引用的子组件
@@ -77,14 +78,15 @@
         // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
         methods = {
             // 接收子组件的值
-            tabChange( cat_id,menu_id,type,cat_spell ){
+            tabChange( cat_id,menu_id,type,cat_spell,filed ){
                 this.columnType = type;
                 this.column_id = cat_id;
                 this.menu_id = menu_id;
                 this.columnPage = 1;
                 this.columnSpell = cat_spell;
+                this.filed = filed;
                 //使用$broadcast事件广播，父组件向各个子组件发送广播事件
-                this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
+                this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,filed,this.columnPage);
             },
             initMenu(listData){
                 let that = this;
@@ -93,8 +95,9 @@
                 that.columnSpell = listData.cat_spell;
                 that.column_id = listData.cat_ids;
                 that.menu_id = listData.id;
+                that.filed = listData.cat_api_filed;
                 that.columnPage = 1;
-                that.$broadcast('requestType',that.column_id,that.menu_id,that.columnType,that.columnSpell,this.columnPage);
+                that.$broadcast('requestType',that.column_id,that.menu_id,that.columnType,that.columnSpell,that.filed,this.columnPage);
             },
             handleScroll(){
                 // console.log( 222 );
@@ -107,7 +110,7 @@
             loadMore(){
                 this.columnPage = this.columnPage*1 + 1;
                 // this.$broadcast('requestType',cat_id,menu_id,type,cat_spell,this.columnPage);
-                this.$broadcast('requestType',this.column_id,this.menu_id,this.columnType,this.columnSpell,this.columnPage);
+                this.$broadcast('requestType',this.column_id,this.menu_id,this.columnType,this.columnSpell,this.filed,this.columnPage);
             },
         };  
 

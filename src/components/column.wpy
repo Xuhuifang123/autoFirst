@@ -220,7 +220,7 @@
             that.newsList = newReport;
         };
         events = {
-            requestType( cat_id,menu_id,type,cat_spell,page ){
+            requestType( cat_id,menu_id,type,cat_spell,filed,page ){
                 const that = this;
                 console.log( that.cat_spell,cat_spell );
                 if( that.cat_spell != cat_spell ){
@@ -232,12 +232,12 @@
                     that.$apply();
                 }
                 if( that.loadFlag ){
-                    that.getNewsList( menu_id,type,page,cat_spell,cat_id );
+                    that.getNewsList( menu_id,type,page,cat_spell,cat_id,filed );
                 }
             }
         };
         
-        async getNewsList( menu_id,type,page,spell,cat_id ){ // id,type(index),page,spell
+        async getNewsList( menu_id,type,page,spell,cat_id,filed ){ // id,type(index),page,spell
             let that = this;
             // 首页默认列表
             if( type=='index' ){
@@ -280,23 +280,24 @@
                     that.setLoadError();
                 }
             } else if( type=='hand' ) {//首页手动列表
+                let api_filed = filed.join(',');
                 let params = {
                     query:{
                         page: page,
                         type: spell,
                         id:menu_id,
                         ua_from:'program',
-                        typeData:{cat_api_filed:cat_id}
+                        typeData:api_filed
                     }
                 };
+                console.log( params );
                 if( that.columnPage == 1 ){
-                    api.loading();;
+                    api.loading();
                 }else{
                     that.loading = true;
                     that.$apply();
                 }
                 const res = await api.GETTYPEHAND( params );
-                console.log( params.query );
                 console.log( res );
                 if( res.data.code == 200 ){
                     if( spell == 'letter' ){
@@ -496,10 +497,10 @@
     .news_nr.news_imgs_nr{
         flex-direction: column;
         .news_title{
-            max-height: 40rpx;
+            // max-height: 40rpx;
             margin-bottom: 16rpx;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            // white-space: nowrap;
+            // text-overflow: ellipsis;
         }
         .img_con{
             display: flex;

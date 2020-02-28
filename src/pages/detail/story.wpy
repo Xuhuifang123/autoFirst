@@ -62,7 +62,7 @@
             <view class='storyShare'>
                 <!-- 分享图 -->
                 <view class='shareCanvas'>
-                    <canvas canvas-id="storyCanvas" style="width:282px; height:365px;"></canvas>
+                    <image src='{{imagePath}}'/>
                 </view>
 
                 <!-- 关闭按钮 -->
@@ -72,6 +72,10 @@
                 <button wx:if='{{downFlag}}' class='save_btn' @tap='getDownFlag()'><image src='../../res/images/save_btn.png'/></button>
                 <button wx:else open-type="openSetting" class='save_btn' bindopensetting='handleSetting'><image src='../../res/images/save_btn.png'/></button>
             </view>
+        </view>
+
+        <view class='hideCanvas'>
+            <canvas canvas-id="storyCanvas" style="width:846px; height:1095px;"></canvas>
         </view>
 
     </view>
@@ -301,10 +305,12 @@
                                     SHARE.Share( that.code, that.storyImage, 'storyCanvas', that.storyInfo.title )
                                         .then( res => {
                                             that.imagePath = res.value;
+                                            that.$apply();
                                             console.log( that.imagePath );
                                         })
                                         .catch( (res) => {
                                             that.imagePath = false;
+                                            that.$apply();
                                             console.log( that.imagePath );
                                         })
                                 }
@@ -653,19 +659,28 @@
     .shareMask.show{
         transform: translateX(0);
     }
-    .storyShare{
-        width: 282px;
-        height: 365px;
+    .storyShare{ 
+        width: 564rpx;
+        height: 730rpx;
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%,-50%);
         overflow: visible;
         .shareCanvas{
-            width: 282px;
-            height: 365px;
+            width: 564rpx;
+            height: 730rpx;
             background: #fff;
             border-radius: 16px;
+            canvas{
+                width: 564rpx;
+                height: 730rpx;
+                opacity: 0;
+            }
+            image{
+                width: 564rpx;
+                height: 730rpx;
+            }
         }
         .close_btn{
             position: absolute;
@@ -692,6 +707,15 @@
                 height: 66rpx;
             }
         }
+    }
+    .hideCanvas{
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        position: absolute;
+        left: -200%;
+        top: 0;
     }
 
     

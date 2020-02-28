@@ -3,8 +3,10 @@ import wepy from 'wepy'
 let winWidth,
     winHeight,
     ctx,
-    canvasWidth = 282,
-    canvasHeight = 365; 
+    rpx,
+    ratio,
+    canvasWidth = 846,
+    canvasHeight = 1095;
 
 //参数依次为  二维码图片，
 const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
@@ -15,8 +17,16 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
             console.log( res );
             winWidth = res.windowHeight;
             winHeight = res.windowWidth;
+            rpx = 3;
+            ratio = res.pixelRatio;
+            // canvasWidth = canvasWidth * rpx;
+            // canvasHeight = canvasHeight * rpx;
         }
     })
+
+    if( storyCanvas == 'videoCanvas' ){
+        canvasHeight = 1008;
+    }
     
     var qrcode = code//二维码图片一般为网络图片后台生成
     var bgImgPath = storyImage //首先你需要准备一张背景图
@@ -24,24 +34,40 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
     ctx = wx.createCanvasContext(storyCanvas)//创建 canvas 绘图上下文
     
     //画矩形 设置背景颜色
-    ctx.rect(0,0,282,365);
+    ctx.rect( 0, 0, canvasWidth, canvasHeight);
     ctx.fillStyle = "#fff";
     ctx.fill();
     
     //将文章图绘制到画布中
-    ctx.drawImage(bgImgPath, 0, 0, 282, 188)
-    ctx.save() 
+    if( storyCanvas == 'videoCanvas' ){
+        ctx.drawImage(bgImgPath, 0, 0, canvasWidth, 159*rpx)
+        var bt_y = 169*rpx,
+            line_y = 219*rpx,
+            code_y = 229*rpx,
+            tip1_y = 265*rpx,
+            tip2_y = 281*rpx;
+    }else{
+        ctx.drawImage(bgImgPath, 0, 0, canvasWidth, 188*rpx)
+        var bt_y = 198*rpx,
+            line_y = 248*rpx,
+            code_y = 258*rpx,
+            tip1_y = 294*rpx,
+            tip2_y = 310*rpx;
+    }
+    ctx.save()
 
-    //下面你需要描述的文字，因为canvas文字不能够换行，所以这里我们按行一行一行写，当然你也可以自己写一个函数将文字截成一段一段的循环放入画布中
+    //29
+
+    //下面你需要描述的文字，因为canvas文字不能够换行，所以这里按行一行一行写
     //标题
     let title = {
-        x: 12,
-        y: 198,
-        width: 258,
-        height: 20,
+        x: 12*rpx,
+        y: bt_y,
+        width: 258*rpx,
+        height: 20*rpx,
         line: 2,
         color: '#000',
-        size: 15,
+        size: 15*rpx,
         align: 'left',
         baseline: 'top',
         text: storyTitle,
@@ -50,22 +76,24 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
     textWrap(title);
 
     // 标题下直线
-    ctx.drawImage(bgborder, 12, 248, 259, 1);
+    ctx.drawImage(bgborder, 12*rpx, line_y, 259*rpx, rpx);
     ctx.save();
     
     // 绘制二维码
-    ctx.drawImage(qrcode, 24, 258, 98, 98);
+    ctx.drawImage(qrcode, 24*rpx, code_y, 98*rpx, 98*rpx);
     ctx.save();
 
     // 提示阅读
     ctx.setFillStyle('#000000');
-    ctx.setFontSize(12);
+    ctx.setFontSize(12*rpx);
     ctx.setTextAlign('left');
     ctx.setTextBaseline('top');
-    ctx.fillText( '长按图片识别小程序码', 138, 294);
-    ctx.fillText( '进入汽势传媒阅读全文', 138, 310);
+    ctx.fillText( '长按图片识别小程序码', 138*rpx, tip1_y);
+    ctx.fillText( '进入汽势传媒阅读全文', 138*rpx, tip2_y);
     // ctx.draw()
-    let CanvasRes = '';
+
+    console.log( canvasWidth,canvasHeight );
+
     //将canvas画布转化为图片
     return new Promise(function(resolve,reject){
         setTimeout(()=>{
@@ -75,9 +103,10 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
                     y: 0,
                     width: canvasWidth,
                     height: canvasHeight,
-                    destWidth: canvasWidth * 750 *2 / winWidth,
-                    destHeight: canvasHeight * 750 *2 / winWidth,
+                    destWidth: canvasWidth,
+                    destHeight: canvasHeight,
                     canvasId: storyCanvas,
+                    quality:1,
                     success: function (res) {
                         console.log( res );
                         /* 这里 就可以显示之前写的 预览区域了 把生成的图片url给image的src */

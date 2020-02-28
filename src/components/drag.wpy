@@ -11,7 +11,7 @@
                 @touchend="touchEnd">
                 <view class='channelItem'>
                     <view class='channelNr_icon'>
-                        <image src='{{item.data.cat_icon}}' mode='widthFix'/>
+                        <image src='{{item.data.cat_icon}}' mode='aspectFit'/>
                     </view>
                     <view class='channelName'>{{item.data.cat_name}}</view>
                 </view>
@@ -93,13 +93,9 @@
             getListData (list) {
                 let that = this;
                 that.listData = list;
-                wx.showLoading({
-                    title: "正在加载...",
-                    mask: true
-                });
                 setTimeout(function(){
                     that.init();
-                    wx.hideLoading();
+                    // wx.hideLoading();
                 },500)
             }
         }
@@ -451,14 +447,17 @@
                 text-align: center;
             }
             .channelNr_icon{
-                width: 40rpx;
-                height: 44rpx;
+                width: 46rpx;
+                height: 46rpx;
+                overflow: hidden;
                 margin: 20rpx auto 6rpx auto;
                 font-size: 0;
                 text-align: center;
                 image{
-                    width: 40rpx;
-                    margin-top: 50%;
+                    width: 46rpx;
+                    height: 46rpx;
+                    position: relative;
+                    top: 50%;
                     transform: translateY(-50%);
                 }
             }
