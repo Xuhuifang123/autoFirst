@@ -68,10 +68,10 @@
                 that.changeColumn( cat_id,menu_id,type,cat_spell,e_id,e_left );
             },
             // 拖拽完成
-            upDateList(list) {
+            upDateList(_list) {
                 var temData = [];
-                for( let i=0; i<list.length; i++ ){
-                    temData.push( list[i].data );
+                for( let i=0; i<_list.length; i++ ){
+                    temData.push( _list[i].data );
                 }
                 this.navList = temData;
                 this.$apply();
@@ -83,16 +83,18 @@
                 })
             },
             showChannel(e){
+                
+                // if( this.dragFlag ){
+                    this.$broadcast('getListData',this.navList);
+                    // this.dragFlag = false;
+                // }
                 this.channelFlag = true;
                 this.$apply();
-                if( this.dragFlag ){
-                    this.$broadcast('getListData',this.navList);
-                    this.dragFlag = false;
-                }
             },
             hideChannel(e){
                 this.channelFlag = false;
                 this.$apply();
+                this.$broadcast('getListData',this.navList);
             }
         };
         changeColumn( cat_id,menu_id,type,cat_spell,item_id,item_left ){
@@ -172,6 +174,14 @@
             }
             
         }
+        // 按照某项属性重新排序
+        compare (property) {
+            return function(a,b){
+                var value1 = a[property];
+                var value2 = b[property];
+                return value1 - value2;
+            }
+        };
     }
 
 </script>
@@ -222,7 +232,7 @@
                     margin-left: -10rpx;
                     background: #fff;
                     bottom: 12rpx;
-                    border-radius: 50%;
+                    border-radius: 8rpx;
                 }
             }
         }
