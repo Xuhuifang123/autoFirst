@@ -14,7 +14,7 @@
             <!-- 直播 -->
             <block wx:elif="{{liveData.liveinfo.status == 2}}">
                 <view class="player_video">
-                    <live-player src="{{liveData.liveinfo.liveurl}}" mode="live" autoplay='true'  style="width: 100%; height: 100%;" />
+                    <video src="{{liveData.liveinfo.liveurl}}" autoplay='true'></video>
                 </view>
             </block>
             <!-- 回看 -->
@@ -95,7 +95,7 @@
             that.$apply();
         }
         onUnload(){
-            if( that.liveData.liveinfo.status == 1 ){
+            if( this.liveData.liveinfo.status == 1 ){
                 clearInterval(this.interval);
             }  
         };
