@@ -56,15 +56,22 @@
             indicator-active-color='#000' >
             <block wx:for="{{focus}}" wx:key='index'>
                 <swiper-item>
+                    <!-- 视频 -->
                     <image wx:if="{{ item.type == ('video') }}"  
                         @tap="videoDetail({{item.id}})" 
                         src="{{item.title_pic1}}" 
                         title="{{item.title}}" class="slide-image"/>
-
-                    <image wx:else
+                    <!-- 文章 -->
+                    <image wx:elif="{{ item.type == ('story') }}"
                         @tap="storyDetail({{item.id}})" 
                         src="{{item.title_pic1}}" 
                         title="{{item.title}}" class="slide-image"/>
+                    <!-- 占位 -->
+                    <image wx:elif="{{ item.type == ('seat') }}"
+                        src="{{item.title_pic1}}" 
+                        title="{{item.title}}" class="slide-image"/>
+                    
+                    <text wx:if="{{ item.isad == ('yes') }}">广告</text>
                 </swiper-item>
             </block>
         </swiper>
@@ -83,7 +90,7 @@
                     </view>
                     <view class='news_info'>
                         <!-- <text class='news_type'>{{item.author}}</text> -->
-                        <text class='news_author'>{{item.source}}</text>
+                        <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
                         <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
                     </view>
                 </view>
@@ -92,7 +99,7 @@
                         <view class='news_title' @tap="storyDetail({{item.id}})">{{item.title}}</view>
                         <view class='news_info'>
                             <!-- <text class='news_type'>{{item.author}}</text> -->
-                            <text class='news_author'>{{item.source}}</text>
+                            <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
                             <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
                         </view>
                     </view>
@@ -113,8 +120,36 @@
                     </view>
                     <view class='news_info'>
                         <!-- <text class='news_type'>{{item.source}}</text> -->
-                        <text class='news_author'>{{item.source}}</text>
+                        <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
                         <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
+                    </view>
+                </view>
+            </block>
+            <block wx:elif="{{item.type==('seat')}}">
+                <view wx:if='{{item.imgs && item.imgs.length > 0}}' class='news_imgs_nr news_nr'>
+                    <view class='news_con'>
+                        <view class='news_title'>{{item.title}}</view>
+                    </view>
+                    <view class='img_con'>
+                        <image src="{{item}}" wx:for="{{item.imgs}}" wx:key="{{inx}}"/>
+                    </view>
+                    <view class='news_info'>
+                        <!-- <text class='news_type'>{{item.author}}</text> -->
+                        <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
+                        <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
+                    </view>
+                </view>
+                <view class="news_nr" wx:else>
+                    <view class='news_con'>
+                        <view class='news_title'>{{item.title}}</view>
+                        <view class='news_info'>
+                            <!-- <text class='news_type'>{{item.author}}</text> -->
+                            <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
+                            <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
+                        </view>
+                    </view>
+                    <view class='img_con'>
+                        <image src="{{item.title_pic1}}" />
                     </view>
                 </view>
             </block>
@@ -417,6 +452,23 @@
             width: 100%;
             height: 350rpx;
         }
+        swiper-item{
+            position: relative;
+        }
+        text{
+            position: absolute;
+            bottom: 10rpx;
+            left: 10rpx;
+            border: 1rpx solid #fff;
+            border-radius: 4rpx;
+            font-size: 14rpx;
+            color: #fff;
+            width: 34rpx;
+            height: 18rpx;
+            vertical-align: top;
+            text-align: center;
+            line-height: 18rpx;
+        }
         .wx-swiper-dot{
             width: 10rpx;
             height: 10rpx;
@@ -480,6 +532,22 @@
             .news_author{
                 float: left;
                 color: #52A3FF;
+                text{
+                    display: inline-block;
+                    border: 1rpx solid #0396FF;
+                    border-radius: 4rpx;
+                    font-size: 14rpx;
+                    color: #0396FF;
+                    width: 34rpx;
+                    height: 18rpx;
+                    vertical-align: top;
+                    text-align: center;
+                    line-height: 18rpx;
+                    margin-right: 10rpx;
+                    vertical-align: top;
+                    position: relative;
+                    top: 8rpx;
+                }
             }
             .news_view{
                 float: right;

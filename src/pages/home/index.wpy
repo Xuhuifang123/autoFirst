@@ -49,7 +49,7 @@
         onShow () {}  // 只在Page中存在的页面生命周期函数
         // 只在Page实例中存在的配置数据，对应于原生的page.json文件
         config = {
-            navigationBarTitleText: '网通社'
+            navigationBarTitleText: '汽势'
         };
 
         data = {

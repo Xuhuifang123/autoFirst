@@ -90,13 +90,19 @@
             // this.init();
         }
         events = {
-            getListData (list) {
+            getListData (list,type) {
                 let that = this;
-                that.listData = list;
-                setTimeout(function(){
+                if( type == 'hide' ){
+                    that.listData = [];
                     that.init();
-                    // wx.hideLoading();
-                },500)
+                }else{
+                    this.clearData();
+                    that.listData = list;
+                    setTimeout(function(){
+                        that.init();
+                        // wx.hideLoading();
+                    },500)
+                }                
             }
         }
         methods= {

@@ -14,13 +14,13 @@
             <!-- 直播 -->
             <block wx:elif="{{liveData.liveinfo.status == 2}}">
                 <view class="player_video">
-                    <live-player src="{{liveData.liveinfo.liveurl}}" mode="live" autoplay='true' style="width: 100%; height: 100%;" />
+                    <live-player src="{{liveData.liveinfo.liveurl}}" mode="live" autoplay='true'  style="width: 100%; height: 100%;" />
                 </view>
             </block>
-            <!-- 会看 -->
+            <!-- 回看 -->
             <block wx:else>
                 <view class="player_video">
-                    <video src="{{liveData.liveinfo.playurl[0]}}" id='video' controls="true" autoplay='true'></video>
+                    <video src="{{videoSrc}}" id='playVideo' controls="true" autoplay='true' bindended='videoEnd' binderror='videoError'></video>
                 </view>
             </block>
 
@@ -42,6 +42,7 @@
         };
         onLoad(options){
             this.getLiveList( options.id );
+            
         };
         data = {
             liveData:{},
@@ -52,13 +53,51 @@
                 'minute':0,
                 'second':0
             },
-            interval:null
+            interval:null,
+            index:0,
+            videoSrc:'',
+            videoList:[],
+            videoContext:null
         };
-        methods = {
+        onReady(){
             
         };
+        methods = {
+            videoEnd:function(){
+                let that = this;
+                if ( that.index == that.videoList.length-1 ){
+                    wx.showToast({
+                        title: '已播放完成',
+                        icon: 'success',
+                        duration: 2000,
+                    })
+                    that.index = 0;
+                    that.videoSrc = that.videoList[0]
+                    that.videoContext.pause()  //暂停
+                    that.$apply();
+                } else {
+                    wx.showToast({
+                        title: '播放下一个视频',
+                        icon: 'loading',
+                        duration: 2000,
+                    })
+                    that.videoPlay();
+                }
+            }
+        };
+        videoPlay(){
+            let that = this
+            var videolLength = that.videoList.length;
+            that.index = that.index + 1;
+            that.videoSrc = that.videoList[that.index]
+            //that.videoContext.autoplay =='true'//设置自动播放
+            that.videoContext.play()//播放视频
+            that.$apply();
+        }
         onUnload(){
-            clearInterval(this.interval);
+            if( that.liveData.liveinfo.status == 1 ){
+                clearInterval(this.interval);
+            }  
         };
         countDown(){
             let that = this;
@@ -97,12 +136,21 @@
             console.log( res );
             if( res.data.code == 200 ){
                 that.liveData = res.data.data;
+                api.finishLoading();
+                that.$apply();
                 if( that.liveData.liveinfo.status == 1 ){
                     that.startTime = that.liveData.liveinfo.start_time;
                     that.countDown();
                 }
-                api.finishLoading();
-                that.$apply();
+                if( that.liveData.liveinfo.status == 3 ){
+                    setTimeout(function(){
+                        that.videoContext = wepy.createVideoContext('playVideo');
+                        console.log( that.videoContext );
+                    },300)
+                    that.videoList = that.liveData.liveinfo.playurl;
+                    that.videoSrc = that.videoList[0];
+                    that.$apply();
+                }
             } else {
                 api.finishLoading();
                 wepy.showToast({

@@ -84,7 +84,7 @@
             },
             showChannel(e){
                 // if( this.dragFlag ){
-                    this.$broadcast('getListData',this.navList);
+                    this.$broadcast('getListData',this.navList,'show');
                     // this.dragFlag = false;
                 // }
                 this.channelFlag = true;
@@ -93,7 +93,7 @@
             hideChannel(e){
                 this.channelFlag = false;
                 this.$apply();
-                this.$broadcast('getListData',this.navList);
+                this.$broadcast('getListData',this.navList,'hide');
             }
         };
         changeColumn( cat_id,menu_id,type,cat_spell,filed,item_id,item_left ){
@@ -212,7 +212,7 @@
         white-space: nowrap;
         width: 100%;
         view{
-            margin-right: 70rpx;
+            margin-right: 50rpx;
             font-size: 24rpx;
             font-size: 30rpx;
             color:rgba(255,255,255,0.6);

@@ -439,6 +439,12 @@
                     height: 400rpx;
                 }
             }
+            .wxParse-img{
+                padding: 0;
+                display: block;
+                margin: 0 auto;
+                width: 100%;
+            }
             .artice_views{
                 height: 28rpx; 
                 color: #999999; 
@@ -714,7 +720,7 @@
         overflow: hidden;
         opacity: 0;
         position: absolute;
-        left: -200%;
+        left: -1500px;
         top: 0;
     }
 
