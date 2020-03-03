@@ -257,7 +257,6 @@
         events = {
             requestType( cat_id,menu_id,type,cat_spell,filed,page ){
                 const that = this;
-                console.log( that.cat_spell,cat_spell );
                 if( that.cat_spell != cat_spell ){
                     that.newsList = [];
                     that.bobaoData = [];
@@ -273,6 +272,7 @@
         };
         
         async getNewsList( menu_id,type,page,spell,cat_id,filed ){ // id,type(index),page,spell
+            console.log( menu_id,type,page,spell,cat_id,filed );
             let that = this;
             // 首页默认列表
             if( type=='index' ){

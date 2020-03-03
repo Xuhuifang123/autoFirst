@@ -86,7 +86,7 @@
             /* 上拉加载更多 */
             loadMore(){
                 if( this.loadFlag ){
-                    this.columnPage = this.columnPage*1 + 100;
+                    this.columnPage = this.columnPage*1 + 1;
                     this.getSpecialList();
                 }
             }

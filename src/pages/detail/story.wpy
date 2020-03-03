@@ -24,7 +24,7 @@
             </view>
             <view class="artice_share flex" wx:if='{{storyInfo}}'>
                 <button class='shareMessage' open-type="share" ><image src="../../res/images/loginWeixin.png" />分享至好友</button>
-                <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
+                <!-- <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button> -->
             </view>
 
             <view class="recommend">
@@ -493,7 +493,8 @@
         .artice_share{
             padding: 0 76rpx;
             display: flex;
-            justify-content: space-between;
+            // justify-content: space-between;
+            justify-content: center;
             margin-bottom: 40rpx;
             button{
                 padding: 0;
