@@ -62,22 +62,6 @@
                         </view>
                     </view>
                 </block>
-                <block wx:else>
-                    <!-- 视频 -->
-                    <view class='news_imgs_nr news_nr news_video'> 
-                        <view class='news_con' @tap="videoDetail({{item.id}})">
-                            <view class='news_title'>{{item.title}}</view>
-                        </view>
-                        <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
-                            <image class='blockImg' src="{{item.title_pic1}}"/>
-                            <view class='videoMask'><image src="../../res/images/iconplay.png" /></view>
-                        </view>
-                        <view class='news_info'>
-                            <view class='news_view'><image src="../../res/images/iconlook.png" />{{item.pv}}</view>
-                            <view class='news_zan'><image src="../../res/images/articeZan.png" />{{item.likeCount}}</view>
-                        </view>
-                    </view>
-                </block>
             </block>
         </view>
 
@@ -108,11 +92,6 @@
             storyDetail:function(id){
                 wepy.navigateTo({
                     url: '../../pages/detail/story?id='+id
-                })
-            },
-            videoDetail:function(id){
-                wepy.navigateTo({
-                    url: '../../pages/detail/videoDetail?id='+id
                 })
             },
             handleScroll(){

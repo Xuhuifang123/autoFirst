@@ -87,7 +87,7 @@ const Share =  (  code,storyImage,storyCanvas,storyTitle  ) => {
     ctx.setTextAlign('left');
     ctx.setTextBaseline('top');
     ctx.fillText( '长按图片识别小程序码', 138*rpx, tip1_y);
-    ctx.fillText( '进入汽势传媒阅读全文', 138*rpx, tip2_y);
+    ctx.fillText( '进入汽势阅读全文', 138*rpx, tip2_y);
     // ctx.draw()
 
     console.log( canvasWidth,canvasHeight );

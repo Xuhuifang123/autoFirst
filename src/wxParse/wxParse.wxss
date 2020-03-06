@@ -21,9 +21,10 @@ view{
     word-break:break-all; overflow:auto;
 }
 .wxParse-inline{
-    display: inline;
+    display: flex;
     margin: 0;
     padding: 0;
+    text-indent: 2em;
 }
 /*//标题 */
 .wxParse-div{margin: 0;padding: 0;}

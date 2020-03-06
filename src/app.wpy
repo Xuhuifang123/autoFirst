@@ -11,8 +11,6 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/home/index',
-      "pages/home/live",
-      "pages/home/video",
       "pages/home/artName",
       "pages/home/my",
       "pages/aboutMy/aboutUs",
@@ -26,8 +24,6 @@ export default class extends wepy.app {
       "pages/list/specialActive",
       "pages/detail/photoDetail",
       "pages/detail/story",
-      "pages/detail/liveDetail",
-      "pages/detail/videoDetail",
       "pages/detail/authorDetail",
       "pages/list/dragPage",
     ],
@@ -48,18 +44,6 @@ export default class extends wepy.app {
           text: "首页",
           iconPath: "./res/images/home.png",
           selectedIconPath: "./res/images/homeSel.png"
-        },
-        {
-          pagePath: "pages/home/live",
-          text: "直播",
-          iconPath: "./res/images/broadcast.png",
-          selectedIconPath: "./res/images/broadcastSel.png"
-        },
-        {
-          pagePath: "pages/home/video",
-          text: "视频",
-          iconPath: "./res/images/video.png",
-          selectedIconPath: "./res/images/videoSel.png"
         },
         {
           pagePath: "pages/home/artName",
@@ -89,9 +73,37 @@ export default class extends wepy.app {
     this.use('promisify')
   }
 
-  onLaunch() {
+  onLaunch(option) {
     const that = this;
     // that.testAsync();
+    console.log( JSON.stringify(option) );
+    // let scene = decodeURIComponent(option.query.scene);
+    // if( scene ){
+    //   let sceneArr = scene.split('&');
+    //   let _type = '';
+    //   let _id = '';
+    //   for (var i in sceneArr){
+    //     if( sceneArr[i].indexOf('id') > -1 ){
+    //       _id = sceneArr[i].split('=')[1];
+    //     }
+    //     if( sceneArr[i].indexOf('type') > -1 ){
+    //       _type = sceneArr[i].split('=')[1];
+    //     }
+    //   }
+      
+    //   // 跳转对应页面
+    //   if( _type == 'story' ){
+    //     console.log( _id );
+    //     wepy.navigateTo({
+    //       url: './pages/detail/story?id='+_id
+    //     })
+    //   }else{
+    //     wepy.navigateTo({
+    //       url: './pages/home/index'
+    //     })
+    //   }
+    // }
+    
 
     that.getUserInfo();
     // location.getInaJxsAddress();
@@ -127,7 +139,12 @@ export default class extends wepy.app {
   };
   
   onLoad(){ 
-
+    
+    // if( query.scene ){
+    //   const scene = decodeURIComponent(query.scene)
+    //   console.log( scene );
+    //   console.log( this.getQueryString(scene, 'id') );
+    // }
   }
 
   setUserInfo(user) {
@@ -160,6 +177,18 @@ export default class extends wepy.app {
   isLogin() {
     let session = this.globalData.session;
     return session != '';
+  }
+
+  getQueryString (url,name) {
+    var reg = new RegExp('(^|&|/?)' + name + '=([^&|/?]*)(&|/?|$)','i')
+    var r = url.substr(1).match(reg) 
+    console.log( r );
+    if (r != null) {
+      console.log("r = " + r)
+      console.log("r[2] = " + r[2])
+      return r[2]
+    }
+    return null;
   }
 
 }

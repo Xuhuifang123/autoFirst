@@ -7,7 +7,7 @@
                     <image src='{{storyInfo.photo}}' class='authorPhoto'/>
                     <view class='fullFlex authorInfo'>
                         <view class='authorInfo_bt'>{{storyInfo.authorname}}</view>
-                        <view class='authorInfo_time'><text>{{storyInfo.add_date}}</text></view>
+                        <view class='authorInfo_time'><text>{{storyInfo.time}}</text></view>
                     </view>
                     <view class='special_label' wx:if='{{storyInfo.tagname}}'>{{storyInfo.tagname}}</view>
                 </view>
@@ -24,7 +24,7 @@
             </view>
             <view class="artice_share flex" wx:if='{{storyInfo}}'>
                 <button class='shareMessage' open-type="share" ><image src="../../res/images/loginWeixin.png" />分享至好友</button>
-                <!-- <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button> -->
+                <button class='shareTimeline' type='primary' @tap='shareTimeLine()'><image src="../../res/images/iconShareLine.png" />分享至朋友圈</button>
             </view>
 
             <view class="recommend">
@@ -95,7 +95,24 @@
             // shareSelectLayout:shareSelectLayout
         };
         onLoad(options){
-            this.getStoryCon( options.id );
+            let _type = '';
+            let _id = '';
+            if( options.scene ){
+                let scene = decodeURIComponent(options.scene);
+                let sceneArr = scene.split('&');
+                for (var i in sceneArr){
+                    if( sceneArr[i].indexOf('id') > -1 ){
+                    _id = sceneArr[i].split('=')[1];
+                    }
+                    if( sceneArr[i].indexOf('type') > -1 ){
+                    _type = sceneArr[i].split('=')[1];
+                    }
+                }
+                this.getStoryCon( _id );
+            }else{
+                this.getStoryCon( options.id );
+            }
+            
         };
         data = {
             userInfo:{},
@@ -493,8 +510,8 @@
         .artice_share{
             padding: 0 76rpx;
             display: flex;
-            // justify-content: space-between;
-            justify-content: center;
+            justify-content: space-between;
+            // justify-content: center;
             margin-bottom: 40rpx;
             button{
                 padding: 0;

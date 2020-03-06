@@ -56,13 +56,8 @@
             indicator-active-color='#000' >
             <block wx:for="{{focus}}" wx:key='index'>
                 <swiper-item>
-                    <!-- 视频 -->
-                    <image wx:if="{{ item.type == ('video') }}"  
-                        @tap="videoDetail({{item.id}})" 
-                        src="{{item.title_pic1}}" 
-                        title="{{item.title}}" class="slide-image"/>
                     <!-- 文章 -->
-                    <image wx:elif="{{ item.type == ('story') }}"
+                    <image wx:if="{{ item.type == ('story') }}"
                         @tap="storyDetail({{item.id}})" 
                         src="{{item.title_pic1}}" 
                         title="{{item.title}}" class="slide-image"/>
@@ -105,23 +100,6 @@
                     </view>
                     <view class='img_con' @tap="storyDetail({{item.id}})">
                         <image src="{{item.title_pic1}}" />
-                    </view>
-                </view>
-            </block>
-            <block wx:elif="{{item.type==('video')}}">
-                <!-- 视频 -->
-                <view class='news_imgs_nr news_nr'> 
-                    <view class='news_con' @tap="videoDetail({{item.id}})">
-                        <view class='news_title'>{{item.title}}</view>
-                    </view>
-                    <view class='img_con news_nr_video' @tap="videoDetail({{item.id}})">
-                        <image class='blockImg' src="{{item.title_pic1}}"/>
-                        <view class='videoMask'><image src="./../res/images/iconplay.png" /></view>
-                    </view>
-                    <view class='news_info'>
-                        <!-- <text class='news_type'>{{item.source}}</text> -->
-                        <view class='news_author'><text wx:if="{{item.show==('yes')}}">广告</text>{{item.source}}</view>
-                        <view class='news_view'><image src="./../res/images/iconlook.png" />{{item.pv}}</view>
                     </view>
                 </view>
             </block>
@@ -217,11 +195,6 @@
             photoList:function(id){
                 wepy.navigateTo({
                     url: '../../pages/list/photoList?id='+id
-                })
-            },
-            videoDetail:function(id){
-                wepy.navigateTo({
-                    url: '../../pages/detail/videoDetail?id='+id
                 })
             },
             toggleDetail:function(type,e){
