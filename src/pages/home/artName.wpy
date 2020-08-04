@@ -6,6 +6,32 @@
         scroll-y
         scroll-with-animation="{{true}}"
         class='wrapSroll'>
+
+        <swiper class='swiper' wx:if="{{ focusFlag }}"
+            indicator-dots='true'
+            autoplay='true'
+            interval='2000'
+            duration='500 '
+            circular='true'
+            indicator-color='#fff'
+            indicator-active-color='#000' >
+            <block wx:for="{{focus}}" wx:key='index'>
+                <swiper-item>
+                    <!-- 文章 -->
+                    <image wx:if="{{ item.type == ('story') }}"
+                        @tap="storyDetail({{item.id}})" 
+                        src="{{item.title_pic1}}" 
+                        title="{{item.title}}" class="slide-image"/>
+                    <!-- 占位 -->
+                    <image wx:elif="{{ item.type == ('seat') }}"
+                        src="{{item.title_pic1}}" 
+                        title="{{item.title}}" class="slide-image"/>
+                    
+                    <text wx:if="{{ item.isad == ('yes') }}">广告</text>
+                </swiper-item>
+            </block>
+        </swiper>
+
         <view class='artName_list'>
             <block wx:for="{{shareTop}}" wx:key="{{index}}">
                 <block wx:if="{{item.type == ('story')}}">
@@ -118,6 +144,8 @@
             this.getNewsList();
         };
         data = {
+            focus:[],
+            focusFlag: false,
             shareList:[],
             authorList:[],
             loading:false,
@@ -180,6 +208,9 @@
                         for( let i=0; i<res.data.data.author.length; i++ ){
                             that.authorList.push( res.data.data.author[i] );
                         }
+                        if( res.data.data.focus && res.data.data.focus.length > 0 ){
+                            that.focus = res.data.data.focus;
+                        }
                     }
                     for( let i=0; i<res.data.data.storyList.length; i++ ){
                         that.shareList.push( res.data.data.storyList[i] );
@@ -225,8 +256,47 @@
         width: 100vw;
         background: rgba(0, 0, 0, 0.04)
     }
+    .swiper{
+        margin: 20rpx 24rpx 0 24rpx;
+        height: 350rpx;
+        image{
+            width: 100%;
+            height: 350rpx;
+        }
+        swiper-item{
+            position: relative;
+        }
+        text{
+            position: absolute;
+            bottom: 10rpx;
+            left: 10rpx;
+            border: 1rpx solid #fff;
+            border-radius: 4rpx;
+            font-size: 14rpx;
+            color: #fff;
+            width: 34rpx;
+            height: 18rpx;
+            vertical-align: top;
+            text-align: center;
+            line-height: 18rpx;
+        }
+        .wx-swiper-dot{
+            width: 10rpx;
+            height: 10rpx;
+            background:#fff;
+            border-radius: 50%;
+            border: 1px solid #000;
+        }
+        .wx-swiper-dot::before{
+            content: '';
+            background: rgba(255,255,255,0.8);
+        }
+        .wx-swiper-dot-active::before{
+            background:#000;
+        }
+    }
     .artName_list{
-        padding: 24rpx 24rpx 0 24rpx;
+        padding: 20rpx 24rpx 0 24rpx;
     }
     .news_nr{
         background: #fff;

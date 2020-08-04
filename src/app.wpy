@@ -26,6 +26,8 @@ export default class extends wepy.app {
       "pages/detail/story",
       "pages/detail/authorDetail",
       "pages/list/dragPage",
+      "pages/list/rankingList",
+      "pages/detail/rankingDetail"
     ],
     window: {
       backgroundTextStyle: 'light',

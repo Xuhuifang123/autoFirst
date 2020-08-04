@@ -1,0 +1,400 @@
+<template>
+    <view class="wrap">
+
+        <view class="ranking_con">
+            <view class="ranking_banner">
+                <image src='{{rankInfo.top_img}}' mode="widthFix"/>
+            </view>
+
+            <view class="ranking_list">
+
+                <view class="ranking_top">
+                    <!-- 第一名 -->
+                    <view class='ranking_nr ranking{{item.sort}}' wx:for="{{rankTop}}" wx:key="index" @tap='authorDetail({{item.uid}})'>
+                        <view class='ranking_dt'>
+                            <image src='{{item.photo}}' class='rank_img'/>
+                            <image src='../../res/images/rank{{item.sort}}.png' class='rank_icon'/>
+                        </view>
+                        <view class='ranking_title'>{{item.name}}</view>
+                    </view>
+                </view>
+
+                <view class="ranking_bot">
+                    <view class='ranking_nr' wx:for="{{rankDetail}}" wx:key="index" @tap='authorDetail({{item.uid}})'>
+                        <view class='ranking_number' wx:if='{{ item.sort < 10 }}'> 0{{ item.sort }} </view>
+                        <view class='ranking_number' wx:else> {{ item.sort }} </view>
+                        <image src='{{item.photo}}' class='rank_img'/>
+                        <view class='ranking_name'>{{ item.name }}</view>
+                    </view>
+                </view>
+                
+            </view>
+        </view>
+
+        <view class="rank_footer">
+            <view class="rank_footer_nr">
+                <image src="https://img.auto-first.cn/system/web/images/AppCode.png"/>
+                <view class='rank_footer_name'>汽势APP</view>
+            </view>
+            <view class="rank_footer_nr">
+                <image src="https://img.auto-first.cn/system/web/images/MiniProCode.png"/>
+                <view class='rank_footer_name'>汽势小程序</view>
+            </view>
+            <view class="rank_footer_nr">
+                <image src="https://img.auto-first.cn/system/web/images/OfficialCode.png"/>
+                <view class='rank_footer_name'>汽势公众号</view>
+            </view>
+            <view class="rank_footer_nr">
+                <image src="https://img.auto-first.cn/system/web/images/videoCode.png"/>
+                <view class='rank_footer_name'>汽势视频</view>
+            </view>
+        </view>
+
+        <button class='shareMessage' open-type="share" ><image src="../../res/images/share2.png" />分享至好友</button>
+
+    </view>
+</template>
+
+<script>
+
+    import wepy from 'wepy'
+    import api from '../../../src/api/ApiConstants';
+    export default class Story extends wepy.page{
+        config = {
+            navigationBarTitleText: '6月份新媒体榜单排行'
+        };
+        components = {
+            // WxParse: WxParse
+            // shareSelectLayout:shareSelectLayout
+        };
+        onLoad(options){
+            let _type = '';
+            let _id = '';
+            if( options.scene ){
+                let scene = decodeURIComponent(options.scene);
+                let sceneArr = scene.split('&');
+                for (var i in sceneArr){
+                    if( sceneArr[i].indexOf('id') > -1 ){
+                        _id = sceneArr[i].split('=')[1];
+                    }
+                    if( sceneArr[i].indexOf('type') > -1 ){
+                        _type = sceneArr[i].split('=')[1];
+                    }
+                }
+                this.getRankingCon( _id );
+            }else{
+                this.getRankingCon( options.id );
+            }
+        };
+        data = {
+            rankTop:[],
+            rankDetail:[],
+            rankInfo:{},
+            Width:0,
+            Height:0,
+            ctx:null,
+            storyImage:'',
+            shareFlag:false,
+            imagePath:'',
+            code:'',
+            downFlag:true
+        };
+        methods = {
+
+        };
+
+        async getRankingCon( topid ){
+            
+            let that = this;
+            let params = {
+                query:{
+                    topid:topid
+                }
+            }
+            api.loading();
+            const res = await api.GETRANKINGDETAIL(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                that.rankInfo = res.data.data.info;
+                const rankList = res.data.data.list;
+                for( let i=0; i<rankList.length; i++  ){
+                    if( i < 3 ){
+                        that.rankTop.push( rankList[i] );
+                    } else {
+                        that.rankDetail.push( rankList[i] );
+                    }
+                }
+
+                api.finishLoading();
+                that.$apply();
+            }else{
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+        };
+
+        // 转发好友
+        onShareAppMessage(options){
+            let that = this;
+            let imgUrl = that.rankInfo.top_img;
+            let rankTitle = that.rankInfo.top_name;
+            let rankId = that.rankInfo.id;
+            let setSharePath;
+            setSharePath = 'pages/detail/rankingDetail?id='+rankId;
+            let shareObj = {
+                title: rankTitle,
+                imageUrl: imgUrl,
+                path: setSharePath,
+            };
+            // 来自页面内的按钮的转发
+            if( options.from == 'button' ){
+                var eData = options.target.dataset;
+                // 此处可以修改 shareObj 中的内容
+                // shareObj.path = '/pages/btnname/btnname?btn_name='+eData.name;
+            }
+            return shareObj;
+        };
+
+    }
+
+</script>
+
+<style lang="less">
+
+    .ranking_con{
+        padding: 24rpx;
+        .ranking_banner{
+            box-shadow: 0px 5px 8px 4px rgba(0, 0, 0, 0.14);
+            margin-bottom: 30rpx;
+            image{
+                display: block;
+                width: 100%;
+            }
+        }
+        .ranking_top{
+            margin-bottom: 30rpx;
+            position: relative;
+            .ranking_dt{
+                position: relative;
+                image.rank_img{
+                    display: block;
+                    border-radius: 50%;
+                    border: 4rpx solid #C92C1D;
+                    overflow: hidden;
+                    margin: 0 auto 0 auto;
+                }
+                .rank_icon{
+                    position: absolute;
+                    left: 50%;
+                }
+            }
+            .ranking_title{
+                line-height: 42rpx;
+                font-size: 30rpx;
+                color: #333333;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .ranking1{
+                width: 200rpx;
+                margin: 0 auto;
+                .ranking_dt{
+                    margin-bottom: 30rpx;
+                    .rank_img{
+                        width: 168rpx;
+                        height: 168rpx;
+                    }
+                    .rank_icon{
+                        bottom: -30rpx;
+                        margin-left: -30rpx;
+                        width: 62rpx;
+                        height: 72rpx;
+                    }
+                }
+            }
+            .ranking2{
+                left: 40rpx;
+            }
+            .ranking3{
+                right: 40rpx;
+            }
+            .ranking2,.ranking3{
+                position: absolute;
+                bottom: 0;
+                width: 200rpx;
+                .ranking_dt{
+                    margin: 0 auto 20rpx auto;
+                    .rank_img{
+                        width: 130rpx;
+                        height: 130rpx;
+                    }
+                    .rank_icon{
+                        width: 52rpx;
+                        height: 56rpx;
+                        bottom: -20rpx;
+                        left: 50%;
+                        margin-left: -26rpx;
+                    }
+                }
+            }
+        }
+        .ranking_bot{
+            .ranking_nr{
+                border-top: 1px solid #f2f2f2;
+                padding: 30rpx 40rpx 30rpx 40rpx;
+                overflow: hidden;
+                .ranking_number{
+                    width: 92rpx;
+                    height: 80rpx;
+                    font-size: 30rpx;
+                    text-align: center;
+                    line-height: 80rpx;
+                    color: #C92C1D;
+                    font-weight: bold;
+                    letter-spacing: 1px;
+                    float: left;
+                }
+                .rank_img{
+                    width: 80rpx;
+                    height: 80rpx;
+                    border-radius: 50%;
+                    overflow: hidden;
+                    float: left;
+                }
+                .ranking_name{
+                    padding: 0 20rpx;
+                    overflow: hidden;
+                    position: relative;
+                    font-size: 36rpx;
+                    color: #333333;
+                    line-height: 80rpx;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+    .rank_footer{
+        background: #C92C1D;
+        overflow: hidden;
+        padding: 44rpx 0;
+        font-size: 0;
+        text-align: center;
+        .rank_footer_nr{
+            display: inline-block;
+            vertical-align: top;
+            margin: 0 20rpx;
+            width: 132rpx;
+            image{
+                width: 132rpx;
+                height: 132rpx;
+                margin-bottom: 6rpx;
+            }
+            .rank_footer_name{
+                font-size: 28rpx;
+                color: #FFFFFF;
+                line-height: 40rpx;
+                text-align: center;
+                white-space: nowrap;
+            }
+        }
+    }
+    .shareMessage{
+        position: fixed;
+        bottom: 100rpx;
+        right: 60rpx;
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+        box-shadow: 0 0 8px 4px rgba(0,0,0,0.2);
+        overflow: hidden;
+        background: #fff;
+        padding: 0;
+        image{
+            width: 40rpx;
+            height: 40rpx;
+            display: block;
+            margin: 20rpx auto 0 auto;
+        }
+    }
+    .shareMask{
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background:rgba(0,0,0,0.6);
+        transform: translateX(-300%);
+        transition: transform 0.3s linear;
+    }
+    .shareMask.show{
+        transform: translateX(0);
+    }
+
+    .storyShare{ 
+        width: 564rpx;
+        height: 730rpx;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        overflow: visible;
+        .shareCanvas{
+            width: 564rpx;
+            height: 730rpx;
+            background: #fff;
+            border-radius: 16px;
+            canvas{
+                width: 564rpx;
+                height: 730rpx;
+                opacity: 0;
+            }
+            image{
+                width: 564rpx;
+                height: 730rpx;
+            }
+        }
+        .close_btn{
+            position: absolute;
+            right: 0;
+            top: -76rpx;
+            width: 56rpx;
+            height: 56rpx;
+        }
+        .save_btn{
+            position: absolute;
+            width: 220rpx;
+            height: 66rpx;
+            left: 50%;
+            bottom: -96rpx;
+            margin-left: -110rpx;
+            padding: 0;
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0);
+            &::after{
+                display: none;
+            }
+            image{
+                width: 220rpx;
+                height: 66rpx;
+            }
+        }
+    }
+    .hideCanvas{
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        position: absolute;
+        left: -1500px;
+        top: 0;
+    }
+
+    
+</style>

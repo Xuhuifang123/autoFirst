@@ -54,6 +54,12 @@ const GETSTORY = (params) => wxRequest(params, HOST + "/init.php?m=api&c=program
 // 作者详情
 const GETAUTHORDETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=uCenter",false);
 
+// 媒体TOP排行榜列表
+const GETRANKINGLIST = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=top_media_list",false);
+
+// 媒体TOP排行榜详情
+const GETRANKINGDETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=index&a=top_media_info",false);
+
 // 图库详情
 const GETPHOTODETAIL = (params) => wxRequest(params, HOST + "/init.php?m=api&c=user&a=photoInfo",false);
 
@@ -120,6 +126,8 @@ module.exports = {
     GETSPECIALLIST,
     GETSTORY,
     GETAUTHORDETAIL,
+    GETRANKINGLIST,
+    GETRANKINGDETAIL,
     GETPHOTODETAIL,
     GETVIDEODETAIL,
     GETLIVEDETAIL,

@@ -15,6 +15,7 @@
                 </view>
                 <image src='../../res/images/my_more.png' class="author_detail" />
             </view>
+            <view class='rankingPos' @tap="rankingList()"><image src='../../res/images/ranking2.png' class="ranking_icon" /></view>
         </view>
     </scroll-view>
 </template>
@@ -38,6 +39,11 @@
             columnPage:1
         };
         methods = {
+            rankingList:function(){
+                wepy.navigateTo({
+                    url: '../../pages/list/rankingList'
+                })
+            },
             handleScroll(){
                 // console.log( 222 );
             },
@@ -131,6 +137,23 @@
                 width: 18rpx;
                 height: 32rpx;
                 margin-left: 20rpx;
+            }
+        }
+        .rankingPos{
+            position: fixed;
+            bottom: 100rpx;
+            right: 60rpx;
+            width: 80rpx;
+            height: 80rpx;
+            border-radius: 50%;
+            box-shadow: 0 0 8px 4px rgba(0,0,0,0.2);
+            overflow: hidden;
+            background: #fff;
+            image{
+                width: 48rpx;
+                height: 38rpx;
+                display: block;
+                margin: 21rpx auto 0 auto;
             }
         }
     }

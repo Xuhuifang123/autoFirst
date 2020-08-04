@@ -283,7 +283,7 @@
         // 转发好友
         onShareAppMessage(options){
             let that = this;
-            let imgUrl = that.storyInfo.photo;
+            let imgUrl = that.storyInfo.title_pic1;
             let storyTitle = that.storyInfo.title;
             let storyId = that.storyInfo.id;
             let setSharePath;
@@ -306,6 +306,7 @@
         // 保存文章题图到本地
         saveImageLocal(){
             let that = this;
+            
             wx.downloadFile({
                 url: that.storyInfo.title_pic1,
                 success: function(res) {
@@ -315,9 +316,11 @@
                         wx.downloadFile({
                             url: that.storyInfo.qrcode,
                             success: function(Dres) {
+                                console.log( Dres );
                                 if (Dres.statusCode === 200){
                                     let codeImg = Dres.tempFilePath;
                                     that.code = codeImg;
+                                    
                                     // SHARE.Share( that.code, that.storyImage, 'storyCanvas', that.storyInfo.title );
                                     SHARE.Share( that.code, that.storyImage, 'storyCanvas', that.storyInfo.title )
                                         .then( res => {
@@ -433,7 +436,7 @@
                 margin-bottom: 20rpx;
             }
             .wxParse-p{
-                text-indent: 0;
+                text-indent: 2em !important;
                 color: #3A3A3A;
                 font-size: 30rpx;
                 line-height: 48rpx;

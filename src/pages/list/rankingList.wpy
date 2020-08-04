@@ -1,0 +1,116 @@
+<template lang="wxml">
+    <scroll-view
+        @scroll="handleScroll"
+        @scrolltoupper="upper"
+        @scrolltolower="loadMore"
+        scroll-y
+        scroll-with-animation="{{true}}"
+        class='wrapSroll'>
+        <view class="ranking_con">
+            <view class="ranking_nr" wx:for="{{ranklingList}}" wx:key="index" @tap='rankingDetail({{item.id}})'>
+                <image src='{{item.top_img}}' class="ranking_photo" mode="widthFix"/>
+                <view class="ranking_title">{{item.top_name}}</view>
+            </view>
+        </view>
+    </scroll-view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '../../../src/api/ApiConstants';
+    export default class Authorllist extends wepy.page {
+        config = {
+            navigationBarTitleText: 'TOP排行'
+        };
+        components = {
+            
+        };
+
+        onLoad(options){
+            this.getRankingList();
+        };
+        data = {
+            ranklingList:[],
+            columnPage:1
+        };
+        methods = {
+            rankingDetail:function( id ){
+                wepy.navigateTo({
+                    url: '../../pages/detail/rankingDetail?id='+id
+                })
+            },
+            handleScroll(){
+                // console.log( 222 );
+            },
+            /* 下拉加载 */
+            upper(){
+                // console.log( '加载更多' );
+            },
+            /* 上拉加载更多 */
+            loadMore(){
+                this.columnPage = this.columnPage*1 + 1;
+                this.getRankingList();
+                console.log( this.columnPage );
+            },
+            authorDetail(id){
+                wepy.navigateTo({
+                    url: '../../pages/detail/authorDetail?id='+id
+                })
+            }
+        };
+        events = {
+
+        };
+        async getRankingList(){
+            let that = this;
+            let params = {
+                query:{
+                    page: that.columnPage
+                }
+            }
+            api.loading();
+            const res = await api.GETRANKINGLIST(params);
+            console.log( res );
+            if( res.data.code == 200 ){
+                for( let i=0; i<res.data.data.length; i++ ){
+                    that.ranklingList.push( res.data.data[i] );
+                }
+                api.finishLoading();
+                that.$apply();
+            }else{
+                api.finishLoading();
+                wepy.showToast({
+                    title: '加载失败 ~',
+                    icon: 'none',
+                    duration: 2000
+                });
+            }
+        };
+        
+    }
+</script>
+
+<style lang="less">
+.ranking_con{
+    padding: 24rpx 24rpx 0 24rpx;
+    .ranking_nr{
+        margin-bottom: 30rpx;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px 2px rgba(0,0,0,0.14);
+        .ranking_photo{
+            width: 100%;
+            display: block;
+        }
+        .ranking_title{
+            padding: 0 24rpx;
+            height: 72rpx;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 72rpx;
+            font-size: 30rpx;
+            color: #3A3A3A;
+        }
+    }
+}
+</style>
