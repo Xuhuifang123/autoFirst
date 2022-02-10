@@ -17,7 +17,7 @@
   "author": "Xu <15116919113@163.com>",
   "license": "MIT",
   "dependencies": {
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-promise": "^0.5.3",
